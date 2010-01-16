@@ -68,6 +68,48 @@ class DataIteratorTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 	
+	public function testDifferentComparisonFilters() {
+		$test_age = 48;
+		$di_pristine = new DataIterator($this->data_list, $this->getMockDataObject());
+		
+		$di_equals = $di_pristine->filter('age == ?', $test_age)->fetch();
+		foreach ( $di_equals as $item ) {
+			$this->assertEquals($test_age, $item->getAge());
+		}
+		
+		$di_not_equal1 = $di_pristine->filter('age <> ?', $test_age)->fetch();
+		$di_not_equal2 = $di_pristine->filter('age != ?', $test_age)->fetch();
+		
+		foreach ( $di_not_equal1 as $item ) {
+			$this->assertTrue($test_age != $item->getAge());
+		}
+		
+		foreach ( $di_not_equal2 as $item ) {
+			$this->assertTrue($test_age != $item->getAge());
+		}
+		
+		$di_gt = $di_pristine->filter('age > ?', $test_age)->fetch();
+		$di_gte = $di_pristine->filter('age >= ?', $test_age)->fetch();
+		$di_lt = $di_pristine->filter('age < ?', $test_age)->fetch();
+		$di_lte = $di_pristine->filter('age <= ?', $test_age)->fetch();
+		
+		foreach ( $di_gt as $item ) {
+			$this->assertGreaterThan($test_age, $item->getAge());
+		}
+		
+		foreach ( $di_gte as $item ) {
+			$this->assertGreaterThanOrEqual($test_age, $item->getAge());
+		}
+		
+		foreach ( $di_lt as $item ) {
+			$this->assertLessThan($test_age, $item->getAge());
+		}
+		
+		foreach ( $di_lte as $item ) {
+			$this->assertLessThanOrEqual($test_age, $item->getAge());
+		}
+	}
+	
 	protected function getMockDataObject($name=NULL, $email=NULL, $age=18) {
 		$data_object = $this->getMockForAbstractClass('DataObject');
 		$data_object->setName($name);
