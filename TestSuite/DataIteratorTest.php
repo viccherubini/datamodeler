@@ -22,16 +22,12 @@ class DataIteratorTest extends PHPUnit_Framework_TestCase {
 			$this->getMockDataObject('Poor Fellow', 'poor@fellow.com', 48),
 		);
 	}
-	
+
+	/**
+	 * @expectedException PHPUnit_Framework_Error
+	 */
 	public function testIteratorMustBeArray() {
-		try {
-			$di = new DataIterator('abc', $this->getMockDataObject());
-		} catch ( Exception $e ) {
-			$this->assertNull($di);
-			return true;
-		}
-		
-		$this->fail();
+		$di = new DataIterator('foobar');
 	}
 	
 	public function testIteratorIsInitiallyAnEmptyArray() {
