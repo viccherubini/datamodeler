@@ -31,11 +31,13 @@ abstract class DataObject {
 			if ( 0 === $argc ) {
 				/* If the length is 0, assume this is a get() */
 				$v = $this->__get($k);
-				$this->method_cache[$method] = $v;
+				$this->method_cache[$k] = $v;
 				return $v;
 			} else {
 				/* Else assume its a set with the first element of $argv. */
-				$this->__set($k, current($argv));
+				$v = current($argv);
+				$this->__set($k, $v);
+				$this->method_cache[$k] = $v;
 				return $this;
 			}
 		}
