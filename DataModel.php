@@ -1,6 +1,7 @@
 <?php
 
 abstract class DataModel {
+	
 	protected $data_adapter = NULL;
 	
 	protected $pkey = NULL;
@@ -8,8 +9,10 @@ abstract class DataModel {
 	
 	const TABLE_ROOT = '';
 	
-	public function __construct(DataAdapterAbstract $data_adapter) {
-		$this->setDataAdapter($data_adapter)
+	public function __construct(DataAdapterAbstract $data_adapter=NULL) {
+		if ( false === is_null($data_adapter) ) {
+			$this->setDataAdapter($data_adapter);
+		}
 	}
 	
 	public function __destruct() {
@@ -37,7 +40,7 @@ abstract class DataModel {
 	
 	
 	
-	public function getDataAdapter {
+	public function getDataAdapter() {
 		return $this->data_adapter;
 	}
 	
@@ -76,14 +79,14 @@ abstract class DataModel {
 			$object->setDateCreate(time());
 		}
 		
-		$this->adapter->insert()
+		$this->getDataAdapter()->insert()
 			->into($this->getTable())
 			->values($object->get())
 			->query();
 
 		$id = 0;
-		if ( 1 == $this->adapter->affectedRows() ) {
-			$id = $this->adapter->insertId();
+		if ( 1 == $this->getDataAdapter()->affectedRows() ) {
+			$id = $this->getDataAdapter()->insertId();
 		}
 		
 		return $id;
@@ -95,7 +98,7 @@ abstract class DataModel {
 			$object->setDateModify(time());
 		}
 		
-		$this->adapter->update()
+		$this->getDataAdapter()->update()
 			->table($this->getTable())
 			->set($object->get())
 			->where($this->getPkey() . ' = ?', $object->getId())
@@ -106,8 +109,8 @@ abstract class DataModel {
 	}
 	
 	protected function hasDataAdapter() {
-		if ( NULL === $this->data_adapter ) {
-			throw new Exception('No DataAdapter has been set. Please set one first.');
+		if ( NULL === $this->getDataAdapter() ) {
+			throw new DataObjectException('No DataAdapter has been set. Please set one first.');
 		}
 		return true;
 	}
@@ -118,4 +121,6 @@ abstract class DataModel {
 		$this->setTable(self::TABLE_ROOT . $class);
 		$this->setPkey($class . '_id');
 	}
+	
+	
 }
