@@ -48,35 +48,24 @@ class DataIteratorTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testFetchWithSingleFilter() {
-		$mock = $this->getMockDataObject();
 		$first = reset($this->data_list);
-		$di1 = new DataIterator($this->data_list, $mock);
-		$di2 = new DataIterator(array($first), $mock);
 		
-		$di3 = $di1->filter('name = ?', $first->getName())->fetch();
+		$di = new DataIterator($this->data_list, $this->getMockDataObject());
+		$di = $di->filter('name = ?', $first->getName())->fetch();
 		
-		$this->assertEquals($di2, $di3);
-		$this->assertEquals($di2->length(), $di3->length());
+		foreach ( $di as $item ) {
+			$this->assertEquals($first->getName(), $item->getName());
+		}
 	}
 	
 	public function testFetchWithMultipleFilters() {
-		$mock = $this->getMockDataObject();
+		$di = new DataIterator($this->data_list, $this->getMockDataObject());
+		$di = $di->filter('favorite_number = ?', 10)->filter('age = ?', 48)->fetch();
 		
-		/* Not sure if this is the best way to do things. */
-		$manually_found_result_list = array();
-		foreach ( $this->data_list as $list_item ) {
-			if ( 10 == $list_item->getFavoriteNumber() && 48 == $list_item->getAge() ) {
-				$manually_found_result_list[] = $list_item;
-			}
+		foreach ( $di as $item ) {
+			$this->assertEquals(10, $item->getFavoriteNumber());
+			$this->assertEquals(48, $item->getAge());
 		}
-		
-		$di1 = new DataIterator($this->data_list, $mock);
-		$di2 = new DataIterator($manually_found_result_list, $mock);
-		
-		$di3 = $di1->filter('favorite_number = ?', 10)->filter('age = ?', 48)->fetch();
-		
-		$this->assertEquals($di2, $di3);
-		$this->assertEquals($di2->length(), $di3->length());
 	}
 	
 	protected function getMockDataObject($name=NULL, $email=NULL, $age=18) {
