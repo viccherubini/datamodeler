@@ -1,9 +1,6 @@
 <?php
 
-
 require_once 'PHPUnit/Framework.php';
-
-set_include_path('.:..');
 require_once 'DataObject.php';
 
 class DataObjectConcrete extends DataObject {
