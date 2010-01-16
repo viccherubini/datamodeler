@@ -75,7 +75,7 @@ abstract class DataModel {
 		}
 		
 		$this->adapter->insert()
-			->into($object->getTable())
+			->into($this->getTable())
 			->values($object->get())
 			->query();
 
@@ -94,9 +94,9 @@ abstract class DataModel {
 		}
 		
 		$this->adapter->update()
-			->table($object->getTable())
+			->table($this->getTable())
 			->set($object->get())
-			->where($object->getPkey() . ' = ?', $object->getId())
+			->where($this->getPkey() . ' = ?', $object->getId())
 			->query();
 		
 		$id = $object->getId();
@@ -113,7 +113,7 @@ abstract class DataModel {
 	protected function init(DataObject $object) {
 		$class = strtolower(get_class($object));
 		
-		//$this->setTable(self::TABLE_ROOT . $class);
-		//$this->setPkey($class . '_id');
+		$this->setTable(self::TABLE_ROOT . $class);
+		$this->setPkey($class . '_id');
 	}
 }
