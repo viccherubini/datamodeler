@@ -2,13 +2,9 @@
 
 abstract class DataObject {
 	protected $id = 0;
-	protected $pkey = NULL;
-	protected $table = NULL;
 	protected $model = array();
 	protected $method_cache = array();
 	protected $has_date = true;
-	
-	const TABLE_ROOT = '';
 	
 	public function __construct() {
 		$this->init();
