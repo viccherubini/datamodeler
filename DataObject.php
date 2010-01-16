@@ -6,6 +6,7 @@ abstract class DataObject {
 	protected $table = NULL;
 	protected $model = array();
 	protected $method_cache = array();
+	protected $has_date = true;
 	
 	const TABLE_ROOT = '';
 	
@@ -65,40 +66,26 @@ abstract class DataObject {
 		return $this->id;
 	}
 	
-	public function getPkey() {
-		return $this->pkey;
+	public function getHasDate() {
+		return $this->has_date;
 	}
-	
-	public function getTable() {
-		return $this->table;
-	}
-	
 	
 	/**
 	 * SETTERS
 	 */
 	
-	public function setPkey($pkey) {
-		$this->pkey = $pkey;
+	public function setId($id) {
+		$this->id = $id;
 		return $this;
 	}
-	
-	public function setTable($table) {
-		$this->table = $table;
-		return $this;
-	}
-	
 	
 	/**
 	 * CLASS MODIFIERS
 	 */
 	
 	public function init() {
-		$class = strtolower(get_class($this));
 		$this->id = 0;
 		$this->model = array();
 		$this->method_cache = array();
-		$this->setTable(self::TABLE_ROOT . $class);
-		$this->setPkey($class . '_id');
 	}
 }
