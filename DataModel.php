@@ -1,15 +1,15 @@
 <?php
 
 abstract class DataModel {
-	protected $adapter = NULL;
+	protected $data_adapter = NULL;
 	
 	protected $pkey = NULL;
 	protected $table = NULL;
 	
 	const TABLE_ROOT = '';
 	
-	public function __construct(DataAdapter $adapter) {
-		
+	public function __construct(DataAdapterAbstract $data_adapter) {
+		$this->setDataAdapter($data_adapter)
 	}
 	
 	public function __destruct() {
@@ -29,14 +29,17 @@ abstract class DataModel {
 		return $this;
 	}
 	
-	public function setDataAdapter(DataAdapter $adapter) {
-		$this->adapter = $adapter;
+	public function setDataAdapter(DataAdapterAbstract $data_adapter) {
+		$this->data_adapter = $data_adapter;
 		return $this;
 	}
 	
 	
 	
 	
+	public function getDataAdapter {
+		return $this->data_adapter;
+	}
 	
 	public function getPkey() {
 		return $this->pkey;
@@ -45,7 +48,6 @@ abstract class DataModel {
 	public function getTable() {
 		return $this->table;
 	}
-	
 	
 	
 	
@@ -104,7 +106,7 @@ abstract class DataModel {
 	}
 	
 	protected function hasDataAdapter() {
-		if ( NULL === $this->adapter ) {
+		if ( NULL === $this->data_adapter ) {
 			throw new Exception('No DataAdapter has been set. Please set one first.');
 		}
 		return true;
