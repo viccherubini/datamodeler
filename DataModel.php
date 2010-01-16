@@ -110,7 +110,7 @@ abstract class DataModel {
 	
 	protected function hasDataAdapter() {
 		if ( NULL === $this->getDataAdapter() ) {
-			throw new DataObjectException('No DataAdapter has been set. Please set one first.');
+			throw new DataModelerException('No DataAdapter has been set. Please set one first.');
 		}
 		return true;
 	}

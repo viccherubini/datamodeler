@@ -1,6 +1,6 @@
 <?php
 
-require_once 'DataObjectException.php';
+require_once 'DataModelerException.php';
 
 require_once 'DataObject.php';
 require_once 'DataModel.php';
@@ -21,6 +21,6 @@ try {
 	$product_model = new ProductModel();
 
 	$product_model->save($product);
-} catch ( DataObjectException $e ) {
+} catch ( DataModelerException $e ) {
 	exit($e . PHP_EOL);
 }
