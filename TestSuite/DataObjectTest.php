@@ -1,7 +1,10 @@
 <?php
 
+
 require_once 'PHPUnit/Framework.php';
-require_once '../DataObject.php';
+
+set_include_path('.:..');
+require_once 'DataObject.php';
 
 class DataObjectConcrete extends DataObject {
 	protected $special_type = NULL;
