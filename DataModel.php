@@ -65,9 +65,9 @@ abstract class DataModel {
 		
 		$id = $object->getId();
 		if ( $id > 0 ) {
-			$id = $this->insert($object);
-		} else {
 			$id = $this->update($object);
+		} else {
+			$id = $this->insert($object);
 		}
 		
 		return $id;
