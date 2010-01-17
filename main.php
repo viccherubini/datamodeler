@@ -6,6 +6,7 @@ require_once 'DataObject.php';
 require_once 'DataModel.php';
 require_once 'DataIterator.php';
 require_once 'DataAdapterPdo.php';
+require_once 'DataAdapterPdoMysql.php';
 
 class ProductObject extends DataObject {
 	
@@ -16,18 +17,17 @@ class ProductModel extends DataModel {
 }
 
 try {
-	$db_config = array(
-		'server' => 'localhost',
-		'username' => 'root',
-		'password' => 'dba89da',
-		'database' => 'ioncart'
-	);
 	
-	$data_adapter = new DataAdapterPdo($db_config);
-	$data_adapter->setDriver(DataAdapterPdo::DRIVER_MYSQL)->connect();
+
+	$data_adapter = new DataAdapterPdoMysql(DataAdapterPdo::DRIVER_MYSQL, 'localhost', 'data_modeler', 'root', 'dba89da');
+	$data_adapter->connect();
+	$data_adapter->query('INSERT INTO `product` (date_create, date_modify, name, price) VALUES(?, ?, ?, ?)', array(time(), 0, "Jon's O'Reilly Honda", 1595));
 	
-	$product = new ProductObject();
-	$product_model = new ProductModel($data_adapter);
+	echo $data_adapter->insertId();
+	
+	//$data_adapter->setDriver(DataAdapterPdo::DRIVER_MYSQL)->connect();
+	//$product = new ProductObject();
+	//$product_model = new ProductModel($data_adapter);
 
 
 } catch ( DataModelerException $e ) {

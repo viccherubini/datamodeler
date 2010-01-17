@@ -58,6 +58,9 @@ abstract class DataModel {
 	
 	public function load(DataObject $object, $pkey) {
 		$this->hasDataAdapter();
+		
+		//$sql = "SELECT * FROM `" . $this->getTable() . "` WHERE {$pkey} 
+		
 	}
 	
 	public function save(DataObject $object) {
