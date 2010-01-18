@@ -2,6 +2,9 @@
 
 
 abstract class DataAdapterPdo {
+	private $connection = NULL;
+	private $connected = false;
+	
 	private $param_list = array();
 	private $driver = NULL;
 	
@@ -29,9 +32,8 @@ abstract class DataAdapterPdo {
 	}
 
 	public function __destruct() {
-		
+		unset($this->connection);
 	}
-
 
 	public function setConnection($connection) {
 		$this->connection = $connection;
