@@ -9,7 +9,7 @@ abstract class DataModel {
 	
 	const TABLE_ROOT = '';
 	
-	public function __construct(DataAdapterAbstract $data_adapter=NULL) {
+	public function __construct(DataAdapterPdo $data_adapter=NULL) {
 		if ( false === is_null($data_adapter) ) {
 			$this->setDataAdapter($data_adapter);
 		}
@@ -32,7 +32,7 @@ abstract class DataModel {
 		return $this;
 	}
 	
-	public function setDataAdapter(DataAdapterAbstract $data_adapter) {
+	public function setDataAdapter(DataAdapterPdo $data_adapter) {
 		$this->data_adapter = $data_adapter;
 		return $this;
 	}
@@ -59,12 +59,14 @@ abstract class DataModel {
 	public function load(DataObject $object, $pkey) {
 		$this->hasDataAdapter();
 		
-		//$sql = "SELECT * FROM `" . $this->getTable() . "` WHERE {$pkey} 
+		
 		
 	}
 	
 	public function save(DataObject $object) {
 		$this->hasDataAdapter();
+		
+		$this->init($object);
 		
 		$id = $object->getId();
 		if ( $id > 0 ) {
@@ -82,10 +84,15 @@ abstract class DataModel {
 			$object->setDateCreate(time());
 		}
 		
-		$this->getDataAdapter()->insert()
-			->into($this->getTable())
-			->values($object->get())
-			->query();
+		$table = $this->getTable();
+		$data = $object->get();
+		$data_length = count($data);
+		
+		$field_list = implode('`, `', array_keys($data));
+		$value_list = implode(', ', array_fill(0, $data_length, '?'));
+		
+		$sql = "INSERT INTO `" . $table . "` (`" . $field_list . "`) VALUES(" . $value_list . ")";
+		$this->getDataAdapter()->query($sql, array_values($data));
 
 		$id = 0;
 		if ( 1 == $this->getDataAdapter()->affectedRows() ) {
@@ -119,7 +126,7 @@ abstract class DataModel {
 	}
 	
 	protected function init(DataObject $object) {
-		$class = strtolower(get_class($object));
+		$class = strtolower(get_parent_class($object));
 		
 		$this->setTable(self::TABLE_ROOT . $class);
 		$this->setPkey($class . '_id');
