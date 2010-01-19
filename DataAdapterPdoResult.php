@@ -21,7 +21,7 @@ class DataAdapterPdoResult {
 	}
 	
 	public function getRowCount() {
-		return $this->getResult()->rowCount();
+		return intval($this->getResult()->rowCount());
 	}
 
 	public function fetch($field=NULL) {

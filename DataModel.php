@@ -9,10 +9,12 @@ abstract class DataModel {
 	
 	const TABLE_ROOT = '';
 	
-	public function __construct(DataAdapterPdo $data_adapter=NULL) {
+	public function __construct(DataAdapterPdo $data_adapter=NULL, $table=NULL) {
 		if ( false === is_null($data_adapter) ) {
 			$this->setDataAdapter($data_adapter);
 		}
+		
+		$this->setTable($table);
 	}
 	
 	public function __destruct() {
@@ -29,6 +31,7 @@ abstract class DataModel {
 	
 	public function setTable($table) {
 		$this->table = $table;
+		$this->setPkey($table . '_id');
 		return $this;
 	}
 	
@@ -56,17 +59,29 @@ abstract class DataModel {
 	
 	
 	
-	public function load(DataObject $object, $pkey) {
+	public function load(DataObject &$object, $pkey_value) {
 		$this->hasDataAdapter();
 		
+		$table = $this->getTable();
+		$pkey = $this->getPkey();
+		$sql = "SELECT * FROM `" . $table . "` WHERE `" . $pkey . "` = ?";
+		$result = $this->getDataAdapter()->query($sql, array($pkey_value));
+		if ( 1 === $result->getRowCount() ) {
+			$data = $result->fetch();
+
+			if ( true === isset($data[$pkey]) ) {
+				$id = $data[$pkey];
+				unset($data[$pkey]);
+			}
+			
+			$object->setId($id)->setObjectData($data);
+		}
 		
-		
+		return $object;
 	}
 	
 	public function save(DataObject $object) {
 		$this->hasDataAdapter();
-		
-		$this->init($object);
 		
 		$id = $object->getId();
 		if ( $id > 0 ) {
@@ -84,18 +99,22 @@ abstract class DataModel {
 			$object->setDateCreate(time());
 		}
 		
-		$table = $this->getTable();
-		$data = $object->get();
+		$table       = $this->getTable();
+		$data        = $object->get();
+		$pkey        = $object->getPkey();
 		$data_length = count($data);
+		$field_list  = implode('`, `', array_keys($data));
+		$value_list  = implode(', ', array_fill(0, $data_length, '?'));
 		
-		$field_list = implode('`, `', array_keys($data));
-		$value_list = implode(', ', array_fill(0, $data_length, '?'));
+		if ( true === isset($data[$pkey]) ) {
+			unset($data[$pkey]);
+		}
 		
-		$sql = "INSERT INTO `" . $table . "` (`" . $field_list . "`) VALUES(" . $value_list . ")";
-		$this->getDataAdapter()->query($sql, array_values($data));
+		$sql    = "INSERT INTO `" . $table . "` (`" . $field_list . "`) VALUES(" . $value_list . ")";
+		$result = $this->getDataAdapter()->query($sql, array_values($data));
 
 		$id = 0;
-		if ( 1 == $this->getDataAdapter()->affectedRows() ) {
+		if ( 1 === $result->getRowCount() ) {
 			$id = $this->getDataAdapter()->insertId();
 		}
 		
@@ -108,13 +127,28 @@ abstract class DataModel {
 			$object->setDateModify(time());
 		}
 		
-		$this->getDataAdapter()->update()
-			->table($this->getTable())
-			->set($object->get())
-			->where($this->getPkey() . ' = ?', $object->getId())
-			->query();
+		$i          = 1;
+		$field_list = NULL;
+		$id         = $object->getId();
+		$data       = $object->get();
+		$table      = $this->getTable();
+		$pkey       = $this->getPkey();
+		$length     = count($data);
+		foreach ( $data as $field => $value ) {
+			$field_list .= "`" . $field . "` = ?";
+			if ( $i++ != $length ) {
+				$field_list .= ', ';
+			}
+		}
 		
-		$id = $object->getId();
+		$sql = "UPDATE `" . $table . "` SET " . $field_list . " WHERE `" . $pkey . "` = '" . $id . "'";
+		$result = $this->getDataAdapter()->query($sql, array_values($data));
+		
+		$id = 0;
+		if ( 1 === $result->getRowCount() ) {
+			$id = $object->getId();
+		}
+		
 		return $id;
 	}
 	
@@ -124,13 +158,5 @@ abstract class DataModel {
 		}
 		return true;
 	}
-	
-	protected function init(DataObject $object) {
-		$class = strtolower(get_parent_class($object));
-		
-		$this->setTable(self::TABLE_ROOT . $class);
-		$this->setPkey($class . '_id');
-	}
-	
-	
+
 }

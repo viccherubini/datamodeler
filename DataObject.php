@@ -77,6 +77,11 @@ abstract class DataObject {
 		return $this;
 	}
 	
+	public function setObjectData(array $model) {
+		$this->model = $model;
+		return $this;
+	}
+	
 	/**
 	 * CLASS MODIFIERS
 	 */

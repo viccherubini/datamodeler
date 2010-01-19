@@ -26,15 +26,15 @@ try {
 	//	print_r($row);
 	//}
 	
-	
-	
-	//$data_adapter->setDriver(DataAdapterPdo::DRIVER_MYSQL)->connect();
 	$product = new ProductObject();
-	$product_model = new ProductModel($data_adapter);
+	$product_model = new ProductModel($data_adapter, 'product');
 
-
-	$product->setName('new product')->setPrice(1895);
+	$product_model->load($product, 3);
+	$product->setName('changed name');
 	$product_model->save($product);
+	
+	//$product->setName('new product')->setPrice(1895);
+	//$product_model->save($product);
 
 } catch ( DataModelerException $e ) {
 	exit($e . PHP_EOL);
