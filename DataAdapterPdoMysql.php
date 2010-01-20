@@ -5,8 +5,6 @@ require_once 'DataAdapterPdoResult.php';
 
 class DataAdapterPdoMysql extends DataAdapterPdo {
 	public function connect() {
-		$this->hasDriver();
-		
 		$this->setConnected(false);
 		
 		$param_list = $this->getParamList();
