@@ -6,7 +6,6 @@ abstract class DataAdapterPdo {
 	private $connected = false;
 	
 	private $param_list = array();
-	private $driver = NULL;
 	
 	private $server = NULL;
 	private $database = NULL;
@@ -21,8 +20,7 @@ abstract class DataAdapterPdo {
 	const DRIVER_PGSQL = 'pgsql';
 	const DRIVER_ODBC = 'odbc';
 
-	public function __construct($driver, $server=NULL, $database=NULL, $username=NULL, $password=NULL, $port=0, array $param_list=array()) {
-		$this->setDriver($driver);
+	public function __construct($server=NULL, $database=NULL, $username=NULL, $password=NULL, $port=0, array $param_list=array()) {
 		$this->setServer($server);
 		$this->setDatabase($database);
 		$this->setUsername($username);
@@ -48,15 +46,6 @@ abstract class DataAdapterPdo {
 		return $this;
 	}
 	
-	public function setDriver($driver) {
-		if ( false === in_array($driver, array(self::DRIVER_MYSQL, self::DRIVER_SQLITE, self::DRIVER_PGSQL)) ) {
-			$driver = self::DRIVER_MYSQL;
-		}
-		
-		$this->driver = $driver;
-		return $this;
-	}
-
 	public function setServer($server) {
 		$this->server = $server;
 		return $this;
@@ -155,11 +144,4 @@ abstract class DataAdapterPdo {
 		return addslashes($value);
 	}
 	
-	protected function hasDriver() {
-		$driver = $this->getDriver();
-		if ( true === empty($driver) ) {
-			throw new DataModelerException('No driver was specified, PDO can not be used until a driver is specified.');
-		}
-		return true;
-	}
 }
