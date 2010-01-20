@@ -30,7 +30,7 @@ try {
 
 	$data_relationship = new DataRelationship($product_model);
 	
-	$iterator = $data_relationship->where('product_id = ?', 3)->where('name <> ?', 'some new name')->find($product);
+	$iterator = $data_relationship->where('product_id <> ?', 3)->find($product);
 
 	foreach ( $iterator as $obj ) {
 		print_r($obj);
