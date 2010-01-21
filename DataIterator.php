@@ -125,11 +125,12 @@ class DataIterator implements Iterator {
 			$field = $filter[0];
 			$value = $filter[1];
 
-			/* Get the operator cheaply. */
-			$op_bits = explode(' ', $field);
+			/* Now $field can look like 'field > ?' or 'field=?', or 'field     <>    ?' */
+			$op_bits = array();
+			$found_match = preg_match('/([a-z0-9-_.]*)[ ]*([=,==,>,>=,<,<=,!=,<>]{1,2})[ ]*([?]{1})/i', $field, $op_bits);
 			
-			$field = trim($op_bits[0]);
-			$op = trim($op_bits[1]);
+			$field = trim($op_bits[1]);
+			$op = trim($op_bits[2]);
 			
 			if ( true == isset($data_array[$field]) ) {
 				switch ( $op ) {

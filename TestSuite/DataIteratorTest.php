@@ -53,6 +53,8 @@ class DataIteratorTest extends PHPUnit_Framework_TestCase {
 		$di = new DataIterator($this->data_list, $this->getMockDataObject());
 		$di = $di->filter('name = ?', $first->getName())->fetch();
 		
+		$this->assertEquals($di->length(), 1);
+		
 		foreach ( $di as $item ) {
 			$this->assertEquals($first->getName(), $item->getName());
 		}
@@ -62,6 +64,8 @@ class DataIteratorTest extends PHPUnit_Framework_TestCase {
 		$di = new DataIterator($this->data_list, $this->getMockDataObject());
 		$di = $di->filter('favorite_number = ?', 10)->filter('age = ?', 48)->fetch();
 		
+		$this->assertLessThan($di->length(), 0);
+		
 		foreach ( $di as $item ) {
 			$this->assertEquals(10, $item->getFavoriteNumber());
 			$this->assertEquals(48, $item->getAge());
@@ -69,16 +73,24 @@ class DataIteratorTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testDifferentComparisonFilters() {
+		/* Each of these should return 1 or more items, so we need to check the length of them all too. */
+		
 		$test_age = 48;
 		$di_pristine = new DataIterator($this->data_list, $this->getMockDataObject());
 		
 		$di_equals = $di_pristine->filter('age == ?', $test_age)->fetch();
+		
+		$this->assertLessThan($di_equals->length(), 0);
+		
 		foreach ( $di_equals as $item ) {
 			$this->assertEquals($test_age, $item->getAge());
 		}
 		
-		$di_not_equal1 = $di_pristine->filter('age <> ?', $test_age)->fetch();
-		$di_not_equal2 = $di_pristine->filter('age != ?', $test_age)->fetch();
+		$di_not_equal1 = $di_pristine->filter('age   <>  ?', $test_age)->fetch();
+		$di_not_equal2 = $di_pristine->filter('age!=?', $test_age)->fetch();
+		
+		$this->assertLessThan($di_not_equal1->length(), 0);
+		$this->assertLessThan($di_not_equal2->length(), 0);
 		
 		foreach ( $di_not_equal1 as $item ) {
 			$this->assertTrue($test_age != $item->getAge());
@@ -88,10 +100,15 @@ class DataIteratorTest extends PHPUnit_Framework_TestCase {
 			$this->assertTrue($test_age != $item->getAge());
 		}
 		
-		$di_gt = $di_pristine->filter('age > ?', $test_age)->fetch();
+		$di_gt = $di_pristine->filter('age>?', $test_age)->fetch();
 		$di_gte = $di_pristine->filter('age >= ?', $test_age)->fetch();
 		$di_lt = $di_pristine->filter('age < ?', $test_age)->fetch();
-		$di_lte = $di_pristine->filter('age <= ?', $test_age)->fetch();
+		$di_lte = $di_pristine->filter('age<=     ?', $test_age)->fetch();
+		
+		$this->assertLessThan($di_gt->length(), 0);
+		$this->assertLessThan($di_gte->length(), 0);
+		$this->assertLessThan($di_lt->length(), 0);
+		$this->assertLessThan($di_lte->length(), 0);
 		
 		foreach ( $di_gt as $item ) {
 			$this->assertGreaterThan($test_age, $item->getAge());
