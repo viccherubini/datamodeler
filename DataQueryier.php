@@ -2,7 +2,11 @@
 
 require_once 'DataIterator.php';
 
-class DataSearcher {
+/**
+ * Query data from the database and return a single element or 
+ * a DataIterator of all matched elements.
+ */
+class DataQueryier {
 	private $data_model = NULL;
 	private $field_list = array();
 	private $where_list = array();
@@ -61,21 +65,19 @@ class DataSearcher {
 		return $this;
 	}
 	
-	public function findSingle(DataObject $object) {
+	public function findFirst(DataObject $object) {
+		$result_single = $this->executeQuery();
+		$data = (array)$result_single->fetch();
 		
+		$object->set($data);
+		return $object;
 	}
 	
 	public function find(DataObject $object) {
-		$sql = $this->buildQuery();
-		
-		$where_list = $this->getWhereList();
-		$result = $this->getDataModel()
-			->getDataAdapter()
-			->query($sql, array_values($where_list));
-		
+		$result_all = $this->executeQuery();
 		$result_list = array();
-		if ( $result->getRowCount() > 0 ) {
-			$result_list = $result->fetchAll();
+		if ( $result_all->getRowCount() > 0 ) {
+			$result_list = $result_all->fetchAll();
 		}
 		
 		return (new DataIterator($result_list, $object));
@@ -108,5 +110,16 @@ class DataSearcher {
 		}
 		
 		return $sql;
+	}
+	
+	private function executeQuery() {
+		$sql = $this->buildQuery();
+		
+		$where_list = $this->getWhereList();
+		$result = $this->getDataModel()
+			->getDataAdapter()
+			->query($sql, array_values($where_list));
+			
+		return $result;
 	}
 }
