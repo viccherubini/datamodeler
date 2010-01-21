@@ -1,7 +1,8 @@
 <?php
 
-require_once 'DataIterator.php';
-
+/**
+ * Build a relationship between several models.
+ */
 class DataRelationship {
 	
 }
