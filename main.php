@@ -19,21 +19,20 @@ class ProductModel extends DataModel {
 }
 
 try {
-	
 
-	$data_adapter = new DataAdapterPdoMysql('localhost', 'data_modeler', 'root', 'dba89da');
+	$data_adapter = new DataAdapterPdoMysql('localhost', 'data_modeler', 'vmc', '');
 	$data_adapter->connect();
 	
 	$product = new ProductObject();
 	$product_model = new ProductModel($data_adapter);
 
-
 	$data_queryier = new DataQueryier($product_model);
-	
-	$iterator = $data_queryier->where('product_id <> ?', 3)->find($product);
+	$iterator = $data_queryier->where('product_id = ?', 3)->find($product);
 
-	$obj = $iterator->current();
-	
+	foreach ( $iterator as $obj ) {
+		$obj->setName(substr(md5(time()), 0, 8));
+		$product_model->save($obj);
+	}
 	
 
 } catch ( DataModelerException $e ) {

@@ -169,6 +169,7 @@ abstract class DataModel {
 	
 	
 	private function findObjectPkey(DataObject $object) {
+		$pkey = $this->getPkey();
 		$data = $object->get();
 		if ( true === isset($data[$pkey]) ) {
 			$id = $data[$pkey];
