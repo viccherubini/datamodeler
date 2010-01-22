@@ -4,7 +4,14 @@ require_once 'DataIterator.php';
 
 /**
  * Query data from the database and return a single element or 
- * a DataIterator of all matched elements.
+ * a DataIterator of all matched elements. This will return
+ * a single DataObject object or a DataIterator object.
+ * @author vmc <vmc@leftnode.com>
+ * @code
+ * $queryier = new DataQueryier($model);
+ * $dataobj  = $queryier->where('id > ?', $id)->where('name <> ?', $name)->findFirst();
+ * $dataiter = $queryier->where('id > ?', $id)->where('name <> ?', $name)->find();
+ * @endcode
  */
 class DataQueryier {
 	private $data_model = NULL;
@@ -78,6 +85,11 @@ class DataQueryier {
 		$result_list = array();
 		if ( $result_all->getRowCount() > 0 ) {
 			$result_list = $result_all->fetchAll();
+			
+			$length = count($result_list);
+			for ( $i=0; $i<$length; $i++ ) {
+				$result_list[$i] = clone $object->set($result_list[$i]);
+			}
 		}
 		
 		return (new DataIterator($result_list, $object));
