@@ -32,9 +32,9 @@ try {
 	
 	$iterator = $data_queryier->where('product_id <> ?', 3)->find($product);
 
-	//foreach ( $iterator as $obj ) {
-	//	print_r($obj);
-	//}
+	$obj = $iterator->current();
+	
+	
 
 } catch ( DataModelerException $e ) {
 	exit($e . PHP_EOL);

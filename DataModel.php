@@ -55,30 +55,38 @@ abstract class DataModel {
 	
 	
 	
-	public function load(DataObject &$object, $pkey_value) {
+	public function load(DataObject $object, $pkey_value=NULL) {
 		$this->hasDataAdapter();
 		
-		$table  = $this->getTable();
-		$pkey   = $this->getPkey();
-		$sql    = "SELECT * FROM `" . $table . "` WHERE `" . $pkey . "` = ?";
-		$result = $this->getDataAdapter()->query($sql, array($pkey_value));
-		if ( 1 === $result->getRowCount() ) {
-			$data = $result->fetch();
-
-			if ( true === isset($data[$pkey]) ) {
-				$id = $data[$pkey];
-				unset($data[$pkey]);
+		$table = $this->getTable();
+		$pkey = $this->getPkey();
+		
+		/**
+		 * Attempt to load from data in the object. If there is data
+		 * and the pkey exists, use that, otherwise, attempt to load it from
+		 * the database.
+		 */
+		
+		$data = $object->get();
+		if ( false === isset($data[$pkey]) ) {
+			$sql = "SELECT * FROM `" . $table . "` WHERE `" . $pkey . "` = ?";
+			$result = $this->getDataAdapter()->query($sql, array($pkey_value));
+			if ( 1 === $result->getRowCount() ) {
+				$data = $result->fetch();
 			}
 			
-			$object->setId($id)->setObjectData($data);
+			$object->set($data);
 		}
+		
+		$object = $this->findObjectPkey($object);
 		
 		return $object;
 	}
-	
+
 	public function save(DataObject $object) {
 		$this->hasDataAdapter();
-		
+
+		$object = $this->findObjectPkey($object);
 		$id = $object->getId();
 		if ( $id > 0 ) {
 			$id = $this->update($object);
@@ -158,4 +166,16 @@ abstract class DataModel {
 
 
 	abstract protected function init();
+	
+	
+	private function findObjectPkey(DataObject $object) {
+		$data = $object->get();
+		if ( true === isset($data[$pkey]) ) {
+			$id = $data[$pkey];
+			unset($data[$pkey]);
+		}
+		
+		$object->setId($id)->set($data);
+		return $object;
+	}
 }
