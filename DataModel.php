@@ -7,7 +7,6 @@ abstract class DataModel {
 	protected $pkey = NULL;
 	protected $table = NULL;
 	
-	const TABLE_ROOT = '';
 	
 	public function __construct(DataAdapterPdo $data_adapter) {
 		$this->setDataAdapter($data_adapter);
