@@ -9,15 +9,10 @@ class DataIterator implements Iterator {
 	private $limit = -1;
 	private $page = 0;
 	
-	private $data_object = NULL;
-	
-	public function __construct(DataObject $data_object, array $data_list) {
+	public function __construct(array $data_list) {
 		$this->data_list = $data_list;
 		$this->key = 0;
 		$this->length = count($data_list);
-		
-		/* Reset the data_object so we always have a pristine one. */
-		$this->data_object = clone $data_object->init();
 	}
 	
 	public function __clone() {
@@ -27,10 +22,6 @@ class DataIterator implements Iterator {
 	
 	public function getList() {
 		return $this->data_list;
-	}
-	
-	public function getObject() {
-		return $this->data_object;
 	}
 	
 	public function rewind() {
@@ -89,7 +80,15 @@ class DataIterator implements Iterator {
 		if ( true === $this->hasFilter() ) {
 			$result_list = array();
 			foreach ( $this->data_list as $list_item ) {
-				if ( true === $this->applyFilter($list_item->model()) ) {
+				if ( true === $list_item instanceof DataObject ) {
+					$model = $list_item->model();
+				} elseif ( true === is_array($list_item) ) {
+					$model = $list_item;
+				} else {
+					$model = array();
+				}
+				
+				if ( true === $this->applyFilter($model) ) {
 					$result_list[] = $list_item;
 				}
 			}
@@ -98,7 +97,7 @@ class DataIterator implements Iterator {
 			$this->filter_count = 0;
 		}
 
-		return (new DataIterator($result_list, $this->getObject()));
+		return (new DataIterator($result_list));
 	}
 	
 	public function filter($field, $value) {
