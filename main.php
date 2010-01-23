@@ -6,7 +6,6 @@ require_once 'DataModelerException.php';
 
 require_once 'DataObject.php';
 require_once 'DataModel.php';
-require_once 'DataQueryier.php';
 require_once 'DataIterator.php';
 require_once 'DataAdapterPdoMysql.php';
 
@@ -22,11 +21,17 @@ try {
 	$product = new Product();
 	$model = new DataModel($db);
 	
-	//$product = $model->load($product, 1);
-	$product->setName('brand new product')->setPrice(1856)->setDateCreate(560500);
-	$id = $model->save($product);
+	//$product = $model->where('product_id = ?', 1)->loadFirst($product);
+	//echo $product->getName() . PHP_EOL;
 	
-	echo $id . PHP_EOL;
+	$iterator = $model->field('product_id', 'name', 'price')->where('product_id != ?', 4)->where('name != ?', 'Second Product')->orderBy('name DESC')->groupBy('name')->limit(2)->loadAll($product);
+	
+	if ( false ) {
+	foreach ( $iterator as $obj ) {
+		echo $obj->getName() . PHP_EOL;
+	}
+	}
+	
 } catch ( DataModelerException $e ) {
 	exit($e . PHP_EOL);
 }
