@@ -71,22 +71,23 @@ class DataModel {
 		return $id;
 	}
 	
-	/*
+	
 	protected function insert(DataObject $object) {
 		$date_create = $object->getDateCreate();
-		if ( true === $object->getHasDate() && true === empty($date_create) ) {
+		if ( true === $object->hasDate() && true === empty($date_create) ) {
 			$object->setDateCreate(time());
 		}
 		
 		$table = $object->table();
 		$pkey = $object->pkey();
-		$data = $object->model();
-		$data_length = count($data);
-		$field_list = implode('`, `', array_keys($data));
-		$value_list = implode(', ', array_fill(0, $data_length, '?'));
+		$model = $object->model();
+		$model_length = count($model);
+		
+		$field_list = implode('`, `', array_keys($model));
+		$value_list = implode(', ', array_fill(0, $model_length, '?'));
 		
 		$sql = "INSERT INTO `" . $table . "` (`" . $field_list . "`) VALUES(" . $value_list . ")";
-		$result = $this->getDataAdapter()->query($sql, array_values($data));
+		$result = $this->getDataAdapter()->query($sql, array_values($model));
 
 		$id = 0;
 		if ( 1 === $result->getRowCount() ) {
@@ -98,36 +99,36 @@ class DataModel {
 	
 	protected function update(DataObject $object) {
 		$date_modify = $object->getDateModify();
-		if ( true === $object->getHasDate() && true === empty($date_modify) ) {
+		if ( true === $object->hasDate() && true === empty($date_modify) ) {
 			$object->setDateModify(time());
 		}
 		
 		$i = 1;
 		$field_list = NULL;
-		$id = $object->getId();
-		$data = $object->get();
-		$table = $this->getTable();
-		$pkey = $this->getPkey();
-		$length = count($data);
+		$id = $object->id();
+		$model = $object->model();
+		$model_length = count($model);
+		$table = $object->table();
+		$pkey = $object->pkey();
 		
-		foreach ( $data as $field => $value ) {
+		foreach ( $model as $field => $value ) {
 			$field_list .= "`" . $field . "` = ?";
-			if ( $i++ != $length ) {
+			if ( $i++ != $model_length ) {
 				$field_list .= ', ';
 			}
 		}
 		
 		$sql = "UPDATE `" . $table . "` SET " . $field_list . " WHERE `" . $pkey . "` = '" . $id . "'";
-		$result = $this->getDataAdapter()->query($sql, array_values($data));
+		$result = $this->getDataAdapter()->query($sql, array_values($model));
 		
 		$id = 0;
 		if ( 1 === $result->getRowCount() ) {
-			$id = $object->getId();
+			$id = $object->id();
 		}
 		
 		return $id;
 	}
-	*/
+
 	
 	protected function hasDataAdapter() {
 		if ( NULL === $this->getDataAdapter() ) {
