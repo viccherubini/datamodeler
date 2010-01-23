@@ -1,16 +1,11 @@
 <?php
 
-abstract class DataModel {
+class DataModel {
 	
 	protected $data_adapter = NULL;
 	
-	protected $pkey = NULL;
-	protected $table = NULL;
-	
-	
 	public function __construct(DataAdapterPdo $data_adapter) {
 		$this->setDataAdapter($data_adapter);
-		$this->init();
 	}
 	
 	public function __destruct() {
@@ -19,16 +14,6 @@ abstract class DataModel {
 	
 	
 	
-	
-	public function setPkey($pkey) {
-		$this->pkey = $pkey;
-		return $this;
-	}
-	
-	public function setTable($table) {
-		$this->table = $table;
-		return $this;
-	}
 	
 	public function setDataAdapter(DataAdapterPdo $data_adapter) {
 		$this->data_adapter = $data_adapter;
@@ -42,13 +27,6 @@ abstract class DataModel {
 		return $this->data_adapter;
 	}
 	
-	public function getPkey() {
-		return $this->pkey;
-	}
-	
-	public function getTable() {
-		return $this->table;
-	}
 	
 	
 	
@@ -57,8 +35,8 @@ abstract class DataModel {
 	public function load(DataObject $object, $pkey_value=NULL) {
 		$this->hasDataAdapter();
 		
-		$table = $this->getTable();
-		$pkey = $this->getPkey();
+		$table = $object->table();
+		$pkey = $object->pkey();
 		
 		/**
 		 * Attempt to load from data in the object. If there is data
@@ -66,7 +44,7 @@ abstract class DataModel {
 		 * the database.
 		 */
 		
-		$data = $object->get();
+		$data = $object->model();
 		if ( false === isset($data[$pkey]) ) {
 			$sql = "SELECT * FROM `" . $table . "` WHERE `" . $pkey . "` = ?";
 			$result = $this->getDataAdapter()->query($sql, array($pkey_value));
@@ -74,10 +52,8 @@ abstract class DataModel {
 				$data = $result->fetch();
 			}
 			
-			$object->set($data);
+			$object->model($data);
 		}
-		
-		$object = $this->findObjectPkey($object);
 		
 		return $object;
 	}
@@ -85,8 +61,7 @@ abstract class DataModel {
 	public function save(DataObject $object) {
 		$this->hasDataAdapter();
 
-		$object = $this->findObjectPkey($object);
-		$id = $object->getId();
+		$id = $object->id();
 		if ( $id > 0 ) {
 			$id = $this->update($object);
 		} else {
@@ -96,22 +71,19 @@ abstract class DataModel {
 		return $id;
 	}
 	
+	/*
 	protected function insert(DataObject $object) {
 		$date_create = $object->getDateCreate();
 		if ( true === $object->getHasDate() && true === empty($date_create) ) {
 			$object->setDateCreate(time());
 		}
 		
-		$table = $this->getTable();
-		$data = $object->get();
-		$pkey = $object->getPkey();
+		$table = $object->table();
+		$pkey = $object->pkey();
+		$data = $object->model();
 		$data_length = count($data);
 		$field_list = implode('`, `', array_keys($data));
 		$value_list = implode(', ', array_fill(0, $data_length, '?'));
-		
-		if ( true === isset($data[$pkey]) ) {
-			unset($data[$pkey]);
-		}
 		
 		$sql = "INSERT INTO `" . $table . "` (`" . $field_list . "`) VALUES(" . $value_list . ")";
 		$result = $this->getDataAdapter()->query($sql, array_values($data));
@@ -155,27 +127,12 @@ abstract class DataModel {
 		
 		return $id;
 	}
+	*/
 	
 	protected function hasDataAdapter() {
 		if ( NULL === $this->getDataAdapter() ) {
 			throw new DataModelerException('No DataAdapter has been set. Please set one first.');
 		}
 		return true;
-	}
-
-
-	abstract protected function init();
-	
-	
-	private function findObjectPkey(DataObject $object) {
-		$pkey = $this->getPkey();
-		$data = $object->get();
-		if ( true === isset($data[$pkey]) ) {
-			$id = $data[$pkey];
-			unset($data[$pkey]);
-		}
-		
-		$object->setId($id)->set($data);
-		return $object;
 	}
 }
