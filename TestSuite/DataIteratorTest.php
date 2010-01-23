@@ -31,26 +31,29 @@ class DataIteratorTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testIteratorIsInitiallyAnEmptyArray() {
-		$di = new DataIterator(array(), $this->getMockDataObject());
+		$di = new DataIterator(array());
 		$this->assertEquals($di->getList(), array());
+		$this->assertEquals($di->length(), 0);
 	}
 	
 	public function testIteratorLength() {
-		$di = new DataIterator($this->data_list, $this->getMockDataObject());
+		$di = new DataIterator($this->data_list);
 		$length = count($this->data_list);
 		$this->assertEquals($di->length(), $length);
 	}
 	
 	public function testFetchWithoutFilters() {
-		$di1 = new DataIterator($this->data_list, $this->getMockDataObject());
+		$di1 = new DataIterator($this->data_list);
 		$di2 = $di1->fetch();
+		
+		$this->assertEquals($di1->length(), $di2->length());
 		$this->assertEquals($di1, $di2);
 	}
 	
 	public function testFetchWithSingleFilter() {
 		$first = reset($this->data_list);
 		
-		$di = new DataIterator($this->data_list, $this->getMockDataObject());
+		$di = new DataIterator($this->data_list);
 		$di = $di->filter('name = ?', $first->getName())->fetch();
 		
 		$this->assertEquals($di->length(), 1);
@@ -61,7 +64,7 @@ class DataIteratorTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testFetchWithMultipleFilters() {
-		$di = new DataIterator($this->data_list, $this->getMockDataObject());
+		$di = new DataIterator($this->data_list);
 		$di = $di->filter('favorite_number = ?', 10)->filter('age = ?', 48)->fetch();
 		
 		$this->assertLessThan($di->length(), 0);
@@ -76,7 +79,7 @@ class DataIteratorTest extends PHPUnit_Framework_TestCase {
 		/* Each of these should return 1 or more items, so we need to check the length of them all too. */
 		
 		$test_age = 48;
-		$di_pristine = new DataIterator($this->data_list, $this->getMockDataObject());
+		$di_pristine = new DataIterator($this->data_list);
 		
 		$di_equals = $di_pristine->filter('age == ?', $test_age)->fetch();
 		
