@@ -11,11 +11,13 @@ class DataIterator implements Iterator {
 	
 	private $data_object = NULL;
 	
-	public function __construct(array $data_list, DataObject $data_object) {
+	public function __construct(DataObject $data_object, array $data_list) {
 		$this->data_list = $data_list;
 		$this->key = 0;
 		$this->length = count($data_list);
-		$this->data_object = $data_object;
+		
+		/* Reset the data_object so we always have a pristine one. */
+		$this->data_object = clone $data_object->init();
 	}
 	
 	public function __clone() {
@@ -87,7 +89,7 @@ class DataIterator implements Iterator {
 		if ( true === $this->hasFilter() ) {
 			$result_list = array();
 			foreach ( $this->data_list as $list_item ) {
-				if ( true === $this->applyFilter($list_item->get()) ) {
+				if ( true === $this->applyFilter($list_item->model()) ) {
 					$result_list[] = $list_item;
 				}
 			}
