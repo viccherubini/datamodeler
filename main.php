@@ -8,33 +8,18 @@ require_once 'DataQueryier.php';
 require_once 'DataIterator.php';
 require_once 'DataAdapterPdoMysql.php';
 
-class ProductObject extends DataObject {
+class Product extends DataObject {
 }
 
-class ProductModel extends DataModel {
-	protected function init() {
-		$this->setTable('product');
-		$this->setPkey('product_id');
-	}
-}
 
 try {
 
-	$data_adapter = new DataAdapterPdoMysql('localhost', 'data_modeler', 'vmc', '');
-	$data_adapter->connect();
+	$product = new Product();
+	$product->setName('here is the product name');
 	
-	$product = new ProductObject();
-	$product_model = new ProductModel($data_adapter);
-
-	$data_queryier = new DataQueryier($product_model);
-	$iterator = $data_queryier->where('product_id = ?', 3)->find($product);
-
-	foreach ( $iterator as $obj ) {
-		$obj->setName(substr(md5(time()), 0, 8));
-		$product_model->save($obj);
-	}
 	
-
+	
+	
 } catch ( DataModelerException $e ) {
 	exit($e . PHP_EOL);
 }
