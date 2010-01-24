@@ -33,7 +33,6 @@ abstract class DataObject {
 			if ( 0 === $argc ) {
 				/* If the length is 0, assume this is a get() */
 				$v = $this->__get($k);
-				$this->method_cache[$k] = $v;
 				return $v;
 			} else {
 				$v = current($argv);
@@ -45,7 +44,6 @@ abstract class DataObject {
 				} else {
 					/* Else assume its a set with the first element of $argv. */
 					$this->__set($k, $v);
-					$this->method_cache[$k] = $v;
 				}
 				
 				return $this;
@@ -55,11 +53,13 @@ abstract class DataObject {
 	
 	public function __set($k, $v) {
 		$this->model[$k] = $v;
+		$this->method_cache[$k] = $v;
 		return true;
 	}
 
 	public function __get($k) {
 		if ( true === isset($this->model[$k]) ) {
+			$this->method_cache[$k] = $v;
 			return $this->model[$k];
 		}
 		return NULL;

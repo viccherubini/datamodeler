@@ -10,17 +10,7 @@ class DataModel {
 	private $orderby_field = NULL;
 	private $orderby_order = NULL;
 	
-	/**
-	 * LOAD_FIRST will return a DataObject regardless of how many rows are found.
-	 */
-	const LOAD_FIRST = 4;
-	
-	/**
-	 * LOAD_ALL will return an iterator regardless of how many rows are found.
-	 */
-	const LOAD_ALL = 8;
-	
-	
+
 	public function __construct(DataAdapterPdo $data_adapter) {
 		$this->setDataAdapter($data_adapter);
 	}
@@ -218,7 +208,7 @@ class DataModel {
 	}
 	
 	
-	protected function insert(DataObject $object) {
+	private function insert(DataObject $object) {
 		$date_create = $object->getDateCreate();
 		if ( true === $object->hasDate() && true === empty($date_create) ) {
 			$object->setDateCreate(time());
@@ -245,7 +235,7 @@ class DataModel {
 	
 	
 	
-	protected function update(DataObject $object) {
+	private function update(DataObject $object) {
 		$date_modify = $object->getDateModify();
 		if ( true === $object->hasDate() && true === empty($date_modify) ) {
 			$object->setDateModify(time());
