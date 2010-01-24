@@ -24,9 +24,9 @@ try {
 	//$product = $model->where('product_id = ?', 1)->loadFirst($product);
 	//echo $product->getName() . PHP_EOL;
 	
-	$iterator = $model->field('product_id', 'name', 'price')->where('product_id != ?', 4)->where('name != ?', 'Second Product')->orderBy('name DESC')->groupBy('name')->limit(2)->loadAll($product);
+	$iterator = $model->field('product_id', 'name', 'price')->where('product_id != ?', 4)->where('name != ?', 'Second Product')->orderBy('name', 'DESC')->groupBy('name')->limit(2)->loadAll($product);
 	
-	if ( false ) {
+	if ( true ) {
 	foreach ( $iterator as $obj ) {
 		echo $obj->getName() . PHP_EOL;
 	}

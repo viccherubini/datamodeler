@@ -7,7 +7,8 @@ class DataModel {
 	private $where_list = array();
 	private $groupby_list = array();
 	private $limit = -1;
-	private $orderby = NULL;
+	private $orderby_field = NULL;
+	private $orderby_order = NULL;
 	
 	/**
 	 * LOAD_FIRST will return a DataObject regardless of how many rows are found.
@@ -57,8 +58,13 @@ class DataModel {
 		return $this;
 	}
 	
-	public function setOrderBy($orderby) {
-		$this->orderby = $orderby;
+	public function setOrderByField($orderby_field) {
+		$this->orderby_field = $orderby_field;
+		return $this;
+	}
+	
+	public function setOrderByOrder($orderby_order) {
+		$this->orderby_order = $orderby_order;
 		return $this;
 	}
 	
@@ -89,18 +95,26 @@ class DataModel {
 		return $this->limit;
 	}
 	
-	public function getOrderBy() {
-		return $this->orderby;
+	public function getOrderByField() {
+		return $this->orderby_field;
+	}
+	
+	public function getOrderByOrder() {
+		return $this->orderby_order;
 	}
 	
 	
 	
 	
 	
-	public function field($field) {
-		if ( false === in_array($field, $this->field_list) ) {
-			$this->field_list[] = $field;
+	public function field() {
+		$argc = func_num_args();
+		$argv = func_get_args();
+		
+		if ( $argc > 0 ) {
+			$this->field_list = $argv;
 		}
+		
 		return $this;
 	}
 	
@@ -133,8 +147,13 @@ class DataModel {
 	}
 	
 	
-	public function orderBy($orderby) {
-		$this->setOrderBy($orderby);
+	public function orderBy($field, $order) {
+		$order = strtoupper($order);
+		if ( 'ASC' !== $order && 'DESC' !== $order ) {
+			$order = 'ASC';
+		}
+		
+		$this->setOrderByField($field)->setOrderByOrder($order);
 		return $this;
 	}
 	
@@ -299,25 +318,24 @@ class DataModel {
 			$sql .= ' GROUP BY `' . implode('`, `', $field_list) . '`';
 		}
 		
-		//$orderby = $this->getOrderBy();
-		//if ( false === empty($orderby) ) {
-		//	$sql .= ' ORDER BY ' . $orderby . '';
-		//}
+		$orderby_field = $this->getOrderByField();
+		$orderby_order = $this->getOrderByOrder();
+		if ( false === empty($orderby_field) && false === empty($orderby_order) ) {
+			$sql .= ' ORDER BY `' . $orderby_field . '` ' . $orderby_order;
+		}
 		
 		$limit = $this->getLimit();
 		if ( $limit > 0 ) {
 			$sql .= ' LIMIT ' . $limit;
 		}
 
-
-exit($sql . PHP_EOL . PHP_EOL);
-
 		$result_model = $this->getDataAdapter()->query($sql, array_values($where_list));
 		
 		$this->setWhereList(array())
 			->setFieldList(array())
 			->setLimit(-1)
-			->setOrderBy(NULL)
+			->setOrderByField(NULL)
+			->setOrderByOrder(NULL)
 			->setGroupByList(array());
 		
 		return $result_model;
