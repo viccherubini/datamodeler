@@ -17,7 +17,6 @@ class DataModel {
 	private $orderby_field = NULL;
 	private $orderby_order = NULL;
 	
-	
 	/**
 	 * Constructor. 
 	 * @param DataAdapterPdo $data_adapter The data store adapter to write to a database.
@@ -32,8 +31,6 @@ class DataModel {
 	public function __destruct() {
 		
 	}
-	
-	
 	
 	/**
 	 * Sets the DataAdapter so database access can be had.
@@ -108,45 +105,70 @@ class DataModel {
 		return $this;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
+	/**
+	 * Returns the data adapter currently being used.
+	 * @retval DataAdapterPdo Returns the instance of the DataAdapterPdo that's being used.
+	 */
 	public function getDataAdapter() {
 		return $this->data_adapter;
 	}
 	
+	/**
+	 * Returns the data adapter currently being used.
+	 * @retval DataAdapterPdo Returns the instance of the DataAdapterPdo that's being used.
+	 */
 	public function getFieldList() {
 		return $this->field_list;
 	}
 	
+	/**
+	 * Returns the list of WHERE fields and their comparisons.
+	 * @retval array Returns the list of WHERE fields and their comparisons.
+	 */
 	public function getWhereList() {
 		return $this->where_list;
 	}
 	
+	/**
+	 * Returns the list of GROUP BY fields.
+	 * @retval array Returns the list of GROUP BY fields.
+	 */
 	public function getGroupByList() {
 		return $this->groupby_list;
 	}
 	
+	/**
+	 * Returns the limit.
+	 * @retval integer Returns the limit.
+	 */
 	public function getLimit() {
 		return $this->limit;
 	}
 	
+	/**
+	 * Returns the field to order by.
+	 * @retval string Returns the field to order by.
+	 */
 	public function getOrderByField() {
 		return $this->orderby_field;
 	}
 	
+	/**
+	 * Returns the order the ORDER BY field should use.
+	 * @retval DataAdapterPdo Returns the order the ORDER BY field should use.
+	 */
 	public function getOrderByOrder() {
 		return $this->orderby_order;
 	}
 	
-	
-	
-	
-	
+	/**
+	 * Sets all of the fields that should be returned in a query. This accepts
+	 * N number of arguments, and each time this is called, the fields are 
+	 * reset to whatever the arguments are. If no arguments are passed, nothing
+	 * happens.
+	 * @param string Each argument must be a string of the field to include in the result set.
+	 * @retval DataModel Returns this for chaining.
+	 */
 	public function field() {
 		$argc = func_num_args();
 		$argv = func_get_args();
@@ -158,7 +180,13 @@ class DataModel {
 		return $this;
 	}
 	
-	
+	/**
+	 * Adds another WHERE clause (or appends to current ones) to the query.
+	 * @param string $field A field in format 'field_name > ?'. The operator can be
+	 * =, ==, >, >=, <, <=, !=, or <>. The ? will be replaced by $value.
+	 * @param string $value The value to replace the ? by in the $field.
+	 * @retval DataModel Returns this for chaining.
+	 */
 	public function where($field, $value) {
 		/* Now $field can look like 'field > ?' or 'field=?', or 'field     <>    ?' */
 		$match_list = array();
@@ -176,7 +204,11 @@ class DataModel {
 		return $this;
 	}	
 	
-	
+	/**
+	 * Sets the limit when doing a SELECT query. Argument must be greater than -1.
+	 * @param integer $limit The limit to set.
+	 * @retval DataModel Returns this for chaining.
+	 */
 	public function limit($limit) {
 		$limit = intval($limit);
 		if ( $limit > 0 ) {
@@ -186,7 +218,12 @@ class DataModel {
 		return $this;
 	}
 	
-	
+	/**
+	 * Sets the order by field and the order to do it in.
+	 * @param string $field The field to order by.
+	 * @param string $order The order to sort by. Must be DESC or ASC.
+	 * @retval DataModel Returns this for chaining.
+	 */
 	public function orderBy($field, $order) {
 		$order = strtoupper($order);
 		if ( 'ASC' !== $order && 'DESC' !== $order ) {
@@ -197,6 +234,12 @@ class DataModel {
 		return $this;
 	}
 	
+	/**
+	 * Sets the order by field and the order to do it in.
+	 * @param string $field The field to order by.
+	 * @param string $order The order to sort by. Must be DESC or ASC.
+	 * @retval DataModel Returns this for chaining.
+	 */
 	public function groupBy($groupby) {
 		if ( false === in_array($groupby, $this->groupby_list) ) {
 			$this->groupby_list[] = $groupby;
@@ -205,7 +248,12 @@ class DataModel {
 		return $this;
 	}
 	
-	
+	/**
+	 * Executes the query and loads the first row found.
+	 * @param DataObject $object The object to load the data into. If no row is found, this object
+	 * is still returned to always have a consistent return type.
+	 * @retval DataObject Returns the object found.
+	 */
 	public function loadFirst(DataObject $object) {
 		$this->hasDataAdapter();
 		
@@ -221,6 +269,12 @@ class DataModel {
 		
 	}
 	
+	/**
+	 * Executes the query and loads all results found. Returns everything as a DataIterator.
+	 * Even if no rows are found, a DataIterator is still returned.
+	 * @param DataObject $object The object to load the data into for each iterator element.
+	 * @retval DataIterator Returns a DataIterator to loop through. Each element is a DataObject element.
+	 */
 	public function loadAll(DataObject $object) {
 		$this->hasDataAdapter();
 		
@@ -243,7 +297,13 @@ class DataModel {
 		return $object_iterator;
 	}
 	
-	
+	/**
+	 * Saves a DataObject object in the database through the DataAdapter. If the
+	 * DataObject already exists (it knows it has an ID set), the data is updated
+	 * otherwise, it is inserted.
+	 * @param DataObject $object The object to save in the database.
+	 * @retval integer Returns the ID of the inserted or updated DataObject.
+	 */
 	public function save(DataObject $object) {
 		$this->hasDataAdapter();
 
@@ -257,7 +317,11 @@ class DataModel {
 		return $id;
 	}
 	
-	
+	/**
+	 * Inserts a DataObject into the database.
+	 * @param DataObject $object The DataObject to insert into the database.
+	 * @retval integer The ID of the inserted element. 0 if the insert fails.
+	 */
 	private function insert(DataObject $object) {
 		$date_create = $object->getDateCreate();
 		if ( true === $object->hasDate() && true === empty($date_create) ) {
@@ -283,8 +347,11 @@ class DataModel {
 		return $id;
 	}
 	
-	
-	
+	/**
+	 * Updates a DataObject into the database.
+	 * @param DataObject $object The DataObject to update in the database.
+	 * @retval integer The ID of the updated element.
+	 */
 	private function update(DataObject $object) {
 		$date_modify = $object->getDateModify();
 		if ( true === $object->hasDate() && true === empty($date_modify) ) {
@@ -306,7 +373,7 @@ class DataModel {
 			}
 		}
 		
-		$sql = "UPDATE `" . $table . "` SET " . $field_list . " WHERE `" . $pkey . "` = '" . $id . "'";
+		$sql = "UPDATE `" . $table . "` SET " . $field_list . " WHERE `" . $pkey . "` = '" . $id . "' LIMIT 1";
 		$result = $this->getDataAdapter()->query($sql, array_values($model));
 		
 		$id = 0;
@@ -317,7 +384,11 @@ class DataModel {
 		return $id;
 	}
 
-	
+	/**
+	 * Determines if a DataAdapterPdo has been set.
+	 * @throw DataModelerException Throws an exception if no DataAdapterPdo has been set.
+	 * @retval bool Returns true if the data adapater has been set.
+	 */
 	private function hasDataAdapter() {
 		if ( NULL === $this->getDataAdapter() ) {
 			throw new DataModelerException('No DataAdapter has been set. Please set one first.');
@@ -325,7 +396,11 @@ class DataModel {
 		return true;
 	}
 	
-	
+	/**
+	 * Loads the data from the database after a findFirst() or findAll() method is called.
+	 * @param DataObject $object The DataObject is used to get the name of the table and primary key.
+	 * @retval DataAdapterPdoResult Returns the result from the database after a query.
+	 */
 	private function load(DataObject $object) {
 		$table = $object->table();
 		$pkey = $object->pkey();
@@ -380,6 +455,4 @@ class DataModel {
 		
 		return $result_model;
 	}
-	
-	
 }
