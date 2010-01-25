@@ -10,6 +10,12 @@ require_once 'DataIterator.php';
 require_once 'DataAdapterPdoMysql.php';
 
 class Product extends DataObject {
+	public function setPrice($price) {
+		$price = abs(intval($price));
+		$this->__set('price', $price);
+		
+		return $this;
+	}
 }
 
 
@@ -21,6 +27,15 @@ try {
 	$product = new Product();
 	$model = new DataModel($db);
 	
+	$product->setPrice(1095);
+	echo $product->getPrice() . PHP_EOL;
+	echo $product->getPrice() . PHP_EOL;
+	
+	$product->setPrice(895);
+	echo $product->getPrice() . PHP_EOL;
+	
+	
+	if ( false ) {
 	/* Load the first matched record. Return it to $product. */
 	$matched_product = $model->where('product_id = ?', 1)->loadFirst($product);
 	echo $matched_product->getName() . PHP_EOL;
@@ -37,7 +52,10 @@ try {
 	foreach ( $iterator as $obj ) {
 		echo $obj->getName() . PHP_EOL;
 	}
-	
+	}
+
+
+
 } catch ( DataModelerException $e ) {
 	exit($e . PHP_EOL);
 }
