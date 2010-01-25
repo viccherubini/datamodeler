@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * Ties a DataObject object to a data store. This abstracts the 
+ * searching and saving of a DataObject away from the data store.
+ * Right now it's tied to a SQL based data store, but future revisions
+ * will allow non SQL related ones.
+ * @author vmc <vmc@leftnode.com>
+ */
 class DataModel {
 	
 	private $data_adapter = NULL;
@@ -10,49 +17,92 @@ class DataModel {
 	private $orderby_field = NULL;
 	private $orderby_order = NULL;
 	
-
+	
+	/**
+	 * Constructor. 
+	 * @param DataAdapterPdo $data_adapter The data store adapter to write to a database.
+	 */
 	public function __construct(DataAdapterPdo $data_adapter) {
 		$this->setDataAdapter($data_adapter);
 	}
 	
+	/**
+	 * Good bye.
+	 */
 	public function __destruct() {
 		
 	}
 	
 	
 	
-	
+	/**
+	 * Sets the DataAdapter so database access can be had.
+	 * @param DataAdapterPdo $data_adapter The data store adapter to write to a database.
+	 * @retval DataModel Returns $this.
+	 */
 	public function setDataAdapter(DataAdapterPdo $data_adapter) {
 		$this->data_adapter = $data_adapter;
 		return $this;
 	}
 	
+	/**
+	 * Sets a list of fields that should be returned in the query.
+	 * @param array $field_list The list of fields to use in the query.
+	 * @retval DataModel Returns $this.
+	 */
 	public function setFieldList(array $field_list) {
 		$this->field_list = $field_list;
 		return $this;
 	}
 	
+	/**
+	 * Sets the list of WHERE arguments.
+	 * @param array $where_list The list of WHERE clauses, such as 'field > ?', or 'name <> ?'
+	 * @retval DataModel Returns $this.
+	 */
 	public function setWhereList(array $where_list) {
 		$this->where_list = $where_list;
 		return $this;
 	}
 	
+	/**
+	 * Sets the list of GROUP BY arguments.
+	 * @param array $groupby_list The list of GROUP BY clauses, this is simply an array of field names.
+	 * @retval DataModel Returns $this.
+	 */
 	public function setGroupByList(array $groupby_list) {
 		$this->groupby_list = $groupby_list;
 		return $this;
 	}
 	
+	/**
+	 * Sets the limit in LIMIT $value. No business logic is in here, that is in limit(), so the
+	 * limit value can be reset to -1. If -1, no LIMIT is used, otherwise, the LIMIT value is used.
+	 * @param integer $limit The max number of records to return.
+	 * @retval DataModel Returns $this.
+	 */
 	public function setLimit($limit) {
 		$limit = intval($limit);
 		$this->limit = $limit;
 		return $this;
 	}
 	
+	/**
+	 * Sets the ORDER BY field. This only allows a single field for now.
+	 * @param string $orderby_field The field to sort the results by.
+	 * @retval DataModel Returns $this.
+	 */
 	public function setOrderByField($orderby_field) {
 		$this->orderby_field = $orderby_field;
 		return $this;
 	}
 	
+	/**
+	 * Sets the direction to order the fields. No business logic is done here, only
+	 * done in orderBy() so this can be reset to NULL for further queries.
+	 * @param string $orderby_order The direction to order the fields.
+	 * @retval DataModel Returns $this.
+	 */
 	public function setOrderByOrder($orderby_order) {
 		$this->orderby_order = $orderby_order;
 		return $this;
