@@ -255,7 +255,6 @@ abstract class DataObject {
 		$class_name = strtolower(get_class($this));
 		$this->id(0)
 			->model(array())
-			->methodCache(array())
 			->children(array())
 			->hasDate(true)
 			->table($class_name)

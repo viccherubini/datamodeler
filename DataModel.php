@@ -322,81 +322,19 @@ class DataModel {
 
 		$id = $object->id();
 		if ( $id > 0 ) {
-			$id = $this->update($object);
+			$id = $this->getDataAdapter()->update($object);
 		} else {
-			$id = $this->insert($object);
+			$id = $this->getDataAdapter()->insert($object);
 		}
 		
 		return $id;
 	}
 	
-	/**
-	 * Inserts a DataObject into the database.
-	 * @param DataObject $object The DataObject to insert into the database.
-	 * @retval integer The ID of the inserted element. 0 if the insert fails.
-	 */
-	private function insert(DataObject $object) {
-		$date_create = $object->getDateCreate();
-		if ( true === $object->hasDate() && true === empty($date_create) ) {
-			$object->setDateCreate(time());
-		}
-		
-		$table = $object->table();
-		$pkey = $object->pkey();
-		$model = $object->model();
-		$model_length = count($model);
-		
-		$field_list = implode('`, `', array_keys($model));
-		$value_list = implode(', ', array_fill(0, $model_length, '?'));
-		
-		$sql = "INSERT INTO `" . $table . "` (`" . $field_list . "`) VALUES(" . $value_list . ")";
-		$result = $this->getDataAdapter()->query($sql, array_values($model));
-
-		$id = 0;
-		if ( 1 === $result->getRowCount() ) {
-			$id = $this->getDataAdapter()->insertId();
-		}
-		
-		return $id;
+	public function delete(DataObject $object) {
+		$this->getDataAdapter()->delete($object);
+		return true;
 	}
 	
-	/**
-	 * Updates a DataObject into the database.
-	 * @param DataObject $object The DataObject to update in the database.
-	 * @retval integer The ID of the updated element.
-	 */
-	private function update(DataObject $object) {
-		$date_modify = $object->getDateModify();
-		if ( true === $object->hasDate() && true === empty($date_modify) ) {
-			$object->setDateModify(time());
-		}
-		
-		$i = 1;
-		$field_list = NULL;
-		$id = $object->id();
-		$table = $object->table();
-		$pkey = $object->pkey();
-		$model = $object->model();
-		$model_length = count($model);
-		
-		foreach ( $model as $field => $value ) {
-			$field_list .= "`" . $field . "` = ?";
-			if ( $i++ != $model_length ) {
-				$field_list .= ', ';
-			}
-		}
-		
-		$sql = "UPDATE `" . $table . "` SET " . $field_list . " WHERE `" . $pkey . "` = '" . $id . "' LIMIT 1";
-		$result = $this->getDataAdapter()->query($sql, array_values($model));
-		
-		$id = 0;
-		if ( 1 === $result->getRowCount() ) {
-			$id = $object->id();
-		}
-		
-		return $id;
-	}
-
 	/**
 	 * Determines if a DataAdapterPdo has been set.
 	 * @throw DataModelerException Throws an exception if no DataAdapterPdo has been set.

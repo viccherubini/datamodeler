@@ -7,24 +7,26 @@ require_once 'DataModelerException.php';
 require_once 'DataObject.php';
 require_once 'DataModel.php';
 require_once 'DataIterator.php';
-require_once 'DataAdapterPdoMysql.php';
+require_once 'DataAdapterPdo.php';
 
 class Product extends DataObject {
 }
 
 
 try {
-
-	$db = new DataAdapterPdoMysql($db_hostname, $db_database, $db_username, $db_password);
-	$db->connect();
-
 	$product = new Product();
+	
+	$dsn = "mysql:host={$db_hostname};port=3306;dbname={$db_database}";
+	$pdo = new PDO($dsn, $db_username, $db_password);
+	$db = new DataAdapterPdo($pdo);
 	$model = new DataModel($db);
 	
-	
 	/* Load the first matched record. Return it to $product. */
-	$matched_product = $model->where('product_id = ?', 1)->loadFirst($product);
-	echo $matched_product->getName() . PHP_EOL;
+	//$matched_product = $model->where('product_id = ?', 1)->loadFirst($product);
+	//echo $matched_product->getName() . PHP_EOL;
+	
+	$product->setProductId(5)->setName('ddd-my new product')->setPrice(8895);
+	$model->save($product);
 	
 	/* Load all matched products into an iterator. Each element of the iterator is a Product > DataObject object. */
 	/*$iterator = $model->field('product_id', 'name', 'price')
@@ -39,8 +41,8 @@ try {
 		echo $obj->getName() . PHP_EOL;
 	}*/
 
-
-
+} catch ( PDOException $e ) {
+	exit($e->getMessage() . PHP_EOL);
 } catch ( DataModelerException $e ) {
-	exit($e . PHP_EOL);
+	exit($e->getMessage() . PHP_EOL);
 }
