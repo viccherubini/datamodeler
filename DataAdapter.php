@@ -44,13 +44,28 @@ abstract class DataAdapter {
 	 */
 	abstract public function query($query);
 	
+	/**
+	 * Load the first row from a data store into a DataObject.
+	 */
 	abstract public function loadFirst(DataObject $object);
 	
+	/**
+	 * Load all rows from the data store with a given query into a DataIterator.
+	 */
 	abstract public function loadAll(DataObject $object);
 	
+	/**
+	 * Insert a DataObject into the data store.
+	 */
 	abstract public function insert(DataObject $object);
 	
+	/**
+	 * Update a DataObject in the data store.
+	 */
 	abstract public function update(DataObject $object);
 	
+	/**
+	 * Delete a DataObject from the data store.
+	 */
 	abstract public function delete(DataObject $object);
 }
