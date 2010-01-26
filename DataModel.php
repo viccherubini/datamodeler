@@ -9,12 +9,25 @@
  */
 class DataModel {
 	
+	/// The DataAdapterPdo object for interacting with a database.
 	private $data_adapter = NULL;
+	
+	/// The list of fields to return in the query.
 	private $field_list = array();
+	
+	/// The list of fields to select WHERE from.
 	private $where_list = array();
+	
+	/// The list of fields to GROUP BY.
 	private $groupby_list = array();
+	
+	/// The number of rows to limit by. If -1, this is ignored.
 	private $limit = -1;
+	
+	/// The field to order the results by.
 	private $orderby_field = NULL;
+	
+	/// The direction to order the results by. Must be ASC or DESC.
 	private $orderby_order = NULL;
 	
 	/**
