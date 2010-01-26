@@ -34,7 +34,7 @@ class DataModel {
 	 * Constructor. 
 	 * @param DataAdapterPdo $data_adapter The data store adapter to write to a database.
 	 */
-	public function __construct(DataAdapterPdo $data_adapter) {
+	public function __construct(DataAdapter $data_adapter) {
 		$this->setDataAdapter($data_adapter);
 	}
 	
@@ -47,10 +47,10 @@ class DataModel {
 	
 	/**
 	 * Sets the DataAdapter so database access can be had.
-	 * @param DataAdapterPdo $data_adapter The data store adapter to write to a database.
-	 * @retval DataModel Returns $this.
+	 * @param DataAdapter $data_adapter The data store adapter to write to a database.
+	 * @retval DataModel Returns this for chaining.
 	 */
-	public function setDataAdapter(DataAdapterPdo $data_adapter) {
+	public function setDataAdapter(DataAdapter $data_adapter) {
 		$this->data_adapter = $data_adapter;
 		return $this;
 	}
@@ -58,7 +58,7 @@ class DataModel {
 	/**
 	 * Sets a list of fields that should be returned in the query.
 	 * @param array $field_list The list of fields to use in the query.
-	 * @retval DataModel Returns $this.
+	 * @retval DataModel Returns this for chaining.
 	 */
 	public function setFieldList(array $field_list) {
 		$this->field_list = $field_list;
@@ -68,7 +68,7 @@ class DataModel {
 	/**
 	 * Sets the list of WHERE arguments.
 	 * @param array $where_list The list of WHERE clauses, such as 'field > ?', or 'name <> ?'
-	 * @retval DataModel Returns $this.
+	 * @retval DataModel Returns this for chaining.
 	 */
 	public function setWhereList(array $where_list) {
 		$this->where_list = $where_list;
@@ -78,7 +78,7 @@ class DataModel {
 	/**
 	 * Sets the list of GROUP BY arguments.
 	 * @param array $groupby_list The list of GROUP BY clauses, this is simply an array of field names.
-	 * @retval DataModel Returns $this.
+	 * @retval DataModel Returns this for chaining.
 	 */
 	public function setGroupByList(array $groupby_list) {
 		$this->groupby_list = $groupby_list;
@@ -89,7 +89,7 @@ class DataModel {
 	 * Sets the limit in LIMIT $value. No business logic is in here, that is in limit(), so the
 	 * limit value can be reset to -1. If -1, no LIMIT is used, otherwise, the LIMIT value is used.
 	 * @param integer $limit The max number of records to return.
-	 * @retval DataModel Returns $this.
+	 * @retval DataModel Returns this for chaining.
 	 */
 	public function setLimit($limit) {
 		$limit = intval($limit);
@@ -100,7 +100,7 @@ class DataModel {
 	/**
 	 * Sets the ORDER BY field. This only allows a single field for now.
 	 * @param string $orderby_field The field to sort the results by.
-	 * @retval DataModel Returns $this.
+	 * @retval DataModel Returns this for chaining.
 	 */
 	public function setOrderByField($orderby_field) {
 		$this->orderby_field = $orderby_field;
@@ -111,7 +111,7 @@ class DataModel {
 	 * Sets the direction to order the fields. No business logic is done here, only
 	 * done in orderBy() so this can be reset to NULL for further queries.
 	 * @param string $orderby_order The direction to order the fields.
-	 * @retval DataModel Returns $this.
+	 * @retval DataModel Returns this for chaining.
 	 */
 	public function setOrderByOrder($orderby_order) {
 		$this->orderby_order = $orderby_order;
@@ -120,7 +120,7 @@ class DataModel {
 	
 	/**
 	 * Returns the data adapter currently being used.
-	 * @retval DataAdapterPdo Returns the instance of the DataAdapterPdo that's being used.
+	 * @retval DataAdapter Returns the instance of the DataAdapter that's being used.
 	 */
 	public function getDataAdapter() {
 		return $this->data_adapter;
@@ -128,7 +128,7 @@ class DataModel {
 	
 	/**
 	 * Returns the data adapter currently being used.
-	 * @retval DataAdapterPdo Returns the instance of the DataAdapterPdo that's being used.
+	 * @retval array The list of fields to be returned in the query.
 	 */
 	public function getFieldList() {
 		return $this->field_list;
