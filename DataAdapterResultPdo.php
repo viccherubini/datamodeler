@@ -1,23 +1,10 @@
 <?php
 
-class DataAdapterPdoResult {
-	private $result = NULL;
+require_once 'DataAdapterResult.php';
 
+class DataAdapterResultPdo extends DataAdapterResult {
 	public function __construct(PDOStatement $result) {
 		$this->setResult($result);
-	}
-	
-	public function __destruct() {
-		unset($this->result);
-	}
-	
-	public function setResult(PDOStatement $result) {
-		$this->result = $result;
-		return $this;
-	}
-	
-	public function getResult() {
-		return $this->result;
 	}
 	
 	public function getRowCount() {

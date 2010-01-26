@@ -1,7 +1,8 @@
 <?php
 
+require_once 'DataModelerException.php';
 require_once 'DataAdapterPdo.php';
-require_once 'DataAdapterPdoResult.php';
+require_once 'DataAdapterResultPdo.php';
 
 class DataAdapterPdoMysql extends DataAdapterPdo {
 	public function connect() {
@@ -46,7 +47,7 @@ class DataAdapterPdoMysql extends DataAdapterPdo {
 				throw new DataModelerException("Failed to execute query: {$sql}. Data store said {$error_info[2]}");
 			}
 
-			$pdo_result = new DataAdapterPdoResult($statement);
+			$pdo_result = new DataAdapterResultPdo($statement);
 			return $pdo_result;
 		} catch ( PDOException $e ) {
 			throw new DataModelerException($e->getMessage());
