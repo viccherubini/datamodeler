@@ -10,6 +10,7 @@
  * @author vmc <vmc@leftnode.com>
  */
 abstract class DataObject {
+
 	/**
 	 * The ID if interfacing with a database.
 	 */
@@ -119,7 +120,6 @@ abstract class DataObject {
 		}
 		return NULL;
 	}
-	
 	
 	/**
 	 * ANONYMOUS GETTERS AND SETTERS
@@ -240,8 +240,6 @@ abstract class DataObject {
 			return $this;
 		}
 	}
-	
-	
 	
 	/**
 	 * CLASS MODIFIERS

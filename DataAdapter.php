@@ -1,18 +1,38 @@
 <?php
 
 abstract class DataAdapter {
+	/**
+	 * The connection object to interface with the data store.
+	 */
 	private $connection = NULL;
+	
+	/**
+	 * Whether or not a valid connection exists.
+	 */
 	private $connected = false;
 
+	/**
+	 * Hello, Dave.
+	 */
 	public function __destruct() {
 		unset($this->connection);
 	}
 
+	/**
+	 * Sets the connection object. This is generally an object, but not always.
+	 * @param mixed $connection The connection object made outside of the class.
+	 * @retval DataAdapter This for chaining.
+	 */
 	public function setConnection($connection) {
 		$this->connection = $connection;
 		return $this;
 	}
 	
+	/**
+	 * Sets the connection status, true == connected, false == unconnected.
+	 * @param bool $connected Whether the data store has a current connection.
+	 * @retval DataAdapter Returns this for chaining. 
+	 */
 	public function setConnected($connected) {
 		if ( false !== $connected && true !== $connected ) {
 			$connected = false;
@@ -21,10 +41,18 @@ abstract class DataAdapter {
 		return $this;
 	}
 	
+	/**
+	 * Returns the connection object.
+	 * @retval mixed The connection object, or NULL when no object has been set.
+	 */
 	public function getConnection() {
 		return $this->connection;
 	}
 	
+	/**
+	 * Returns the connection status. True if connected, false otherwise. False by default.
+	 * @retval mixed The connection status.
+	 */
 	public function getConnected() {
 		return $this->connected;
 	}
