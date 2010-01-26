@@ -48,7 +48,7 @@ try {
 	echo $product->getName() . PHP_EOL;
 	
 	/* Load all matched products into an iterator. Each element of the iterator is a Product > DataObject object. */
-	/*$iterator = $model->field('product_id', 'name', 'price')
+	$iterator = $model->field('product_id', 'name', 'price')
 		->where('product_id != ?', 4)
 		->where('name != ?', 'Second Product')
 		->orderBy('name', 'DESC')
@@ -58,7 +58,7 @@ try {
 	
 	foreach ( $iterator as $obj ) {
 		echo $obj->getName() . PHP_EOL;
-	}*/
+	}
 
 } catch ( PDOException $e ) {
 	exit($e->getMessage() . PHP_EOL);
