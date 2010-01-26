@@ -14,19 +14,38 @@ class Product extends DataObject {
 
 
 try {
+	/* New DataObject for working with. */
 	$product = new Product();
 	
+	/* Create the PDO connection outside of the data adapter. */
 	$dsn = "mysql:host={$db_hostname};port=3306;dbname={$db_database}";
 	$pdo = new PDO($dsn, $db_username, $db_password);
+
+	/**
+	 * The DataModel lets us communicate with the data store. The DataModel is responsible
+	 * for loading/updating/inserting/deleting DataObjects.
+	 */
 	$db = new DataAdapterPdo($pdo);
 	$model = new DataModel($db);
 	
-	/* Load the first matched record. Return it to $product. */
-	//$matched_product = $model->where('product_id = ?', 1)->loadFirst($product);
-	//echo $matched_product->getName() . PHP_EOL;
-	
-	$product->setProductId(5)->setName('ddd-my new product')->setPrice(8895);
+	/* This will insert a new DataObject. */
+	$product->setName('My New Product')->setPrice(7984);
 	$model->save($product);
+	
+	/**
+	 * Cheaply load a product without doing a query and update it. Be careful doing it this way, not recommended.
+	 * In this case, $product has the name from the previous call, and if product_id 5 doesn't exist
+	 * a record that doesn't exist will attempt to be updated, resulting in nothing. 
+	 * You should always use $model->loadFirst($product).
+	 */
+	$product->setProductId(5)->setPrice(7845);
+	$model->save($product);
+	
+	/**
+	 * Load up a new DataObject. This loads all of the data into the $product variable.
+	 */
+	$product = $model->where('product_id = ?', 1)->loadFirst($product);
+	echo $product->getName() . PHP_EOL;
 	
 	/* Load all matched products into an iterator. Each element of the iterator is a Product > DataObject object. */
 	/*$iterator = $model->field('product_id', 'name', 'price')

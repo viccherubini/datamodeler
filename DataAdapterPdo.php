@@ -5,11 +5,22 @@ require_once 'DataAdapter.php';
 require_once 'DataAdapterResultPdo.php';
 
 class DataAdapterPdo extends DataAdapter {
+	/**
+	 * Welcome, my friends. Connect to me.
+	 * @param object $connection A valid PDO object that has already been connected to the data store.
+	 */
 	public function __construct(PDO $connection) {
 		$this->setConnection($connection);
 		$this->setConnected(true);
 	}
 
+	/**
+	 * Execute a query against the data store.
+	 * @param string $sql The query to execute.
+	 * @param array $value_list An optional array of values to replace the ?'s with in $sql.
+	 * @throw DataModelerException If a query fails.
+	 * @retval DataAdapterResultPdo Returns a valid DataAdapterResult object to fetch data.
+	 */
 	public function query($sql, $value_list=array()) {
 		if ( false === $this->getConnected() ) {
 			throw new DataModelerException('Datastore does not currently have a valid connection, statement can not be executed.');
@@ -57,16 +68,33 @@ class DataAdapterPdo extends DataAdapter {
 		return addslashes($value);
 	}
 	
-	
+	/**
+	 * Load the first found row from the database. If no rows are found, the
+	 * object that was passed in is returned. If one or more rows are found,
+	 * the first row is loaded into the DataObject and returned.
+	 * @param DataObject $object The object to get data from and to load into.
+	 * @retval DataObject Returns the DataObject for further info.
+	 */
 	public function loadFirst(DataObject $object) {
 		
 	}
 	
+	/**
+	 * Executes the query and loads all results found. Returns everything as a DataIterator.
+	 * Even if no rows are found, a DataIterator is still returned to ensure
+	 * consistent results.
+	 * @param DataObject $object The object to load the data into for each iterator element.
+	 * @retval DataIterator Returns a DataIterator to loop through. Each element is a DataObject element.
+	 */
 	public function loadAll(DataObject $object) {
 		
 	}
 	
-	
+	/**
+	 * Insert a new DataObject record into the database.
+	 * @param DataObject $object The object to get data from to insert.
+	 * @retval integer Returns the auto-incremented ID of the inserted row, 0 if the query failed.
+	 */
 	public function insert(DataObject $object) {
 		$date_create = $object->getDateCreate();
 		if ( true === $object->hasDate() && true === empty($date_create) ) {
@@ -92,6 +120,11 @@ class DataAdapterPdo extends DataAdapter {
 		return $id;
 	}
 	
+	/**
+	 * Update a DataObject in the database.
+	 * @param DataObject $object The object to get data from to update.
+	 * @retval integer Returns the ID of the updated row, always.
+	 */
 	public function update(DataObject $object) {
 		$date_modify = $object->getDateModify();
 		if ( true === $object->hasDate() && true === empty($date_modify) ) {
@@ -121,13 +154,18 @@ class DataAdapterPdo extends DataAdapter {
 		return $id;
 	}
 	
+	/**
+	 * Deletes a DataObject from the database.
+	 * @param DataObject $object The DataObject to delete.
+	 * @retval bool Returns true on successful deletion, false otherwise.
+	 */
 	public function delete(DataObject $object) {
 		$id = $object->id();
 		$table = $object->table();
 		$pkey = $object->pkey();
 		
-		$sql = "DELETE FROM `" . $table . "` WHERE `" . $pkey . "` = '" . $id . "' LIMIT 1";
-		$result = $this->query($sql);
+		$sql = "DELETE FROM `" . $table . "` WHERE `" . $pkey . "` = ? LIMIT 1";
+		$result = $this->query($sql, array($id));
 		
 		if ( 1 === $result->getRowCount() ) {
 			return true;
