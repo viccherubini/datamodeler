@@ -4,17 +4,14 @@
 abstract class DataAdapterPdo {
 	private $connection = NULL;
 	private $connected = false;
-	
 	private $param_list = array();
-	
 	private $server = NULL;
 	private $database = NULL;
 	private $username = NULL;
 	private $password = NULL;
 	private $port = 0;
-	
 	private $affected_rows = 0;
-	
+
 	const DRIVER_MYSQL = 'mysql';
 	const DRIVER_SQLITE = 'sqlite';
 	const DRIVER_PGSQL = 'pgsql';
@@ -125,11 +122,10 @@ abstract class DataAdapterPdo {
 		return $this->affected_rows;
 	}
 
-
-	
-	abstract public function connect();
-	
-	
+	/**
+	 * Returns ID of the last inserted element.
+	 * @retval integer Returns the ID of the last inserted element, 0 otherwise.
+	 */
 	public function insertId() {
 		if ( true === $this->getConnected() ) {
 			return $this->getConnection()->lastInsertId();
@@ -137,6 +133,13 @@ abstract class DataAdapterPdo {
 		return 0;
 	}
 	
+	/**
+	 * Properly escapes a string for SQL insertion. Generally this method shouldn't be used. 
+	 * ODBC drivers can't escape things properly, so addslashes() is used. If there is no
+	 * database connection, addslashes() (which is very unsafe) is used.
+	 * @param string $value The value to be escaped.
+	 * @retval string Returns the escaped string.
+	 */
 	public function escape($value) {
 		if ( true === $this->getConnected() && $this->getDriver() != self::DRIVER_ODBC ) {
 			return $this->getConnection()->quote($value);
@@ -144,4 +147,8 @@ abstract class DataAdapterPdo {
 		return addslashes($value);
 	}
 	
+	/**
+	 * Abstract method used to connect to a database.
+	 */
+	abstract public function connect();
 }
