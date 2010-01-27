@@ -32,7 +32,7 @@ class DataIteratorTest extends PHPUnit_Framework_TestCase {
 	
 	public function testIteratorIsInitiallyAnEmptyArray() {
 		$di = new DataIterator(array());
-		$this->assertEquals($di->getList(), array());
+		$this->assertEquals($di->getDataList(), array());
 		$this->assertEquals($di->length(), 0);
 	}
 	
@@ -76,7 +76,7 @@ class DataIteratorTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testDifferentComparisonFilters() {
-		/* Each of these should return 1 or more items, so we need to check the length of them all too. */
+		// Each of these should return 1 or more items, so we need to check the length of them all too.
 		
 		$test_age = 48;
 		$di_pristine = new DataIterator($this->data_list);
@@ -128,6 +128,22 @@ class DataIteratorTest extends PHPUnit_Framework_TestCase {
 		foreach ( $di_lte as $item ) {
 			$this->assertLessThanOrEqual($test_age, $item->getAge());
 		}
+	}
+	
+	public function testPagination() {
+		$data = range(1, 100);
+		
+		$di = new DataIterator($data);
+		
+		$limit = $i = 10;
+		$page = 2;
+		$di->limit($limit)->page($page);
+		
+		foreach ( $di as $item ) {
+			$this->assertEquals($item, $data[$i++]);
+		}
+		
+		$this->assertEquals($di->length(), 20);
 	}
 	
 	protected function getMockDataObject($name=NULL, $email=NULL, $age=18) {
