@@ -4,10 +4,15 @@ require_once 'DataModelerException.php';
 require_once 'DataAdapter.php';
 require_once 'DataAdapterResultPdo.php';
 
+/**
+ * This class handles a PHP PDO connection. The connection must be made
+ * outside of the class and passed in for easier testing.
+ * @author vmc <vmc@leftnode.com>
+ */
 class DataAdapterPdo extends DataAdapter {
 	/**
 	 * Welcome, my friends. Connect to me.
-	 * @param object $connection A valid PDO object that has already been connected to the data store.
+	 * @param PDO $connection A valid PDO object that has already been connected to the data store.
 	 */
 	public function __construct(PDO $connection) {
 		$this->setConnection($connection);
@@ -74,6 +79,7 @@ class DataAdapterPdo extends DataAdapter {
 	 * the first row is loaded into the DataObject and returned.
 	 * @param DataObject $object The object to get data from and to load into.
 	 * @retval DataObject Returns the DataObject for further info.
+	 * @todo Finish writing this.
 	 */
 	public function loadFirst(DataObject $object) {
 		
@@ -85,6 +91,7 @@ class DataAdapterPdo extends DataAdapter {
 	 * consistent results.
 	 * @param DataObject $object The object to load the data into for each iterator element.
 	 * @retval DataIterator Returns a DataIterator to loop through. Each element is a DataObject element.
+	 * @todo Finish writing this.
 	 */
 	public function loadAll(DataObject $object) {
 		

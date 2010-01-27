@@ -1,6 +1,12 @@
 <?php
 
+/**
+ * Abstract data adapter that can be used for any data store, including
+ * databases and NoSQL data stores.
+ * @author vmc <vmc@leftnode.com>
+ */
 abstract class DataAdapter {
+	
 	/**
 	 * The connection object to interface with the data store.
 	 */

@@ -6,6 +6,7 @@
  * Right now it's tied to a SQL based data store, but future revisions
  * will allow non SQL related ones.
  * @author vmc <vmc@leftnode.com>
+ * @todo Move the loading of DataObject data from here to the DataAdapter classes.
  */
 class DataModel {
 	
@@ -343,6 +344,11 @@ class DataModel {
 		return $id;
 	}
 	
+	/**
+	 * Deletes a DataObject from the data store.
+	 * @param DataObject $object The object to delete. Should contain all info it needs to delete itself.
+	 * @retval bool Always returns true.
+	 */
 	public function delete(DataObject $object) {
 		$this->getDataAdapter()->delete($object);
 		return true;

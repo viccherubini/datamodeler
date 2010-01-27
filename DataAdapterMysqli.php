@@ -4,10 +4,15 @@ require_once 'DataModelerException.php';
 require_once 'DataAdapter.php';
 require_once 'DataAdapterResultMysqli.php';
 
+/**
+ * This class handles a PHP mysqli connection. The connection must be made
+ * outside of the class and passed in for easier testing.
+ * @author vmc <vmc@leftnode.com>
+ */
 class DataAdapterMysqli extends DataAdapter {
 	/**
 	 * Welcome, my friends. Connect to me.
-	 * @param object $connection A valid PDO object that has already been connected to the data store.
+	 * @param mysqli $connection A valid PDO object that has already been connected to the data store.
 	 */
 	public function __construct(mysqli $connection) {
 		$this->setConnection($connection);
@@ -20,6 +25,7 @@ class DataAdapterMysqli extends DataAdapter {
 	 * @param array $value_list An optional array of values to replace the ?'s with in $sql.
 	 * @throw DataModelerException If a query fails.
 	 * @retval DataAdapterResultPdo Returns a valid DataAdapterResult object to fetch data.
+	 * @todo Finish writing this to handle queries.
 	 */
 	public function query($sql) {
 		if ( false === $this->getConnected() ) {
