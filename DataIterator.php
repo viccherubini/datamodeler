@@ -80,8 +80,8 @@ class DataIterator implements Iterator {
 	 */
 	public function rewind() {
 		if ( $this->page > 0 && $this->limit > -1 ) {
-			$this->key = ( ($this->page-1) * $this->limit );
-			$this->length = ($this->page * $this->limit );
+			$this->key = (($this->page-1) * $this->limit);
+			$this->length = ($this->page * $this->limit);
 		} else {
 			$this->key = 0;
 		}
