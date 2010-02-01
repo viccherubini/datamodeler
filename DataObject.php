@@ -121,6 +121,11 @@ abstract class DataObject {
 		return NULL;
 	}
 	
+	/**
+	 * Determine if this object exists. It exists if it has a loaded ID,
+	 * and does not exist if the ID is 0 or less.
+	 * @retval bool Returns true if the object exists, false otherwise.
+	 */
 	public function exists() {
 		$id = $this->id();
 		if ( $id > 0 ) {
