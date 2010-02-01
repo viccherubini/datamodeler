@@ -327,11 +327,12 @@ class DataModel {
 	/**
 	 * Saves a DataObject object in the database through the DataAdapter. If the
 	 * DataObject already exists (it knows it has an ID set), the data is updated
-	 * otherwise, it is inserted.
+	 * otherwise, it is inserted. The parameter is returned by reference so 
+	 * you can tell if it exists or not.
 	 * @param DataObject $object The object to save in the database.
 	 * @retval integer Returns the ID of the inserted or updated DataObject.
 	 */
-	public function save(DataObject $object) {
+	public function save(DataObject &$object) {
 		$this->hasDataAdapter();
 
 		$id = $object->id();
@@ -341,6 +342,8 @@ class DataModel {
 			$id = $this->getDataAdapter()->insert($object);
 		}
 		
+		$object->id($id);
+
 		return $id;
 	}
 	
