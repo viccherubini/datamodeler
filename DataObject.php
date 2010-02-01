@@ -121,6 +121,14 @@ abstract class DataObject {
 		return NULL;
 	}
 	
+	public function exists() {
+		$id = $this->id();
+		if ( $id > 0 ) {
+			return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * ANONYMOUS GETTERS AND SETTERS
 	 */
