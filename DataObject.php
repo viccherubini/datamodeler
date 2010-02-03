@@ -249,7 +249,7 @@ abstract class DataObject {
 			if ( false !== $has_date && true !== $has_date ) {
 				$has_date = true;
 			}
-			$this->has_date = true;
+			$this->has_date = $has_date;
 			return $this;
 		}
 	}
