@@ -273,7 +273,15 @@ class DataModel {
 		$argv = func_get_args();
 		
 		if ( $argc > 0 ) {
-			$this->field_list = $argv;
+			$field_list = array();
+			foreach ( $argv as $field ) {
+				if ( false === stripos($field, '.') ) {
+					$field = '`' . $field . '`';
+				}
+				$field_list[] = $field;
+			}
+			
+			$this->field_list = $field_list;
 		}
 		
 		return $this;
@@ -321,8 +329,13 @@ class DataModel {
 		if ( 0 !== $found_match ) {
 			$field = trim(@$match_list[1]);
 			$operator = trim(@$match_list[2]);
-		
-			$field_and_operator = '`' . $field . '` ' . $operator . ' ?';
+			
+			/* Only wrap this in backticks if the field isn't like tablename.fieldname */
+			if ( false === stripos($field, '.') ) {
+				$field = '`' . $field . '`';
+			}
+
+			$field_and_operator = $field . ' ' . $operator . ' ?';
 		
 			$this->where_list[$field_and_operator] = $value;
 		}
@@ -358,6 +371,10 @@ class DataModel {
 			$order = 'ASC';
 		}
 		
+		if ( false === stripos($field, '.') && 0 === preg_match('/[a-z_]+\(.*\)/i', $field) ) {
+			$field = '`' . $field . '`';
+		}
+		
 		$this->setOrderByField($field)->setOrderByOrder($order);
 		return $this;
 	}
@@ -371,6 +388,9 @@ class DataModel {
 	 */
 	public function groupBy($groupby) {
 		if ( false === in_array($groupby, $this->groupby_list) ) {
+			if ( false === stripos($groupby, '.') ) {
+				$groupby = '`' . $groupby . '`';
+			}
 			$this->groupby_list[] = $groupby;
 		}
 		
@@ -494,12 +514,11 @@ class DataModel {
 			if ( 0 === count($field_list) ) {
 				$sql_field_list = '*';
 			} else {
-				$sql_field_list = implode('`, `', $field_list);
-				$sql_field_list = '`' . $sql_field_list . '`';
+				$sql_field_list = implode(', ', $field_list);
 			}
 		}
 		
-		$sql = 'SELECT ' . $sql_field_list . ' FROM `' . $table . '` ';
+		$sql = "SELECT {$sql_field_list} FROM `{$table}` ";
 		
 		$join_list = $this->getJoinList();
 		if ( count($join_list) > 0 ) {
@@ -507,8 +526,8 @@ class DataModel {
 				$join_table = $join->table();
 				$join_pkey = $join->pkey();
 				
-				$sql .= 'INNER JOIN `' . $join_table . '`
-					ON `' . $table . '`.`' . $pkey . '` = `' . $join_table . '`.`' . $join_pkey . '` ';
+				$sql .= "INNER JOIN `{$join_table}`
+					ON {$table}.{$pkey} = {$join_table}.{$join_pkey} ";
 			}
 		}
 		
@@ -516,29 +535,29 @@ class DataModel {
 		$where_list = $this->getWhereList();
 		if ( count($where_list) > 0 ) {
 			$i = 0;
-			$sql .= 'WHERE ';
+			$sql .= "WHERE ";
 			
 			foreach ( $where_list as $field_and_operator => $value ) {
-				$sql .= ( $i++ !== 0 ? ' AND ' : NULL ) . '(' . $field_and_operator . ')';
+				$sql .= ( $i++ !== 0 ? " AND " : NULL ) . "({$field_and_operator})";
 			}
 		}
 		
 		$groupby_list = $this->getGroupByList();
 		if ( count($groupby_list) > 0 ) {
-			$sql .= ' GROUP BY `' . implode('`, `', $field_list) . '`';
+			$sql .= " GROUP BY " . implode(', ', $groupby_list) . " ";
 		}
 		
 		$orderby_field = $this->getOrderByField();
 		$orderby_order = $this->getOrderByOrder();
 		if ( false === empty($orderby_field) && false === empty($orderby_order) ) {
-			$sql .= ' ORDER BY ' . $orderby_field . ' ' . $orderby_order;
+			$sql .= "ORDER BY {$orderby_field} {$orderby_order} ";
 		}
 		
 		$limit = $this->getLimit();
 		if ( $limit > 0 ) {
-			$sql .= ' LIMIT ' . $limit;
+			$sql .= " LIMIT {$limit} ";
 		}
-
+		
 		$result_model = $this->getDataAdapter()->query($sql, array_values($where_list));
 		
 		$this->setWhereList(array())
