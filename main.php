@@ -12,10 +12,17 @@ require_once 'DataAdapterPdo.php';
 class Product extends DataObject {
 }
 
+class Product_Favorite extends DataObject {
+	public function __construct() {
+		parent::__construct();
+		$this->hasDate(false);
+	}
+}
 
 try {
 	/* New DataObject for working with. */
 	$product = new Product();
+	$product_favorite = new Product_Favorite();
 	
 	/* Create the PDO connection outside of the data adapter. */
 	$dsn = "mysql:host={$db_hostname};port=3306;dbname={$db_database}";
@@ -46,6 +53,13 @@ try {
 	 */
 	$product = $model->where('product_id = ?', 1)->loadFirst($product);
 	echo $product->getName() . PHP_EOL;
+	
+	/* Test doing a basic inner join. */
+	$favorited_product_list = $model->innerJoin($product_favorite)
+		->loadAll($product);
+	foreach ( $favorited_product_list as $obj ) {
+		echo get_class($obj) . PHP_EOL;
+	}
 	
 	/* Load all matched products into an iterator. Each element of the iterator is a Product > DataObject object. */
 	$iterator = $model->field('product_id', 'name', 'price')

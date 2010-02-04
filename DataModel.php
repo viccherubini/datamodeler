@@ -21,6 +21,18 @@ class DataModel {
 	private $field_list = array();
 	
 	/**
+	 * If this is true, only the fields from the DataObject in load() will be loaded.
+	 * This is convenient if you're doing an INNER JOIN and only want the results from
+	 * a single table into the object. 
+	 */
+	private $fields_from_data_object = false;
+	
+	/**
+	 * A list of objects to join on.
+	 */
+	private $join_list = array();
+	
+	/**
 	 * The list of fields to select WHERE from.
 	 */
 	private $where_list = array();
@@ -62,6 +74,7 @@ class DataModel {
 	
 	/**
 	 * Sets the DataAdapter so database access can be had.
+	 * 
 	 * @param DataAdapter $data_adapter The data store adapter to write to a database.
 	 * @retval DataModel Returns this for chaining.
 	 */
@@ -72,6 +85,7 @@ class DataModel {
 	
 	/**
 	 * Sets a list of fields that should be returned in the query.
+	 * 
 	 * @param array $field_list The list of fields to use in the query.
 	 * @retval DataModel Returns this for chaining.
 	 */
@@ -81,7 +95,34 @@ class DataModel {
 	}
 	
 	/**
+	 * Sets the value of $fields_from_data_object.
+	 * 
+	 * @param bool $value True or false.
+	 * @retval DataModel Returns this for chaining.
+	 */
+	public function setFieldsFromDataObject($value) {
+		if ( false !== $value && true !== $value ) {
+			$value = false;
+		}
+		
+		$this->fields_from_data_object = $value;
+		return $this;
+	}
+	
+	/**
+	 * Sets a list of objects to join on.
+	 * 
+	 * @param array $join_list The list of DataObjects to join on.
+	 * @retval DataModel Returns this for chaining.
+	 */
+	public function setJoinList(array $join_list) {
+		$this->join_list = $join_list;
+		return $this;
+	}
+	
+	/**
 	 * Sets the list of WHERE arguments.
+	 * 
 	 * @param array $where_list The list of WHERE clauses, such as 'field > ?', or 'name <> ?'
 	 * @retval DataModel Returns this for chaining.
 	 */
@@ -92,6 +133,7 @@ class DataModel {
 	
 	/**
 	 * Sets the list of GROUP BY arguments.
+	 * 
 	 * @param array $groupby_list The list of GROUP BY clauses, this is simply an array of field names.
 	 * @retval DataModel Returns this for chaining.
 	 */
@@ -103,6 +145,7 @@ class DataModel {
 	/**
 	 * Sets the limit in LIMIT $value. No business logic is in here, that is in limit(), so the
 	 * limit value can be reset to -1. If -1, no LIMIT is used, otherwise, the LIMIT value is used.
+	 * 
 	 * @param integer $limit The max number of records to return.
 	 * @retval DataModel Returns this for chaining.
 	 */
@@ -114,6 +157,7 @@ class DataModel {
 	
 	/**
 	 * Sets the ORDER BY field. This only allows a single field for now.
+	 * 
 	 * @param string $orderby_field The field to sort the results by.
 	 * @retval DataModel Returns this for chaining.
 	 */
@@ -125,6 +169,7 @@ class DataModel {
 	/**
 	 * Sets the direction to order the fields. No business logic is done here, only
 	 * done in orderBy() so this can be reset to NULL for further queries.
+	 * 
 	 * @param string $orderby_order The direction to order the fields.
 	 * @retval DataModel Returns this for chaining.
 	 */
@@ -135,6 +180,7 @@ class DataModel {
 	
 	/**
 	 * Returns the data adapter currently being used.
+	 * 
 	 * @retval DataAdapter Returns the instance of the DataAdapter that's being used.
 	 */
 	public function getDataAdapter() {
@@ -143,6 +189,7 @@ class DataModel {
 	
 	/**
 	 * Returns the data adapter currently being used.
+	 * 
 	 * @retval array The list of fields to be returned in the query.
 	 */
 	public function getFieldList() {
@@ -150,7 +197,26 @@ class DataModel {
 	}
 	
 	/**
+	 * Returns the value of $fields_from_data_object.
+	 * 
+	 * @retval bool Returns whether or not to load only the fields from the DataObject in load*().
+	 */
+	public function getFieldsFromDataObject() {
+		return $this->fields_from_data_object;
+	}
+	
+	/**
+	 * Returns the list of other objects to join on.
+	 * 
+	 * @retval array The list of objects to join on.
+	 */
+	public function getJoinList() {
+		return $this->join_list;
+	}
+	
+	/**
 	 * Returns the list of WHERE fields and their comparisons.
+	 * 
 	 * @retval array Returns the list of WHERE fields and their comparisons.
 	 */
 	public function getWhereList() {
@@ -159,6 +225,7 @@ class DataModel {
 	
 	/**
 	 * Returns the list of GROUP BY fields.
+	 * 
 	 * @retval array Returns the list of GROUP BY fields.
 	 */
 	public function getGroupByList() {
@@ -167,6 +234,7 @@ class DataModel {
 	
 	/**
 	 * Returns the limit.
+	 * 
 	 * @retval integer Returns the limit.
 	 */
 	public function getLimit() {
@@ -175,6 +243,7 @@ class DataModel {
 	
 	/**
 	 * Returns the field to order by.
+	 * 
 	 * @retval string Returns the field to order by.
 	 */
 	public function getOrderByField() {
@@ -183,6 +252,7 @@ class DataModel {
 	
 	/**
 	 * Returns the order the ORDER BY field should use.
+	 * 
 	 * @retval DataAdapterPdo Returns the order the ORDER BY field should use.
 	 */
 	public function getOrderByOrder() {
@@ -194,6 +264,7 @@ class DataModel {
 	 * N number of arguments, and each time this is called, the fields are 
 	 * reset to whatever the arguments are. If no arguments are passed, nothing
 	 * happens.
+	 * 
 	 * @param string Each argument must be a string of the field to include in the result set.
 	 * @retval DataModel Returns this for chaining.
 	 */
@@ -209,9 +280,36 @@ class DataModel {
 	}
 	
 	/**
+	 * Sets the $fields_from_data_object member to true. When true, the query
+	 * will only load the fields from the DataObject set in load*(). This will
+	 * overwrite any previously set fields.
+	 * 
+	 * @retval DataObject Returns this for chaining.
+	 */
+	public function fieldsFrom() {
+		return $this->setFieldsFromDataObject(true);
+	}
+	
+	
+	/**
+	 * Start building an INNER JOIN part of the query. This method is quite naive
+	 * right now, as it just takes a DataObject to get the table and primary key to 
+	 * join from.
+	 * 
+	 * @param DataObject $object The DataObject to join on.
+	 * @retval DataModel Returns this for chaining.
+	 */
+	public function innerJoin(DataObject $object) {
+		$this->join_list[] = $object;
+		return $this;
+	}
+	
+	
+	/**
 	 * Adds another WHERE clause (or appends to current ones) to the query.
 	 * @param string $field A field in format 'field_name > ?'. The operator can be
 	 * =, ==, >, >=, <, <=, !=, or <>. The ? will be replaced by $value.
+	 * 
 	 * @param string $value The value to replace the ? by in the $field.
 	 * @retval DataModel Returns this for chaining.
 	 */
@@ -234,6 +332,7 @@ class DataModel {
 	
 	/**
 	 * Sets the limit when doing a SELECT query. Argument must be greater than -1.
+	 * 
 	 * @param integer $limit The limit to set.
 	 * @retval DataModel Returns this for chaining.
 	 */
@@ -248,6 +347,7 @@ class DataModel {
 	
 	/**
 	 * Sets the order by field and the order to do it in.
+	 * 
 	 * @param string $field The field to order by.
 	 * @param string $order The order to sort by. Must be DESC or ASC.
 	 * @retval DataModel Returns this for chaining.
@@ -264,6 +364,7 @@ class DataModel {
 	
 	/**
 	 * Sets the order by field and the order to do it in.
+	 * 
 	 * @param string $field The field to order by.
 	 * @param string $order The order to sort by. Must be DESC or ASC.
 	 * @retval DataModel Returns this for chaining.
@@ -278,6 +379,7 @@ class DataModel {
 	
 	/**
 	 * Executes the query and loads the first row found.
+	 * 
 	 * @param DataObject $object The object to load the data into. If no row is found, this object
 	 * is still returned to always have a consistent return type.
 	 * @retval DataObject Returns the object found.
@@ -329,6 +431,7 @@ class DataModel {
 	 * DataObject already exists (it knows it has an ID set), the data is updated
 	 * otherwise, it is inserted. The parameter is returned by reference so 
 	 * you can tell if it exists or not.
+	 * 
 	 * @param DataObject $object The object to save in the database.
 	 * @retval integer Returns the ID of the inserted or updated DataObject.
 	 */
@@ -349,6 +452,7 @@ class DataModel {
 	
 	/**
 	 * Deletes a DataObject from the data store.
+	 * 
 	 * @param DataObject $object The object to delete. Should contain all info it needs to delete itself.
 	 * @retval bool Always returns true.
 	 */
@@ -359,6 +463,7 @@ class DataModel {
 	
 	/**
 	 * Determines if a DataAdapterPdo has been set.
+	 * 
 	 * @throw DataModelerException Throws an exception if no DataAdapterPdo has been set.
 	 * @retval bool Returns true if the data adapater has been set.
 	 */
@@ -371,6 +476,7 @@ class DataModel {
 	
 	/**
 	 * Loads the data from the database after a findFirst() or findAll() method is called.
+	 * 
 	 * @param DataObject $object The DataObject is used to get the name of the table and primary key.
 	 * @retval DataAdapterPdoResult Returns the result from the database after a query.
 	 */
@@ -379,16 +485,32 @@ class DataModel {
 		$pkey = $object->pkey();
 
 		$sql_field_list = NULL;
-		$field_list = $this->getFieldList();
+		$fields_from_data_object = $this->getFieldsFromDataObject();
 		
-		if ( 0 === count($field_list) ) {
-			$sql_field_list = '*';
+		if ( true === $fields_from_data_object ) {
+			$sql_field_list = '`' . $table . '`.*';
 		} else {
-			$sql_field_list = implode('`, `', $field_list);
-			$sql_field_list = '`' . $sql_field_list . '`';
+			$field_list = $this->getFieldList();
+			if ( 0 === count($field_list) ) {
+				$sql_field_list = '*';
+			} else {
+				$sql_field_list = implode('`, `', $field_list);
+				$sql_field_list = '`' . $sql_field_list . '`';
+			}
 		}
 		
 		$sql = 'SELECT ' . $sql_field_list . ' FROM `' . $table . '` ';
+		
+		$join_list = $this->getJoinList();
+		if ( count($join_list) > 0 ) {
+			foreach ( $join_list as $join ) {
+				$join_table = $join->table();
+				$join_pkey = $join->pkey();
+				
+				$sql .= 'INNER JOIN `' . $join_table . '`
+					ON `' . $table . '`.`' . $pkey . '` = `' . $join_table . '`.`' . $join_pkey . '` ';
+			}
+		}
 		
 		$value_list = array();
 		$where_list = $this->getWhereList();
@@ -409,7 +531,7 @@ class DataModel {
 		$orderby_field = $this->getOrderByField();
 		$orderby_order = $this->getOrderByOrder();
 		if ( false === empty($orderby_field) && false === empty($orderby_order) ) {
-			$sql .= ' ORDER BY `' . $orderby_field . '` ' . $orderby_order;
+			$sql .= ' ORDER BY ' . $orderby_field . ' ' . $orderby_order;
 		}
 		
 		$limit = $this->getLimit();
@@ -421,6 +543,7 @@ class DataModel {
 		
 		$this->setWhereList(array())
 			->setFieldList(array())
+			->setJoinList(array())
 			->setLimit(-1)
 			->setOrderByField(NULL)
 			->setOrderByOrder(NULL)
