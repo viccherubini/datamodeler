@@ -305,10 +305,15 @@ class DataModel {
 	 * join from.
 	 * 
 	 * @param DataObject $object The DataObject to join on.
+	 * @param string $field Optional field to join on. If empty, the pkey from $object is used.
 	 * @retval DataModel Returns this for chaining.
 	 */
-	public function innerJoin(DataObject $object) {
-		$this->join_list[] = $object;
+	public function innerJoin(DataObject $object, $field=NULL) {
+		if ( true === empty($field) ) {
+			$field = $object->pkey();
+		}
+		
+		$this->join_list[] = array($object, $field);
 		return $this;
 	}
 	
@@ -523,11 +528,11 @@ class DataModel {
 		$join_list = $this->getJoinList();
 		if ( count($join_list) > 0 ) {
 			foreach ( $join_list as $join ) {
-				$join_table = $join->table();
-				$join_pkey = $join->pkey();
+				$join_table = $join[0]->table();
+				$join_field = $join[1];
 				
 				$sql .= "INNER JOIN `{$join_table}`
-					ON {$table}.{$pkey} = {$join_table}.{$join_pkey} ";
+					ON {$table}.{$pkey} = {$join_table}.{$join_field} ";
 			}
 		}
 		
