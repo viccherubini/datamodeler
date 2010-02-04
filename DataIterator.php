@@ -190,9 +190,10 @@ class DataIterator implements Iterator {
 					$result_list[] = $list_item;
 				}
 			}
-
-			$this->filter = array();
-			$this->filter_count = 0;
+			
+			if ( $this->limit > 0 ) {
+				$result_list = array_slice($result_list, 0, $this->limit);
+			}
 		}
 
 		return (new DataIterator($result_list));
