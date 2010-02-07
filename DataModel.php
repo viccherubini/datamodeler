@@ -305,15 +305,23 @@ class DataModel {
 	 * join from.
 	 * 
 	 * @param DataObject $object The DataObject to join on.
-	 * @param string $field Optional field to join on. If empty, the pkey from $object is used.
+	 * @param string $field1 Optional field to join from $object. If empty, the pkey from $object is used.
+	 * @param string $field2 Optional field to join on the object in the load*() method. If empty, the pkey from that object is used.
 	 * @retval DataModel Returns this for chaining.
 	 */
-	public function innerJoin(DataObject $object, $field=NULL) {
-		if ( true === empty($field) ) {
-			$field = $object->pkey();
+	public function innerJoin(DataObject $object_left, DataObject $object_right, $field_left=NULL, $field_right=NULL) {
+		$table_left = $object_left->table();
+		$table_right = $object_right->table();
+		
+		if ( true === empty($field_left) ) {
+			$field_left = $object_left->pkey();
 		}
 		
-		$this->join_list[] = array($object, $field);
+		if ( true === empty($field_right) ) {
+			$field_right = $object_right->pkey();
+		}
+		
+		$this->join_list[] = array($table_left, $table_right, $field_left, $field_right);
 		return $this;
 	}
 	
@@ -420,7 +428,7 @@ class DataModel {
 			$object->model($model);
 		}
 		
-		return $object;
+		return clone $object;
 	}
 	
 	/**
@@ -528,11 +536,14 @@ class DataModel {
 		$join_list = $this->getJoinList();
 		if ( count($join_list) > 0 ) {
 			foreach ( $join_list as $join ) {
-				$join_table = $join[0]->table();
-				$join_field = $join[1];
+				$table_left = $join[0];
+				$table_right = $join[1];
 				
-				$sql .= "INNER JOIN `{$join_table}`
-					ON {$table}.{$pkey} = {$join_table}.{$join_field} ";
+				$field_left = $join[2];
+				$field_right = $join[3];
+
+				$sql .= "INNER JOIN `{$table_right}`
+					ON {$table_left}.{$field_left} = {$table_right}.{$field_right} ";
 			}
 		}
 		
