@@ -138,6 +138,24 @@ abstract class DataObject {
 	 * ANONYMOUS GETTERS AND SETTERS
 	 */
 	
+	public function allFields() {
+		$table = $this->table();
+		$all_fields = "{$table}.*";
+		return $all_fields;
+	}
+	
+	public function field($field) {
+		$table = $this->table();
+		$field = "{$table}.{$field}";
+		return $field;
+	}
+	
+	public function fieldOp($field, $op) {
+		$field = $this->field($field);
+		$field_op = "{$field} {$op} ?";
+		return $field_op;
+	}
+	
 	/**
 	 * Set or get all of the model data. If this has an array for an argument,
 	 * the model will be set. If no argument is passed, the model will be returned.
