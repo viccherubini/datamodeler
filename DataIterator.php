@@ -61,6 +61,12 @@ class DataIterator implements Iterator {
 	 * Allow a clean clone of this object.
 	 */
 	public function __clone() {
+		$this->reset();
+	}
+	
+	public function reset() {
+		$this->filter = array();
+		$this->filter_count = 0;
 		$this->length = count($this->data_list);
 		$this->rewind();
 	}
