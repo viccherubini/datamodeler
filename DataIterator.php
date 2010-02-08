@@ -202,6 +202,8 @@ class DataIterator implements Iterator {
 			}
 		}
 
+		$this->reset();
+		
 		return (new DataIterator($result_list));
 	}
 	
