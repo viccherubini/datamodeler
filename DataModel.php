@@ -5,6 +5,7 @@
  * searching and saving of a DataObject away from the data store.
  * Right now it's tied to a SQL based data store, but future revisions
  * will allow non SQL related ones.
+
  * @author vmc <vmc@leftnode.com>
  * @todo Move the loading of DataObject data from here to the DataAdapter classes.
  */
