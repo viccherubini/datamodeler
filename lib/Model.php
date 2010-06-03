@@ -3,6 +3,6 @@
 declare(encoding='UTF-8');
 namespace DataModeler;
 
-class Model {
+abstract class Model {
 	
 }
