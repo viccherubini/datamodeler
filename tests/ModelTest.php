@@ -7,8 +7,58 @@ require_once 'lib/Model.php';
 
 class ModelTest extends TestCase {
 
-	
+	public function testMagicGetter() {
+		$first_name = "Vic Cherubini";
+		
+		$model = $this->buildMockModel();
+		$model->first_name = $first_name;
+		
+		$this->assertEquals($first_name, $model->first_name);
+	}
 
+	
+	public function testMagicGetterCanGetPkey() {
+		$product_id = 10;
+		
+		$model = $this->buildMockModel();
+		$model->pkey('product_id');
+		$model->id($product_id);
+		
+		
+		$this->assertEquals($product_id, $model->product_id);
+	}
+
+
+	public function testMagicSetter() {
+		$expected_model_array = array('first_name' => "Vic Cherubini");
+		
+		$model = $this->buildMockModel();
+		$model->first_name = "Vic Cherubini";
+		
+		$this->assertEquals($expected_model_array, $model->model());
+	}
+	
+	
+	public function testMagicSetterCannotSetPkeyInModel() {
+		$model = $this->buildMockModel();
+		$model->pkey('product_id');
+		
+		$model->product_id = 10;
+		$this->assertEmptyArray($model->model());
+	}
+	
+	
+	public function testMagicSetterCanSetPkeyInObject() {
+		$pkey = "product_id";
+		$product_id = 10;
+		
+		$model = $this->buildMockModel();
+		$model->pkey($pkey);
+		$model->$pkey = 10;
+		
+		$this->assertEquals($product_id, $model->id());
+	}
+	
 
 	public function testDatetypeIsTimestampByDefault() {
 		$model = $this->buildMockModel();
@@ -66,7 +116,7 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testFirstElementOfModelCanBeFalse() {
+	public function testModelFirstElementCanBeFalse() {
 		$model = $this->buildMockModel();
 		$model->model(array(false));
 		
@@ -74,7 +124,18 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testTableNameCanBeSet() {
+	public function testPkeyCannotContainBackticks() {
+		$pkey_with_backticks = '`p.product_id`';
+		$pkey_without_backticks = 'p.product_id';
+		
+		$model = $this->buildMockModel();
+		$model->pkey($pkey_with_backticks);
+		
+		$this->assertEquals($pkey_without_backticks, $model->pkey());
+	}
+	
+	
+	public function testTableCanBeSet() {
 		$table = 'products';
 	
 		$model = $this->buildMockModel();
@@ -87,7 +148,7 @@ class ModelTest extends TestCase {
 	/**
 	 * @dataProvider providerValidTableNameList
 	 */
-	public function testTableNameCanOnlyContainValidCharacters($table) {
+	public function testTableCanOnlyContainValidCharacters($table) {
 		$model = $this->buildMockModel();
 		$model->table($table);
 		
@@ -95,7 +156,7 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testTableNameHasBackticksRemoved() {
+	public function testTableCannotContainBackticks() {
 		$table_with_backticks = '`table_name`';
 		$table_without_backticks = 'table_name';
 		
@@ -104,7 +165,6 @@ class ModelTest extends TestCase {
 		
 		$this->assertEquals($table_without_backticks, $model->table());
 	}
-	
 	
 	
 	public function providerValidTableNameList() {
