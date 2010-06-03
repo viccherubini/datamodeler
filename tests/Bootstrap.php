@@ -1,9 +1,10 @@
 <?php
 
 declare(encoding='UTF-8');
-namespace DataModeler;
+namespace DataModelerTest;
 
 require_once 'PHPUnit/Framework.php';
+require_once 'TestCase.php';
 
 $data_modeler_test_path = dirname(__FILE__);
 $data_modeler_lib_path  = $data_modeler_test_path . '/../';
