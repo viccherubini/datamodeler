@@ -23,6 +23,36 @@ abstract class Model {
 	}
 	
 	
+	public function __get($key) {
+		$pkey = $this->pkey();
+		
+		if ( $pkey === $key ) {
+			return $this->id();
+		} else {
+			$model = $this->model();
+			if ( true === isset($model[$key]) ) {
+				return $model[$key];
+			}
+		}
+		
+		return NULL;
+	}
+	
+	public function __set($key, $value) {
+		$pkey = $this->pkey();
+		
+		if ( $key === $pkey ) {
+			$this->id($value);
+		} else {
+			if ( true === $this->isValidField($key) ) {
+				$this->model[$key] = $value;
+			}
+		}
+		
+		return true;
+	}
+	
+	
 	public function datetype($datetype = 0) {
 		$datetype = intval($datetype);
 		if ( $datetype > 0 ) {
@@ -46,6 +76,10 @@ abstract class Model {
 
 	public function model(array $model = array()) {
 		if ( false !== current($model) || ( count($model) > 0 ) ) {
+			$pkey = $this->pkey();
+			if ( true === isset($model[$pkey]) ) {
+				unset($model[$pkey]);
+			}
 			$this->model = $model;
 		}
 		return $this->model;
@@ -53,19 +87,34 @@ abstract class Model {
 	
 	
 	public function pkey($pkey = NULL) {
-		
+		$pkey = trim($pkey);
+		if ( false === empty($pkey) ) {
+			$pkey = $this->removeBackticks($pkey);
+			$this->pkey = $pkey;
+		}
+		return $this->pkey;
 	}
 
 
 	public function table($table = NULL) {
 		$table = trim($table);
 		if ( false === empty($table) ) {
-			$table = str_replace('`', NULL, $table);
+			$table = $this->removeBackticks($table);
 			$this->table = $table;
 		}
 		return $this->table;
 	}
 
-
 	
+	private function removeBackticks($value) {
+		return str_replace('`', NULL, $value);
+	}
+	
+	
+	private function isValidField($field) {
+		if ( 1 === preg_match('/[a-z0-9_\-.]+/i', $field) ) {
+			return true;
+		}
+		return false;
+	}
 }
