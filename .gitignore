@@ -1,2 +1,2 @@
-build
-configure.php
+config/configure.php
+docs/test-coverage
