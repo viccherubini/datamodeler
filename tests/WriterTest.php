@@ -13,4 +13,13 @@ class WriterTest extends TestCase {
 		$this->assertEmptyArray($writer->getAdapterList());
 	}
 
+	public function testAdapterCanBeAttached() {
+		$adapter = $this->buildMockAdapter();
+		
+		$writer = new \DataModeler\Writer;
+		$writer->addAdapter($adapter);
+		
+		$this->assertEquals(1, count($writer->getAdapterList()));
+	}
+
 }
