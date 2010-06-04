@@ -3,7 +3,7 @@
 declare(encoding='UTF-8');
 namespace DataModelerTest;
 
-require_once 'Adapter/AdapterTest.php';
+require_once 'AdapterTest.php';
 require_once 'ModelTest.php';
 require_once 'WriterTest.php';
 
