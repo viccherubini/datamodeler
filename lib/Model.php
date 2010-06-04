@@ -22,6 +22,7 @@ abstract class Model {
 	const DATETYPE_TIMESTAMP = 2;
 	const DATETYPE_NOW = 4;
 	
+	
 	public function __construct() {
 		
 	}
