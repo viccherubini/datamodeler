@@ -23,7 +23,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 
 	
 	protected function buildMockAdapter() {
-		$adapter = $this->getMockForAbstractClass('\DataModeler\Adapter');
+		$adapter = $this->getMockForAbstractClass('\DataModeler\Adapter\Adapter');
 	
 		return $adapter;
 	}
