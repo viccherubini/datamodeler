@@ -3,12 +3,21 @@
 declare(encoding='UTF-8');
 namespace DataModeler;
 
+/**
+ * Abstract Model class for building FAT, intelligent models. The model is
+ * your primary in memory data store. This class should be extended to another
+ * class that is a 1:1 relationship with a table or document.
+ * 
+ * @author vmc <vmc@leftnode.com>
+ * @version 0.0.10
+ */
 abstract class Model {
-	private $id = NULL;
-	private $pkey = NULL;
 	private $datetype = NULL;
-	private $table = NULL;
+	private $hasdate = NULL;
+	private $id = NULL;
 	private $model = array();
+	private $pkey = NULL;
+	private $table = NULL;
 	
 	const DATETYPE_TIMESTAMP = 2;
 	const DATETYPE_NOW = 4;
@@ -19,7 +28,7 @@ abstract class Model {
 	
 	
 	public function __destruct() {
-		
+		$this->model = array();
 	}
 	
 	
@@ -34,9 +43,9 @@ abstract class Model {
 				return $model[$key];
 			}
 		}
-		
 		return NULL;
 	}
+	
 	
 	public function __set($key, $value) {
 		$pkey = $this->pkey();
@@ -48,7 +57,6 @@ abstract class Model {
 				$this->model[$key] = $value;
 			}
 		}
-		
 		return true;
 	}
 	
@@ -61,10 +69,17 @@ abstract class Model {
 			}
 			$this->datetype = $datetype;
 		}
-		
 		return $this->datetype;
 	}
 
+
+	public function hasdate($hasdate = NULL) {
+		if ( true === $hasdate || false === $hasdate ) {
+			$this->hasdate = $hasdate;
+		}
+		return $this->hasdate;
+	}
+	
 
 	public function id($id = NULL) {
 		if ( false === empty($id) ) {
