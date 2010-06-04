@@ -84,6 +84,30 @@ class ModelTest extends TestCase {
 	}
 	
 	
+	public function testHasdateCannotBeNonBoolean() {
+		$model = $this->buildMockModel();
+		$model->hasdate(103);
+		
+		$this->assertNull($model->hasdate());
+	}
+	
+	
+	public function testHasdateCanBeTrue() {
+		$model = $this->buildMockModel();
+		$model->hasdate(true);
+		
+		$this->assertTrue($model->hasdate());
+	}
+	
+	
+	public function testHasdateCanBeFalse() {
+		$model = $this->buildMockModel();
+		$model->hasdate(false);
+		
+		$this->assertFalse($model->hasdate());
+	}
+	
+	
 	public function testIdIsInitiallyEmpty() {
 		$model = $this->buildMockModel();
 		$this->assertNull($model->id());
