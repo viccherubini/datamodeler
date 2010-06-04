@@ -4,6 +4,7 @@ declare(encoding='UTF-8');
 namespace DataModelerTest;
 
 class TestCase extends \PHPUnit_Framework_TestCase {
+	
 	public static function assertArray($a, $message = '') {
 		self::assertThat(is_array($a), self::isTrue(), $message);
 	}
@@ -19,6 +20,14 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 		self::assertArray($a);
 		self::assertGreaterThan(0, count($a), $message);
 	}
+
+	
+	protected function buildMockAdapter() {
+		$adapter = $this->getMockForAbstractClass('\DataModeler\Adapter');
+	
+		return $adapter;
+	}
+
 	
 	protected function buildMockModel() {
 		$model = $this->getMockForAbstractClass('\DataModeler\Model');
