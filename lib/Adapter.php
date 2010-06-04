@@ -1,7 +1,7 @@
 <?php
 
 declare(encoding='UTF-8');
-namespace DataModeler\Adapter;
+namespace DataModeler;
 
 abstract class Adapter {
 	private $id = NULL;

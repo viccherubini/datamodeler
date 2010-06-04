@@ -3,7 +3,7 @@
 declare(encoding='UTF-8');
 namespace DataModelerTest;
 
-require_once 'lib/Adapter/Adapter.php';
+require_once 'lib/Adapter.php';
 
 class AdapterTest extends TestCase {
 
