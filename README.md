@@ -13,7 +13,8 @@ You can attach multiple adapters to a single Writer. Each time `write()` is call
 	<?php
 	
 	declare(encoding='UTF-8');
-	namespace DataModeler;
+	
+	use DataModeler, DataModeler\Adapter, DataModeler\Adapter\Document;
 	
 	require_once 'lib/Model.php';
 	require_once 'lib/Writer.php';
@@ -23,7 +24,7 @@ You can attach multiple adapters to a single Writer. Each time `write()` is call
 	class \Product extends Model {
 	}
 	
-	$pdo_adapter = new Adapter\Pdo;
+	$pdo_adapter = new Pdo;
 	$pdo_adapter->setDriver('mysql')
 		->setServer('localhost')
 		->setUsername('username')
@@ -31,7 +32,7 @@ You can attach multiple adapters to a single Writer. Each time `write()` is call
 		->setDatabase('products');
 	$pdo_adapter->connect();
 	
-	$mongodb_adapter = new Adapter\Document\Mongodb;
+	$mongodb_adapter = new Mongodb;
 	$mongodb_adapter->setServer('localhost')
 		->setUsername('username')
 		->setPassword('password')
