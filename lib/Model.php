@@ -33,6 +33,32 @@ abstract class Model {
 	}
 	
 	
+	public function __call($method, $argv) {
+		$argc = count($argv);
+		
+		$k = $this->convertCamelCaseToUnderscores($method);
+		
+		if ( 0 === $argc ) {
+			/* If the length is 0, assume this is a get() */
+			$v = $this->__get($k);
+			return $v;
+		} else {
+			$v = current($argv);
+			
+			/* If the key is the pkey of the object, don't allow that to be set. */
+			$pkey = $this->pkey();
+			if ( $k === $pkey ) {
+				$this->id($v);
+			} else {
+				/* Else assume its a set with the first element of $argv. */
+				$this->__set($k, $v);
+			}
+			
+			return $this;
+		}
+	}
+	
+	
 	public function __get($key) {
 		$pkey = $this->pkey();
 		
@@ -122,15 +148,27 @@ abstract class Model {
 	}
 
 	
+	private function convertCamelCaseToUnderscores($v) {
+		$v = substr($v, 3);
+		$v = strtolower(substr($v, 0, 1)) . substr($v, 1);
+		$v = preg_replace('/[A-Z]/', '_\\0', $v);
+		$v = strtolower($v);
+		
+		return $v;
+	}
+	
+	private function isValidField($field) {
+		if ( 1 === preg_match('/^[a-z0-9_\-.]+$/i', $field) ) {
+			return true;
+		}
+		return false;
+	}
+	
+	
 	private function removeBackticks($value) {
 		return str_replace('`', NULL, $value);
 	}
 	
 	
-	private function isValidField($field) {
-		if ( 1 === preg_match('/[a-z0-9_\-.]+/i', $field) ) {
-			return true;
-		}
-		return false;
-	}
+	
 }
