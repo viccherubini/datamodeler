@@ -34,4 +34,10 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 		
 		return $model;
 	}
+	
+	
+	protected function buildMockPdo($dsn) {
+		$pdo = $this->getMock('\PDO', array(), array($dsn));
+		return $pdo;
+	}
 }
