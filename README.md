@@ -14,34 +14,47 @@ You can attach multiple adapters to a single Writer. Each time `write()` is call
 	
 	declare(encoding='UTF-8');
 	
-	use DataModeler, DataModeler\Adapter, DataModeler\Adapter\Document;
+	use DataModeler\Model,
+		DataModeler\Writer,
+		DataModeler\Adapter\Sql,
+		DataModeler\Adapter\Document\Redis;
 	
 	require_once 'lib/Model.php';
 	require_once 'lib/Writer.php';
-	require_once 'lib/Adapter/Pdo.php';
-	require_once 'lib/Adapter/Document/Mongodb.php';
+	require_once 'lib/Adapter/Sql.php';
+	require_once 'lib/Adapter/Document/Redis.php';
 	
+	/**
+	 * Automatically build an object that models data in a datastore.
+	 */
 	class \Product extends Model {
+	
 	}
 	
-	$pdo_adapter = new Pdo;
-	$pdo_adapter->setDriver('mysql')
-		->setServer('localhost')
-		->setUsername('username')
-		->setPassword('password')
-		->setDatabase('products');
-	$pdo_adapter->connect();
+	/**
+	 * Because the Sql class depends on an external object, the \PDO object,
+	 * the object is constructed externally and added to the Sql object.
+	 */
+	$sql_adapter = new \PDO('sqlite:/path/to/database.sqlite3');
 	
-	$mongodb_adapter = new Mongodb;
-	$mongodb_adapter->setServer('localhost')
+	$sql_adapter = new Sql;
+	$sql_adapter->attachDb($sql);
+	
+	/**
+	 * If an external \Redis object were ever necessary, it would be constructed
+	 * externally and added to the Redis DataModeler object. For now, the
+	 * management of a Redis connection will be handled internally since there's
+	 * no dependency injection.
+	 */
+	$redis_adapter = new Redis;
+	$redis_adapter->setServer('localhost')
 		->setUsername('username')
 		->setPassword('password')
-		->setDatabase('mongodb');
+		->setDatabase('redisdb');
 	
 	$writer = new Writer();
-	$writer->addAdapter($pdo_adapter);
-	$writer->addAdapter($mongodb_adapter);
-	
+	$writer->addAdapter($sql_adapter);
+	$writer->addAdapter($redis_adapter);
 	
 	$product = new \Product;
 	$product->setName('Writing Advance PHP Applications: A Book')
