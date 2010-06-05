@@ -7,15 +7,54 @@ require_once 'lib/Model.php';
 
 class ModelTest extends TestCase {
 
-	public function testMagicGetter() {
-		$first_name = "Vic Cherubini";
-		
+	public function testMagicCallerWithGet() {
 		$model = $this->buildMockModel();
-		$model->first_name = $first_name;
+		$model->setFirstname('Vic');
 		
-		$this->assertEquals($first_name, $model->first_name);
+		$this->assertEquals('Vic', $model->getFirstname());
 	}
 
+
+	public function testMagicCallerWithSet() {
+		$firstname = 'Vic';
+		$lastname = 'Cherubini';
+		
+		$model = $this->buildMockModel();
+		$model->setFirstname($firstname);
+		$model->setLastname($lastname);
+		
+		$this->assertEquals(array('firstname' => $firstname, 'lastname' => $lastname), $model->model());
+	}
+	
+	
+	public function testMagicCallerWithSetDoesNotAllowPkeyToBeSetInModel() {
+		$pkey = 'product_id';
+		
+		$model = $this->buildMockModel();
+		$model->pkey($pkey);
+		
+		$model->setProductId(10);
+		
+		$this->assertEmptyArray($model->model());
+	}
+	
+
+	public function testMagicGetter() {
+		$firstname = "Vic";
+		
+		$model = $this->buildMockModel();
+		$model->firstname = $firstname;
+		
+		$this->assertEquals($firstname, $model->firstname);
+	}
+
+
+	public function testMagicGetterReturnsNullWhenKeyDoesNotExist() {
+		$model = $this->buildMockModel();
+		
+		$this->assertNull($model->firstname);
+	}
+	
 	
 	public function testMagicGetterCanGetPkey() {
 		$product_id = 10;
@@ -57,6 +96,18 @@ class ModelTest extends TestCase {
 		$model->$pkey = 10;
 		
 		$this->assertEquals($product_id, $model->id());
+	}
+	
+	/**
+	 * @dataProvider providerInvalidFieldName
+	 */
+	public function testMagicSetterDoesNotAllowInvalidFieldToBeSet($field) {
+		$value = "invalid value";
+		
+		$model = $this->buildMockModel();
+		$model->$field = $value;
+	
+		$this->assertEmptyArray($model->model());
 	}
 	
 
@@ -148,6 +199,18 @@ class ModelTest extends TestCase {
 	}
 	
 	
+	public function testModelDoesNotAllowPkeyToBeSetInIt() {
+		$array = array('product_id' => 10);
+		$pkey = 'product_id';
+		
+		$model = $this->buildMockModel();
+		$model->pkey($pkey);
+		$model->model($array);
+		
+		$this->assertEmptyArray($model->model());
+	}
+	
+	
 	public function testPkeyCannotContainBackticks() {
 		$pkey_with_backticks = '`p.product_id`';
 		$pkey_without_backticks = 'p.product_id';
@@ -170,7 +233,7 @@ class ModelTest extends TestCase {
 	
 	
 	/**
-	 * @dataProvider providerValidTableNameList
+	 * @dataProvider providerValidTableName
 	 */
 	public function testTableCanOnlyContainValidCharacters($table) {
 		$model = $this->buildMockModel();
@@ -191,7 +254,7 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function providerValidTableNameList() {
+	public function providerValidTableName() {
 		return array(
 			array('products'),
 			array('p.products'),
@@ -200,6 +263,17 @@ class ModelTest extends TestCase {
 			array('p.product_list'),
 			array('p.product-list')
 		);
-		
+	}
+	
+	
+	public function providerInvalidFieldName() {
+		return array(
+			array('vic[]cherubini'),
+			array('vic cherubini'),
+			array('vic*cherubini'),
+			array('vic@cherubini'),
+			array('vic()cherubini'),
+			array('vic&cherubini')
+		);
 	}
 }
