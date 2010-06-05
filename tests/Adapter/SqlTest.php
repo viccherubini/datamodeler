@@ -3,19 +3,21 @@
 declare(encoding='UTF-8');
 namespace DataModelerTest\Adapter;
 
-use DataModelerTest\TestCase;
+use DataModelerTest\TestCase, DataModeler\Adapter\Sql;
 
-require_once 'lib/Adapter/Pdo.php';
+require_once 'lib/Adapter/Sql.php';
 
-class PdoTest extends TestCase {
+class SqlTest extends TestCase {
 
-	public function testHostNameCanBeSet() {
-		$host = '127.0.0.1';
+	public function testPdoCanBeAttached() {
+		$pdo = $this->buildMockPdo('sqlite::memory:');
 		
-		//$pdo_root = 
+		$sql = new Sql;
+		$sql->attachDb($pdo);
 		
-		//$pdo = new Pdo;
-		
-		
+		$this->assertTrue($sql->getDb() instanceof \PDO);
 	}
+	
+	
+	
 }
