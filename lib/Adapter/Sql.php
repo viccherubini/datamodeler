@@ -16,5 +16,16 @@ class Sql {
 		
 	}
 	
+	public function attachDb(\PDO $db) {
+		$this->db = $db;
+		return $this;
+	}
 	
+	
+	
+	
+	
+	public function getDb() {
+		return $this->db;
+	}
 }
