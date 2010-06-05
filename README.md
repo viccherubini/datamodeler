@@ -9,7 +9,7 @@ Of course, the order is not important initially; the Adapter can be built before
 
 You can attach multiple adapters to a single Writer. Each time `write()` is called on the Writer object, the Model sent to `write()` will be written to each attached Adapter.
 
-## Sample Writing Application
+## Sample Writer Application
 	<?php
 	
 	declare(encoding='UTF-8');
@@ -63,3 +63,5 @@ You can attach multiple adapters to a single Writer. Each time `write()` is call
 		
 	$writer->write($product);
 	
+
+## Sample Loader Application
