@@ -32,18 +32,4 @@ class Writer {
 	public function getAdapterList() {
 		return $this->adapterList;
 	}
-	
-	
-	
-	public function write(Model $model) {
-		if ( false !== current($this->adapterList) ) {
-			return false;
-		}
-		
-		foreach ( $this->adapterList as $adapter ) {
-			$adapter->write($model);
-		}
-		
-		return true;
-	}
 }
