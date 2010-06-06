@@ -49,6 +49,16 @@ class SqlTest extends TestCase {
 	
 	
 	/**
+	 * @expectedException \DataModeler\Exception
+	 */
+	public function testRawExecuteCanNotBeExecutedIfNoPdoAttached() {
+		$sql = new Sql;
+		
+		$sql->rawExecute("SELECT * FROM `fake_table` WHERE id = 10");
+	}
+	
+	
+	/**
 	 * @dataProvider providerRawExecuteQuery
 	 */
 	public function testRawExecuteReturnsTheRowCountOfTheQueryExecuted($sql_query, $expected_row_count) {
@@ -70,6 +80,27 @@ class SqlTest extends TestCase {
 		
 		$sql->rawExecute("SELECT * FROM `products`");
 	}
+
+
+	public function testRawQueryReturnsPdoStatementObject() {
+		$sql = new Sql;
+		$sql->attachDb($this->pdo);
+		
+		$result_pdo_statement = $sql->rawQuery("SELECT * FROM `products`");
+		
+		$this->assertTrue($result_pdo_statement instanceof \PDOStatement);
+	}
+	
+	/**
+	 * @expectedException \DataModeler\Exception
+	 */
+	public function testRawQueryCanNotBeExecutedIfNoPdoAttached() {
+		$sql = new Sql;
+		
+		$result_pdo_statement = $sql->rawQuery("SELECT * FROM `fake_table` WHERE id = 10");
+	}
+
+
 
 
 	public function providerRawExecuteQuery() {

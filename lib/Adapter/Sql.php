@@ -26,7 +26,7 @@ class Sql {
 	
 	public function rawQuery($sql) {
 		$this->hasDb();
-		$result = $this->getDb()->query($sql, PDO::FETCH_ASSOC);
+		$result = $this->getDb()->query($sql, \PDO::FETCH_ASSOC);
 		
 		return $result;
 	}
