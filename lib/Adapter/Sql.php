@@ -26,18 +26,18 @@ class Sql {
 	
 	public function rawQuery($sql) {
 		$this->hasDb();
+		$result = $this->getDb()->query($sql, PDO::FETCH_ASSOC);
 		
-		$result = $this->getDb()->query($sql);
-		
-		
-		$this->getDb()->closeCursor();
+		return $result;
 	}
 	
 	
 	public function rawExecute($sql) {
 		$this->hasDb();
+		$this->preventSelectStatementExecution($sql);
 		
 		$row_count = $this->getDb()->exec($sql);
+		
 		return $row_count;
 	}
 	
@@ -50,7 +50,25 @@ class Sql {
 	
 	private function hasDb() {
 		if ( NULL === $this->getDb() ) {
-			throw new DataModeler\Exception("Database object has not yet been attached to Sql Adapter.");
+			throw new \DataModeler\Exception("Database object has not yet been attached to Sql Adapter.");
+		}
+		
+		return true;
+	}
+	
+	
+	private function isSelectStatement($sql) {
+		if ( 0 === stripos($sql, 'SELECT') ) {
+			return true;
+		}
+		
+		return false;
+	}
+
+
+	private function preventSelectStatementExecution($sql) {
+		if ( true === $this->isSelectStatement($sql) ) {
+			throw new \DataModeler\Exception("SELECT statements will return an incorrect number of rows, use query() or a prepared statement instead.");
 		}
 		
 		return true;
