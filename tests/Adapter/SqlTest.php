@@ -10,11 +10,9 @@ require_once 'lib/Adapter/Sql.php';
 class SqlTest extends TestCase {
 	
 	private $pdo = NULL;
-	
 	private $sql_create_table = NULL;
 	private $sql_list = array();
-	
-	
+
 	
 	public function setUp() {
 		$this->pdo = new \PDO('sqlite::memory:');
@@ -90,6 +88,7 @@ class SqlTest extends TestCase {
 		
 		$this->assertTrue($result_pdo_statement instanceof \PDOStatement);
 	}
+
 	
 	/**
 	 * @expectedException \DataModeler\Exception
