@@ -211,6 +211,25 @@ class ModelTest extends TestCase {
 	}
 	
 	
+	public function testObjectExistsWhenPkeyValueIsSet() {
+		$pkey = 'product_id';
+		$id = 10;
+		
+		$model = $this->buildMockModel();
+		$model->pkey($pkey);
+		$model->id($id);
+		
+		$this->assertTrue($model->exists());
+	}
+	
+	
+	public function testObjectDoesNotExistWhenPkeyValueIsNotSet() {
+		$model = $this->buildMockModel();
+		
+		$this->assertFalse($model->exists());
+	}
+	
+	
 	public function testPkeyCannotContainBackticks() {
 		$pkey_with_backticks = '`p.product_id`';
 		$pkey_without_backticks = 'p.product_id';

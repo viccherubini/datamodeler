@@ -98,6 +98,12 @@ abstract class Model {
 		}
 		return $this->datetype;
 	}
+	
+	
+	public function exists() {
+		$id = $this->id();
+		return (false === empty($id));
+	}
 
 
 	public function hasdate($hasdate = NULL) {
