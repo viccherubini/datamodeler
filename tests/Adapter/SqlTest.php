@@ -10,26 +10,17 @@ require_once 'lib/Adapter/Sql.php';
 class SqlTest extends TestCase {
 	
 	private $pdo = NULL;
-	private $sql_create_table = NULL;
-	private $sql_list = array();
-
 	
 	public function setUp() {
 		$this->pdo = new \PDO('sqlite::memory:');
 		
-		$this->sql_create_table = "CREATE TABLE products (id INTEGER PRIMARY KEY, name TEXT, price REAL, sku TEXT)";
-		
-		$this->sql_list = array(
-			"INSERT INTO products VALUES (NULL, 'Product 1', 10.95, 'P1')",
-			"INSERT INTO products VALUES (NULL, 'Product 2', 18.95, 'P2')",
-			"INSERT INTO products VALUES (NULL, 'Product 3', 22.97, 'P3')"
-		);
-		
-		$this->pdo->exec($this->sql_create_table);
-		
-		foreach ( $this->sql_list as $sql ) {
-			$this->pdo->exec($sql);
+		$sql_file = DIRECTORY_DATA . 'SqlTest.sql';
+		if ( true === is_file($sql_file) ) {
+			$sql_data = file_get_contents($sql_file);
+			
+			$this->pdo->exec($sql_data);
 		}
+		
 	}
 
 
