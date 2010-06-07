@@ -101,4 +101,16 @@ class SqlTest extends TestCase {
 		);
 	}
 	
+	
+	public function providerPreparedQuery() {
+		return array(
+			array("SELECT * FROM `products` WHERE id = :id", array(':id' => 2), 1),
+			array("SELECT * FROM `products` WHERE id = :id AND sku = :sku", array(':id' => 2, ':sku' => 'P2'), 1),
+			array("SELECT * FROM `products` WHERE id <> :id", array(':id' => 1), 3),
+			array("SELECT * FROM `products` WHERE id = :id", array(':id' => 2), 1)
+		);
+		
+		
+	}
+	
 }
