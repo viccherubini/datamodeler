@@ -29,7 +29,7 @@ class SqlTest extends TestCase {
 	}
 	
 
-	public function testPdoCanBeAttached() {
+	public function testAttachDb_CanAttachPdoObject() {
 		$sql = new Sql;
 		$sql->attachDb($this->pdo);
 		
@@ -40,7 +40,7 @@ class SqlTest extends TestCase {
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
-	public function testRawExecuteCanNotBeExecutedIfNoPdoAttached() {
+	public function testRawExecute_RequiresPdoToExecute() {
 		$sql = new Sql;
 		
 		$sql->rawExecute("SELECT * FROM `fake_table` WHERE id = 10");
@@ -50,7 +50,7 @@ class SqlTest extends TestCase {
 	/**
 	 * @dataProvider providerRawExecuteQuery
 	 */
-	public function testRawExecuteReturnsTheRowCountOfTheQueryExecuted($sql_query, $expected_row_count) {
+	public function testRawExecute_ReturnsRowCount($sql_query, $expected_row_count) {
 		$sql = new Sql;
 		$sql->attachDb($this->pdo);
 		
@@ -63,7 +63,7 @@ class SqlTest extends TestCase {
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
-	public function testRawExecuteDoesNotAllowSelectStatements() {
+	public function testRawExecute_DoesNotAllowSelectStatements() {
 		$sql = new Sql;
 		$sql->attachDb($this->pdo);
 		
@@ -71,7 +71,7 @@ class SqlTest extends TestCase {
 	}
 
 
-	public function testRawQueryReturnsPdoStatementObject() {
+	public function testRawQuery_ReturnsPdoStatementObject() {
 		$sql = new Sql;
 		$sql->attachDb($this->pdo);
 		
@@ -84,13 +84,11 @@ class SqlTest extends TestCase {
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
-	public function testRawQueryCanNotBeExecutedIfNoPdoAttached() {
+	public function testRawQuery_RequiresPdoToExecute() {
 		$sql = new Sql;
 		
 		$result_pdo_statement = $sql->rawQuery("SELECT * FROM `fake_table` WHERE id = 10");
 	}
-
-
 
 
 	public function providerRawExecuteQuery() {
@@ -106,11 +104,7 @@ class SqlTest extends TestCase {
 		return array(
 			array("SELECT * FROM `products` WHERE id = :id", array(':id' => 2), 1),
 			array("SELECT * FROM `products` WHERE id = :id AND sku = :sku", array(':id' => 2, ':sku' => 'P2'), 1),
-			array("SELECT * FROM `products` WHERE id <> :id", array(':id' => 1), 3),
-			array("SELECT * FROM `products` WHERE id = :id", array(':id' => 2), 1)
+			array("SELECT * FROM `products` WHERE name = :name", array(':name' => "Baba O'Reilly"), 0)
 		);
-		
-		
 	}
-	
 }

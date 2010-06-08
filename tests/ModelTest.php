@@ -7,7 +7,7 @@ require_once 'lib/Model.php';
 
 class ModelTest extends TestCase {
 
-	public function testMagicCallerWithGet() {
+	public function testMagicCaller_CanSetAndGetValue() {
 		$model = $this->buildMockModel();
 		$model->setFirstname('Vic');
 		
@@ -15,7 +15,7 @@ class ModelTest extends TestCase {
 	}
 
 
-	public function testMagicCallerWithSet() {
+	public function testMagicCaller_SetsModelArrayProperly() {
 		$firstname = 'Vic';
 		$lastname = 'Cherubini';
 		
@@ -27,7 +27,7 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testMagicCallerWithSetDoesNotAllowPkeyToBeSetInModel() {
+	public function testMagicCaller_DoesNotAllowPkeyToBeSet() {
 		$pkey = 'product_id';
 		
 		$model = $this->buildMockModel();
@@ -39,7 +39,7 @@ class ModelTest extends TestCase {
 	}
 	
 
-	public function testMagicGetter() {
+	public function testMagicGetter_ReturnsValueFromModel() {
 		$firstname = "Vic";
 		
 		$model = $this->buildMockModel();
@@ -49,26 +49,25 @@ class ModelTest extends TestCase {
 	}
 
 
-	public function testMagicGetterReturnsNullWhenKeyDoesNotExist() {
+	public function testMagicGetter_ReturnsNullWhenKeyDoesNotExist() {
 		$model = $this->buildMockModel();
 		
 		$this->assertNull($model->firstname);
 	}
 	
 	
-	public function testMagicGetterCanGetPkey() {
+	public function testMagicGetter_CanGetPkey() {
 		$product_id = 10;
 		
 		$model = $this->buildMockModel();
 		$model->pkey('product_id');
 		$model->id($product_id);
 		
-		
 		$this->assertEquals($product_id, $model->product_id);
 	}
 
 
-	public function testMagicSetter() {
+	public function testMagicSetter_SetsValueInModel() {
 		$expected_model_array = array('first_name' => "Vic Cherubini");
 		
 		$model = $this->buildMockModel();
@@ -78,7 +77,7 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testMagicSetterCannotSetPkeyInModel() {
+	public function testMagicSetter_CannotSetPkeyInModel() {
 		$model = $this->buildMockModel();
 		$model->pkey('product_id');
 		
@@ -87,7 +86,7 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testMagicSetterCanSetPkeyInObject() {
+	public function testMagicSetter_CanSetPkeyInObject() {
 		$pkey = "product_id";
 		$product_id = 10;
 		
@@ -101,7 +100,7 @@ class ModelTest extends TestCase {
 	/**
 	 * @dataProvider providerInvalidFieldName
 	 */
-	public function testMagicSetterDoesNotAllowInvalidFieldToBeSet($field) {
+	public function testMagicSetter_DoesNotAllowMalignedFieldToBeSet($field) {
 		$value = "invalid value";
 		
 		$model = $this->buildMockModel();
@@ -111,7 +110,7 @@ class ModelTest extends TestCase {
 	}
 	
 
-	public function testDatetypeIsTimestampByDefault() {
+	public function testDatetype_IsTimestampByDefault() {
 		$model = $this->buildMockModel();
 		$model->datetype(100);
 		
@@ -119,7 +118,7 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testDatetypeCanBeNow() {
+	public function testDatetype_CanBeSqlNow() {
 		$model = $this->buildMockModel();
 		$model->datetype(\DataModeler\Model::DATETYPE_NOW);
 		
@@ -127,7 +126,7 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testDatetypeCanBeTimestamp() {
+	public function testDatetype_CanBeTimestamp() {
 		$model = $this->buildMockModel();
 		$model->datetype(\DataModeler\Model::DATETYPE_TIMESTAMP);
 		
@@ -135,7 +134,7 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testHasdateCannotBeNonBoolean() {
+	public function testHasdate_MustBeBoolean() {
 		$model = $this->buildMockModel();
 		$model->hasdate(103);
 		
@@ -143,7 +142,7 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testHasdateCanBeTrue() {
+	public function testHasdate_CanBeTrue() {
 		$model = $this->buildMockModel();
 		$model->hasdate(true);
 		
@@ -151,7 +150,7 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testHasdateCanBeFalse() {
+	public function testHasdate_CanBeFalse() {
 		$model = $this->buildMockModel();
 		$model->hasdate(false);
 		
@@ -159,13 +158,13 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testIdIsInitiallyEmpty() {
+	public function testId_IsInitiallyEmpty() {
 		$model = $this->buildMockModel();
 		$this->assertNull($model->id());
 	}
 	
 	
-	public function testIdCanBeSet() {
+	public function testId_CanBeSet() {
 		$id = 10;
 		
 		$model = $this->buildMockModel();
@@ -175,7 +174,7 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testModelIsInitiallyEmpty() {
+	public function testModel_IsInitiallyEmpty() {
 		$model = $this->buildMockModel();
 		
 		$this->assertEmptyArray($model->model());
@@ -185,13 +184,13 @@ class ModelTest extends TestCase {
 	/**
 	 * @expectedException PHPUnit_Framework_Error
 	 */
-	public function testModelMustBeArray() {
+	public function testModel_MustBeArray() {
 		$model = $this->buildMockModel();
 		$model->model(10);
 	}
 	
 	
-	public function testModelFirstElementCanBeFalse() {
+	public function testModel_FirstElementCanBeFalse() {
 		$model = $this->buildMockModel();
 		$model->model(array(false));
 		
@@ -199,7 +198,7 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testModelDoesNotAllowPkeyToBeSetInIt() {
+	public function testModel_DoesNotAllowPkeyToBeSet() {
 		$array = array('product_id' => 10);
 		$pkey = 'product_id';
 		
@@ -211,7 +210,7 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testObjectExistsWhenPkeyValueIsSet() {
+	public function testExists_IsTrueWhenIdIsSet() {
 		$pkey = 'product_id';
 		$id = 10;
 		
@@ -223,14 +222,14 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testObjectDoesNotExistWhenPkeyValueIsNotSet() {
+	public function testExists_IsFalseWhenIdIsNotSet() {
 		$model = $this->buildMockModel();
 		
 		$this->assertFalse($model->exists());
 	}
 	
 	
-	public function testPkeyCannotContainBackticks() {
+	public function testPkey_CannotContainBackticks() {
 		$pkey_with_backticks = '`p.product_id`';
 		$pkey_without_backticks = 'p.product_id';
 		
@@ -241,7 +240,7 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testTableCanBeSet() {
+	public function testTable_CanBeSet() {
 		$table = 'products';
 	
 		$model = $this->buildMockModel();
@@ -254,7 +253,7 @@ class ModelTest extends TestCase {
 	/**
 	 * @dataProvider providerValidTableName
 	 */
-	public function testTableCanOnlyContainValidCharacters($table) {
+	public function testTable_CanOnlyContainValidCharacters($table) {
 		$model = $this->buildMockModel();
 		$model->table($table);
 		
@@ -262,7 +261,7 @@ class ModelTest extends TestCase {
 	}
 	
 	
-	public function testTableCannotContainBackticks() {
+	public function testTable_CannotContainBackticks() {
 		$table_with_backticks = '`table_name`';
 		$table_without_backticks = 'table_name';
 		

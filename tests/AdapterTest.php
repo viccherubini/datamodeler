@@ -7,7 +7,7 @@ require_once 'lib/Adapter.php';
 
 class AdapterTest extends TestCase {
 
-	public function testAdapterIdIsSetOnCreation() {
+	public function testGetId_IsSetOnAdapterCreation() {
 		$adapter = $this->buildMockAdapter();
 		
 		$adapter_id = $adapter->getId();
