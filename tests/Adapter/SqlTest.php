@@ -40,6 +40,53 @@ class SqlTest extends TestCase {
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
+	public function testQuery_RequiresQueryToExecute() {
+		$sql = new Sql;
+		$sql->attachDb($this->pdo);
+		
+		$sql->query(NULL);
+	}
+	
+	
+	/**
+	 * @dataProvider providerPreparedQuery
+	 */
+	public function testQuery_ReturnsPdoStatementObject($query, $input_parameters) {
+		$sql = new Sql;
+		$sql->attachDb($this->pdo);
+		
+		$query_result = $sql->query($query, $input_parameters);
+		
+		$this->assertTrue($query_result instanceof \PDOStatement);
+	}
+	
+	/**
+	 * @dataProvider providerInvalidPreparedQuery
+	 * @expectedException \DataModeler\Exception
+	 */
+	public function testQuery_ThrowsErrorOnInvalidQuery($query) {
+		$sql = new Sql;
+		$sql->attachDb($this->pdo);
+		
+		$sql->query($query);
+	}
+	
+	
+	/**
+	 * @dataProvider providerPreparedQueryWithInvalidInputParameters
+	 * @expectedException \DataModeler\Exception
+	 */
+	public function testQuery_ThrowsErrorOnInvalidParameters($query, $input_parameters) {
+		$sql = new Sql;
+		$sql->attachDb($this->pdo);
+		
+		$sql->query($query, $input_parameters);
+	}
+	
+	
+	/**
+	 * @expectedException \DataModeler\Exception
+	 */
 	public function testRawExecute_RequiresPdoToExecute() {
 		$sql = new Sql;
 		
@@ -100,11 +147,30 @@ class SqlTest extends TestCase {
 	}
 	
 	
+	public function providerInvalidPreparedQuery() {
+		return array(
+			array("SELECT * FROM `invalid_table` WHERE id = :id"),
+			array("SELECT * FROM `products` WHERE not_id = :name"),
+			array("UPDATE `products` SET invalid_name = :name WHERE id = :id")
+		);
+	}
+	
+	
+	public function providerPreparedQueryWithInvalidInputParameters() {
+		return array(
+			array("SELECT * FROM `products` WHERE id = :id", array(':name' => 'Vic Cherubini')),
+			array("SELECT * FROM `products` WHERE id = :name", array(':id' => 'Vic Cherubini')),
+			array("UPDATE `products` SET name = :name WHERE id = :id", array(':xname' => 'Vic Cherubini'))
+		);
+	}
+	
+	
 	public function providerPreparedQuery() {
 		return array(
-			array("SELECT * FROM `products` WHERE id = :id", array(':id' => 2), 1),
-			array("SELECT * FROM `products` WHERE id = :id AND sku = :sku", array(':id' => 2, ':sku' => 'P2'), 1),
-			array("SELECT * FROM `products` WHERE name = :name", array(':name' => "Baba O'Reilly"), 0)
+			array("SELECT * FROM `products` WHERE id = :id", array(':id' => 2)),
+			array("SELECT * FROM `products` WHERE id = :id AND sku = :sku", array(':id' => 2, ':sku' => 'P2')),
+			array("SELECT * FROM `products` WHERE name = :name", array(':name' => "Baba O'Reilly")),
+			array("UPDATE `products` SET name = :name WHERE id = :id", array(':name' => "Baba O'Reilly", ':id' => 1))
 		);
 	}
 }
