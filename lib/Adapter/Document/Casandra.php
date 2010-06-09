@@ -3,6 +3,8 @@
 declare(encoding='UTF-8');
 namespace DataModeler\Adapter\Document;
 
-class Casandra {
+use DataModeler\Adapter;
+
+class Casandra extends Adapter {
 	
 }

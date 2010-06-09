@@ -3,6 +3,8 @@
 declare(encoding='UTF-8');
 namespace DataModeler\Adapter\Document;
 
-class Redis {
+use DataModeler\Adapter;
+
+class Redis extends Adapter {
 	
 }

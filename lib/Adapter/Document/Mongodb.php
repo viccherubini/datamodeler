@@ -3,6 +3,8 @@
 declare(encoding='UTF-8');
 namespace DataModeler\Adapter\Document;
 
-class Mongodb {
+use DataModeler\Adapter;
+
+class Mongodb extends Adapter {
 	
 }

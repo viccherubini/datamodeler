@@ -3,6 +3,8 @@
 declare(encoding='UTF-8');
 namespace DataModeler\Adapter\Document;
 
-class Couchdb {
+use DataModeler\Adapter;
+
+class Couchdb extends Adapter {
 	
 }
