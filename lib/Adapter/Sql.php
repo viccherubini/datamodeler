@@ -21,6 +21,11 @@ class Sql extends Adapter {
 	}
 	
 	
+	public function getDb() {
+		return $this->db;
+	}
+	
+	
 	public function query($sql, $input_parameters = array(), $driver_options = array()) {
 		$this->sql = $sql;
 		
@@ -62,9 +67,7 @@ class Sql extends Adapter {
 	}
 	
 	
-	public function getDb() {
-		return $this->db;
-	}
+	
 	
 	
 	
