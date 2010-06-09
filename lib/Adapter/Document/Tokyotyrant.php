@@ -3,8 +3,11 @@
 declare(encoding='UTF-8');
 namespace DataModeler\Adapter\Document;
 
-use DataModeler\Adapter;
+use \DataModeler\Adapter, \DataModeler\Model;
 
 class Tokyotyrant extends Adapter {
 	
+	public function write(\DataModeler\Model $model) {
+		
+	}
 }

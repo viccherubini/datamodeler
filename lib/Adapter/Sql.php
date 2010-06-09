@@ -3,7 +3,7 @@
 declare(encoding='UTF-8');
 namespace DataModeler\Adapter;
 
-use DataModeler\Adapter;
+use \DataModeler\Adapter, \DataModeler\Model;
 
 class Sql extends Adapter {
 	
@@ -67,6 +67,9 @@ class Sql extends Adapter {
 	}
 	
 	
+	public function write(\DataModeler\Model $model) {
+		
+	}
 	
 	
 	

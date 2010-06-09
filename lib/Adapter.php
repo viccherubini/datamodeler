@@ -24,4 +24,7 @@ abstract class Adapter {
 		$this->id = $id;
 		return $this;
 	}
+	
+	
+	abstract public function write(\DataModeler\Model $model);
 }

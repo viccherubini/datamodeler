@@ -20,7 +20,7 @@ class Writer {
 	}
 	
 	
-	public function addAdapter(Adapter $adapter) {
+	public function addAdapter(\DataModeler\Adapter $adapter) {
 		$adapter_id = $adapter->getId();
 		if ( false === isset($this->adapterList[$adapter_id]) ) {
 			$this->adapterList[$adapter_id] = $adapter;
