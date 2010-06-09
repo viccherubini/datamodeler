@@ -15,12 +15,9 @@ abstract class Adapter {
 	}
 	
 	
-	
 	public function getId() {
 		return $this->id;
 	}
-	
-	
 	
 	
 	public function setId($id) {
