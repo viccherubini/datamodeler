@@ -7,7 +7,7 @@ use \DataModeler\Adapter, \DataModeler\Model;
 
 class Redis extends Adapter {
 	
-	public function write(\DataModeler\Model $model) {
+	public function write(Model $model) {
 		
 	}
 }

@@ -26,5 +26,5 @@ abstract class Adapter {
 	}
 	
 	
-	abstract public function write(\DataModeler\Model $model);
+	abstract public function write(Model $model);
 }

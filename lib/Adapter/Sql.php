@@ -67,8 +67,20 @@ class Sql extends Adapter {
 	}
 	
 	
-	public function write(\DataModeler\Model $model) {
+	public function write(Model $model) {
+		$this->hasDb();
 		
+		$table = $model->table();
+		if ( true === empty($table) ) {
+			throw new \DataModeler\Exception("The Model does not have a table and can not be saved.");
+		}
+		
+		
+		if ( true === $model->exists() ) {
+			
+		} else {
+			
+		}
 	}
 	
 	

@@ -40,7 +40,7 @@ class SqlTest extends TestCase {
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
-	public function testQuery_RequiresQueryToExecute() {
+	public function testQuery_RequiresQuery() {
 		$sql = new Sql;
 		$sql->attachDb($this->pdo);
 		
@@ -87,7 +87,7 @@ class SqlTest extends TestCase {
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
-	public function testRawExecute_RequiresPdoToExecute() {
+	public function testRawExecute_RequiresPdo() {
 		$sql = new Sql;
 		
 		$sql->rawExecute("SELECT * FROM `fake_table` WHERE id = 10");
@@ -131,10 +131,36 @@ class SqlTest extends TestCase {
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
-	public function testRawQuery_RequiresPdoToExecute() {
+	public function testRawQuery_RequiresPdo() {
 		$sql = new Sql;
 		
 		$result_pdo_statement = $sql->rawQuery("SELECT * FROM `fake_table` WHERE id = 10");
+	}
+
+
+	/**
+	 * @expectedException \DataModeler\Exception
+	 */
+	public function testWrite_RequiresPdo() {
+		$sql = new Sql;
+		
+		$model = $this->buildMockModel();
+		$model->table('products');
+		
+		$sql->write($model);
+	}
+	
+	
+	/**
+	 * @expectedException \DataModeler\Exception
+	 */
+	public function testWrite_ModelRequiresTable() {
+		$sql = new Sql;
+		$sql->attachDb($this->pdo);
+		
+		$model = $this->buildMockModel();
+		
+		$sql->write($model);
 	}
 
 

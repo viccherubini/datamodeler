@@ -7,7 +7,7 @@ use \DataModeler\Adapter, \DataModeler\Model;
 
 class Couchdb extends Adapter {
 	
-	public function write(\DataModeler\Model $model) {
+	public function write(Model $model) {
 		
 	}
 }

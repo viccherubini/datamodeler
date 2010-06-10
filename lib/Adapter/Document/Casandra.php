@@ -8,7 +8,7 @@ use \DataModeler\Adapter, \DataModeler\Model;
 class Casandra extends Adapter {
 	
 	
-	public function write(\DataModeler\Model $model) {
+	public function write(Model $model) {
 		
 	}
 }
