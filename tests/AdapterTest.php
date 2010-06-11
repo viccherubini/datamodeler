@@ -14,4 +14,11 @@ class AdapterTest extends TestCase {
 		$this->assertFalse(empty($adapter_id));
 	}
 
+
+	public function testGetPriority_IsCastToInteger() {
+		$adapter = $this->buildMockAdapter();
+		
+		$adapter->setPriority('some string');
+		$this->assertTrue(is_int($adapter->getPriority()));
+	}
 }
