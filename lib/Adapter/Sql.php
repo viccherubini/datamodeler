@@ -15,7 +15,7 @@ class Sql extends Adapter {
 	
 	public function attachDb(\PDO $db) {
 		$db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
-		
+
 		$this->db = $db;
 		return $this;
 	}
@@ -84,7 +84,34 @@ class Sql extends Adapter {
 	}
 	
 	
+	private function getFieldList($table) {
+		$field_list = array();
+		
+		$driver_name = $this->db->getAttribute(\PDO::ATTR_DRIVER_NAME);
+		$driver_name = strtolower($driver_name);
+		
+		
+		switch ( $driver_name ) {
+			case 'mysql': {
+				break;
+			}
+			
+			case 'sqlite': {
+				
+				break;
+			}
+			
+			case 'pgsql': {
+				
+				break;
+			}
+		}
+		
+		
+		
 	
+		
+	}
 	
 	private function handlePreparedStatementResult() {
 		if ( false === $this->statement ) {
