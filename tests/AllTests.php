@@ -5,6 +5,7 @@ namespace DataModelerTest;
 
 require_once 'Adapter/AllTests.php';
 require_once 'AdapterTest.php';
+require_once 'IteratorTest.php';
 require_once 'ModelTest.php';
 require_once 'WriterTest.php';
 
@@ -14,6 +15,7 @@ class AllTests {
 
 		$suite->addTestSuite(\DataModelerTest\Adapter\AllTests::suite());
 		$suite->addTestSuite('\DataModelerTest\AdapterTest');
+		$suite->addTestSuite('\DataModelerTest\IteratorTest');
 		$suite->addTestSuite('\DataModelerTest\ModelTest');
 		$suite->addTestSuite('\DataModelerTest\WriterTest');
 		
