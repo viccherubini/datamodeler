@@ -174,7 +174,6 @@ abstract class Model {
 	private function removeBackticks($value) {
 		return str_replace('`', NULL, $value);
 	}
-	
-	
-	
+
+
 }
