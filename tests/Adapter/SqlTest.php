@@ -3,7 +3,9 @@
 declare(encoding='UTF-8');
 namespace DataModelerTest\Adapter;
 
-use DataModelerTest\TestCase, DataModeler\Adapter\Sql;
+use DataModelerTest\TestCase,
+	DataModeler\Adapter\Sql,
+	DataModeler\Iterator;
 
 require_once 'lib/Adapter/Sql.php';
 
@@ -20,7 +22,6 @@ class SqlTest extends TestCase {
 			
 			$this->pdo->exec($sql_data);
 		}
-		
 	}
 
 
@@ -31,16 +32,16 @@ class SqlTest extends TestCase {
 
 	public function testAttachDb_CanAttachPdoObject() {
 		$sql = new Sql;
-		$sql->attachDb($this->pdo);
-		
-		$this->assertTrue($sql->getDb() instanceof \PDO);
+		$attached = $sql->attachDb($this->pdo);
+	
+		$this->assertTrue($attached instanceof Sql);
 	}
 	
 	
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
-	public function testQuery_RequiresQuery() {
+	public function _testQuery_RequiresQuery() {
 		$sql = new Sql;
 		$sql->attachDb($this->pdo);
 		
@@ -51,20 +52,20 @@ class SqlTest extends TestCase {
 	/**
 	 * @dataProvider providerPreparedQuery
 	 */
-	public function testQuery_ReturnsPdoStatementObject($query, $input_parameters) {
+	public function _testQuery_ReturnsIterator($query, $input_parameters) {
 		$sql = new Sql;
 		$sql->attachDb($this->pdo);
 		
-		$query_result = $sql->query($query, $input_parameters);
+		$iterator = $sql->query($query, $input_parameters);
 		
-		$this->assertTrue($query_result instanceof \PDOStatement);
+		$this->assertIterator($iterator);
 	}
 	
 	/**
 	 * @dataProvider providerInvalidPreparedQuery
 	 * @expectedException \DataModeler\Exception
 	 */
-	public function testQuery_ThrowsErrorOnInvalidQuery($query) {
+	public function _testQuery_ThrowsErrorOnInvalidQuery($query) {
 		$sql = new Sql;
 		$sql->attachDb($this->pdo);
 		
@@ -76,7 +77,7 @@ class SqlTest extends TestCase {
 	 * @dataProvider providerPreparedQueryWithInvalidInputParameters
 	 * @expectedException \DataModeler\Exception
 	 */
-	public function testQuery_ThrowsErrorOnInvalidParameters($query, $input_parameters) {
+	public function _testQuery_ThrowsErrorOnInvalidParameters($query, $input_parameters) {
 		$sql = new Sql;
 		$sql->attachDb($this->pdo);
 		
@@ -118,50 +119,9 @@ class SqlTest extends TestCase {
 	}
 
 
-	public function testRawQuery_ReturnsPdoStatementObject() {
-		$sql = new Sql;
-		$sql->attachDb($this->pdo);
-		
-		$result_pdo_statement = $sql->rawQuery("SELECT * FROM `products`");
-		
-		$this->assertTrue($result_pdo_statement instanceof \PDOStatement);
-	}
-
-	
-	/**
-	 * @expectedException \DataModeler\Exception
-	 */
-	public function testRawQuery_RequiresPdo() {
-		$sql = new Sql;
-		
-		$result_pdo_statement = $sql->rawQuery("SELECT * FROM `fake_table` WHERE id = 10");
-	}
 
 
-	/**
-	 * @expectedException \DataModeler\Exception
-	 */
-	public function testWrite_RequiresPdo() {
-		$sql = new Sql;
-		
-		$model = $this->buildMockModel();
-		$model->table('products');
-		
-		$sql->write($model);
-	}
-	
-	
-	/**
-	 * @expectedException \DataModeler\Exception
-	 */
-	public function testWrite_ModelRequiresTable() {
-		$sql = new Sql;
-		$sql->attachDb($this->pdo);
-		
-		$model = $this->buildMockModel();
-		
-		$sql->write($model);
-	}
+
 
 
 	public function providerRawExecuteQuery() {
