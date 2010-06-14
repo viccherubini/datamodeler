@@ -165,10 +165,6 @@ class Iterator implements \Iterator {
 	
 	
 	private function applyFilter($dataMap) {
-		if ( false === $this->hasFilter() ) {
-			return true;
-		}
-		
 		$passed = false;
 		$matchCount = 0;
 
@@ -217,14 +213,14 @@ class Iterator implements \Iterator {
 					
 					case '<': {
 						if ( $dataMap[$field] < $value ) {
-							$match_count++;
+							$matchCount++;
 						}
 						break;
 					}
 					
 					case '>': {
 						if ( $dataMap[$field] > $value ) {
-							$match_count++;
+							$matchCount++;
 						}
 						break;
 					}
