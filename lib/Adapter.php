@@ -37,7 +37,5 @@ abstract class Adapter {
 		$this->priority = $priority;
 		return $this;
 	}
-	
-	
-	abstract public function write(Model $model);
+
 }
