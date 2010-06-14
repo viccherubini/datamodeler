@@ -3,6 +3,8 @@
 declare(encoding='UTF-8');
 namespace DataModelerTest;
 
+use DataModeler\Iterator;
+
 class TestCase extends \PHPUnit_Framework_TestCase {
 	
 	public static function assertArray($a, $message = '') {
@@ -19,6 +21,12 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	public static function assertNotEmptyArray($a, $message = '') {
 		self::assertArray($a);
 		self::assertGreaterThan(0, count($a), $message);
+	}
+
+	
+	public static function assertIterator($obj, $message = '') {
+		self::assertTrue(is_object($obj));
+		self::assertTrue($obj instanceof Iterator);
 	}
 
 	
