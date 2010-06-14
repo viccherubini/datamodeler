@@ -113,7 +113,6 @@ class IteratorTest extends TestCase {
 			->rewind();
 		
 		$this->assertEquals(next($data), $iterator->next());
-		
 	}
 	
 	
@@ -231,7 +230,7 @@ class IteratorTest extends TestCase {
 	
 	
 	/**
-	 * @dataProvider providerFilter
+	 * @_dataProvider providerFilter
 	 */
 	public function _testFetch_ReturnsMatchedIteratorForModels($field, $value, $expected) {
 		/*$iteratorData = array();
@@ -292,8 +291,6 @@ class IteratorTest extends TestCase {
 			return $e;
 		}, $this->providerFilter());
 	}
-	
-	
 	
 	
 }
