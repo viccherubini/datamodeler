@@ -8,10 +8,13 @@ use \DataModeler\Adapter, \DataModeler\Model;
 class Sql extends Adapter {
 	
 	private $db = NULL;
+	private $driverOptions = array();
 	private $sql = NULL;
 	private $statement = NULL;
-	private $statement_execute = false;
-	
+	private $statementExecute = false;
+	private $where = NULL;
+
+
 	
 	public function attachDb(\PDO $db) {
 		$db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
@@ -19,39 +22,36 @@ class Sql extends Adapter {
 		$this->db = $db;
 		return $this;
 	}
+
+
+	public function find() {
+		
+	}
 	
+	public function findAll() {
+		
+	}
 	
-	public function getDb() {
-		return $this->db;
+	public function insert(Model $object, array $input_parameters) {
+		
+		
 	}
 	
 	
-	public function query($sql, $input_parameters = array(), $driver_options = array()) {
-		$this->sql = $sql;
+	public function query($sql, array $input_parameters, Model $model = NULL) {
 		
-		$this->hasSql();
-		$this->hasDb();
+	}
+	
+	public function queryFirst($sql, array $input_parameters, Model $model = NULL) {
 		
-		$this->statement = $this->db->prepare($sql, $driver_options);
-		$this->handlePreparedStatementResult();
-		
-		$this->statement_execute = $this->statement->execute($input_parameters);
-		$this->handlePreparedStatementExecute();
-		
-		return (clone $this->statement);
 	}
 	
 	
-	public function rawQuery($sql) {
-		$this->sql = $sql;
-		
-		$this->hasSql();
-		$this->hasDb();
-		
-		$result = $this->getDb()->query($sql, \PDO::FETCH_ASSOC);
-		
-		return $result;
-	}
+	
+	
+	
+	
+	
 	
 	
 	public function rawExecute($sql) {
@@ -61,80 +61,46 @@ class Sql extends Adapter {
 		$this->hasDb();
 		$this->preventSelectStatementExecution();
 		
-		$row_count = $this->getDb()->exec($sql);
+		$row_count = $this->db->exec($sql);
 		
 		return $row_count;
 	}
 	
 	
-	public function write(Model $model) {
-		$this->hasDb();
+	
+	
+	public function update(Model $model, $where = NULL, array $input_parameters = array()) {
 		
-		$table = $model->table();
-		if ( true === empty($table) ) {
-			throw new \DataModeler\Exception("The Model does not have a table and can not be saved.");
-		}
-		
-		
-		if ( true === $model->exists() ) {
-			
-		} else {
-			
-		}
 	}
 	
 	
-	private function getFieldList($table) {
-		$field_list = array();
-		
-		$driver_name = $this->db->getAttribute(\PDO::ATTR_DRIVER_NAME);
-		$driver_name = strtolower($driver_name);
-		
-		
-		switch ( $driver_name ) {
-			case 'mysql': {
-				break;
-			}
-			
-			case 'sqlite': {
-				
-				break;
-			}
-			
-			case 'pgsql': {
-				
-				break;
-			}
-		}
-		
-		
-		
 	
-		
+	public function where($where) {
+		$this->where = $where;
+		return $this;
 	}
+	
 	
 	private function handlePreparedStatementResult() {
 		if ( false === $this->statement ) {
 			$error_info = $this->db->errorInfo();
-			$error_string = $error_info[2];
-			throw new \DataModeler\Exception("An error occurred when executing {$this->sql}. Driver said {$error_string}.");
+			throw new \DataModeler\Exception("An error occurred when preparing {$this->sql}. Driver said {$error_info[2]}.");
 		}
 		return true;
 	}
 
 	
 	private function handlePreparedStatementExecute() {
-		if ( false === $this->statement_execute ) {
+		if ( false === $this->statementExecute ) {
 			$error_info = $this->statement->errorInfo();
-			$error_string = $error_info[2];
-			throw new \DataModeler\Exception("An error occurred when executing {$this->sql}. The prepared statement failed to execute. Driver said {$error_string}.");
+			throw new \DataModeler\Exception("An error occurred when executing {$this->sql}. The prepared statement failed to execute. Driver said {$error_info[2]}.");
 		}
 		return true;
 	}
 	
 	
 	private function hasDb() {
-		if ( NULL === $this->getDb() ) {
+		if ( true === empty($this->db) ) {
 			throw new \DataModeler\Exception("Database object has not yet been attached to Sql Adapter.");
 		}
 		return true;
