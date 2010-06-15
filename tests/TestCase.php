@@ -3,7 +3,8 @@
 declare(encoding='UTF-8');
 namespace DataModelerTest;
 
-use DataModeler\Iterator;
+use \DataModeler\Iterator,
+	\DataModeler\Model;
 
 class TestCase extends \PHPUnit_Framework_TestCase {
 	
@@ -29,6 +30,11 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 		self::assertTrue($obj instanceof Iterator);
 	}
 
+	public static function assertModel($obj, $message = '') {
+		self::assertTrue(is_object($obj));
+		self::assertTrue($obj instanceof Model);
+	}
+
 	
 	protected function buildMockAdapter() {
 		$adapter = $this->getMockForAbstractClass('\DataModeler\Adapter');
@@ -36,11 +42,18 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	
-	protected function buildMockModel() {
+	protected function buildMockModel($table = NULL, $pkey = NULL) {
 		$model = $this->getMockForAbstractClass('\DataModeler\Model');
+		$model->table($table);
+		$model->pkey($pkey);
+		
 		return $model;
 	}
 	
+	protected function buildMockProduct() {
+		$model = $this->buildMockModel('products', 'id');
+		return $model;
+	}
 	
 	protected function buildMockPdo($dsn) {
 		$pdo = $this->getMock('\PDO', array(), array($dsn));
