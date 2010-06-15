@@ -126,6 +126,7 @@ abstract class Model {
 		if ( false !== current($model) || ( count($model) > 0 ) ) {
 			$pkey = $this->pkey();
 			if ( true === isset($model[$pkey]) ) {
+				$this->id($model[$pkey]);
 				unset($model[$pkey]);
 			}
 			$this->model = $model;
