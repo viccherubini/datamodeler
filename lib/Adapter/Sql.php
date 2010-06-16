@@ -9,170 +9,116 @@ use \DataModeler\Adapter,
 
 class Sql extends Adapter {
 	
-	private $db = NULL;
-	private $driverOptions = array();
-	private $inputParameters = array();
+	private $pdo = NULL;
 	private $model = NULL;
-	private $sql = NULL;
 	private $statement = NULL;
-	private $statementExecute = false;
-	private $where = NULL;
 
+	private $prepareCount = 0;
 
+	public function getPrepareCount() {
+		return $this->prepareCount;
+	}
+
+	public function getStatement() {
+		return $this->statement;
+	}
 	
-	public function attachDb(\PDO $db) {
-		$db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
+	public function getQueryString() {
+		if ( $this->hasStatement() ) {
+			return $this->statement->queryString;
+		}
+		return NULL;
+	}
 
-		$this->db = $db;
+	public function attachPdo(\PDO $pdo) {
+		$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
+		$this->pdo = $pdo;
+		
 		return $this;
 	}
 
-	public function rawExecute($sql) {
-		$this->sql = $sql;
+	public function prepare(Model $model, $where = NULL) {
+		$this->hasPdo();
 		
-		$this->hasSql();
-		$this->hasDb();
-		$this->preventSelectStatementExecution();
-		
-		$row_count = $this->db->exec($sql);
-		
-		return $row_count;
-	}
+		if ( !$this->hasSameModel($model) ) {
+			$this->model = $model;
+			if ( empty($where) ) {
+				$where = "{$model->pkey()} = ? LIMIT 1";
+			}
 
-	public function find(Model $model, $where = NULL, array $inputParameters = array()) {
-		$this->hasDb();
-		
-		$this->prepareSqlParameters($model, $where, $inputParameters);
-		$this->executeFind();
-		
-		$matchedModel = clone $this->model;
-		$rowData = $this->statement->fetch(\PDO::FETCH_ASSOC);
-		if ( false !== $rowData && true === is_array($rowData) ) {
-			$matchedModel->model($rowData);
+			$this->statement = $this->pdo->prepare("SELECT * FROM {$model->table()} WHERE {$where}");
+			$this->prepareCount++;
 		}
 		
-		return $matchedModel;
+		return $this;
+	}
+
+	public function get($id) {
+		$model = $this->executeFindStatement(array($id));
+		return $model;
+	}
+
+	public function find(array $inputParameters) {
+		$model = $this->executeFindStatement($inputParameters);
+		return $model;
 	}
 	
-	public function findAll(Model $model, $where = NULL, array $inputParameters = array()) {
-		$this->hasDb();
+	public function save(Model $model) {
+		$rowCount = 0;
 		
-		$this->prepareSqlParameters($model, $where, $inputParameters);
-		$this->executeFind();
-		
-		$iteratorData = array();
-		$rowData = $this->statement->fetchAll(\PDO::FETCH_ASSOC);
-		if ( false !== $rowData && true === is_array($rowData) ) {
-			foreach ( $rowData as $row ) {
-				$clonedModel = clone $this->model;
-				$clonedModel->model($row);
-			
-				$iteratorData[] = $clonedModel;
+		if ( $model->exists() ) {
+			if ( !$this->hasSameModel($model) ) {
+				$setList = implode(' = ?, ', array_keys($model->model())) . ' = ?';
+				$this->statement->prepare("UPDATE {$model->table()} SET {$setList} WHERE {$model->pkey()} = ? LIMIT 1");
+			}
+		} else {
+			if ( !$this->hasSameModel($model) ) {
+				$fieldList = implode(', ', array_keys($model->model()));
+				$valueList = implode(', ', array_fill(0, count($model->model()), '?'));
+				
+				$this->statement->prepare("INSERT INTO {$model->table()} ({$fieldList}) VALUES({$valueList})");
 			}
 		}
 		
-		$iterator = new Iterator($iteratorData);
-		
-		return $iterator;
-	}
-	
-	public function insert(Model $object, array $inputParameters = array()) {
-		
-		
-	}
-	
-	public function query($sql, array $inputParameters, Model $model = NULL) {
-		
-	}
-	
-	public function queryFirst($sql, array $inputParameters, Model $model = NULL) {
-		
-	}
-	
-	public function update(Model $model, $where = NULL, array $inputParameters = array()) {
-		
-	}
-	
-	
-	
-	
-	private function executeFind() {
-		$this->buildSelectSqlStatement();
-		$this->prepareSqlStatement();
-		$this->executePreparedStatement();
-		return true;
-	}
-	
-	private function prepareSqlParameters(Model $model, $where, array $inputParameters) {
 		$this->model = $model;
-		$this->inputParameters = $inputParameters;
-		$this->where = NULL;
-		
-		if ( false === empty($where) ) {
-			$this->where = "WHERE {$where}";
+		if ( $this->hasStatement() ) {
+			$inputParameters = array_values($model->model());
+			$this->statement->execute($inputParameters);
+			$rowCount = $this->statement->rowCount();
 		}
 		
-		return true;
-	}
-
-	private function buildSelectSqlStatement() {
-		$this->sql = "SELECT * FROM {$this->model->table()} {$this->where}";
-		return true;
+		return ( $rowCount > 0 ? true : false );
 	}
 	
-	private function prepareSqlStatement() {
-		$this->statement = $this->db->prepare($this->sql);
-		$this->handlePreparedStatement();
-		return true;
-	}
-	
-	private function executePreparedStatement() {
-		$this->statementExecute = $this->statement->execute($this->inputParameters);
-		$this->handlePreparedStatementExecution();
-		return true;
-	}
 
-	private function handlePreparedStatement() {
-		if ( false === $this->statement ) {
-			$error_info = $this->db->errorInfo();
-			throw new \DataModeler\Exception("An error occurred when preparing {$this->sql}. Driver said {$error_info[2]}.");
+	
+	private function executeFindStatement(array $inputParameters) {
+		$model = clone $this->model;
+		if ( $this->hasStatement() ) {
+			$this->statement->execute($inputParameters);
+			$rowData = $this->statement->fetch(\PDO::FETCH_ASSOC);
+			
+			if ( is_array($rowData) ) {
+				$model->model($rowData);
+			}
 		}
-		return true;
-	}
-
-	private function handlePreparedStatementExecution() {
-		if ( false === $this->statementExecute ) {
-			$error_info = $this->statement->errorInfo();
-			throw new \DataModeler\Exception("An error occurred when executing {$this->sql}. The prepared statement failed to execute. Driver said {$error_info[2]}.");
-		}
-		return true;
+		
+		return $model;
 	}
 	
-	private function hasDb() {
-		if ( true === empty($this->db) ) {
+	private function hasSameModel(Model $model) {
+		return ( $this->model instanceof Model && $this->model->isA($model) );
+	}
+	
+	private function hasStatement() {
+		return ( $this->statement instanceof \PDOStatement );
+	}
+	
+	private function hasPdo() {
+		if ( empty($this->pdo) || !($this->pdo instanceof \PDO) ) {
 			throw new \DataModeler\Exception("Database object has not yet been attached to Sql Adapter.");
 		}
 		return true;
 	}
-	
-	private function hasSql() {
-		if ( true === empty($this->sql) ) {
-			throw new \DataModeler\Exception("The SQL query is empty and can not be executed.");
-		}
-		return true;
-	}
-	
-	private function isSelectStatement() {
-		if ( 0 === stripos($this->sql, 'SELECT') ) {
-			return true;
-		}
-		return false;
-	}
 
-	private function preventSelectStatementExecution() {
-		if ( true === $this->isSelectStatement() ) {
-			throw new \DataModeler\Exception("SELECT statements will return an incorrect number of rows, use query() or a prepared statement instead.");
-		}
-		return true;
-	}
 }
