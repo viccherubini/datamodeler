@@ -3,6 +3,8 @@
 declare(encoding='UTF-8');
 namespace DataModelerTest;
 
+use \DataModeler\Model;
+
 require_once 'lib/Model.php';
 
 class ModelTest extends TestCase {
@@ -134,6 +136,42 @@ class ModelTest extends TestCase {
 	}
 	
 	
+	public function testEqualTo_TwoModelsAreEqualWhenIdIsSame() {
+		$product1 = $this->buildMockProduct();
+		$product2 = $this->buildMockProduct();
+		
+		$product1->id(1);
+		$product2->id(1);
+		
+		$this->assertTrue($product1->equalTo($product2));
+		$this->assertTrue($product2->equalTo($product1));
+	}
+	
+	
+	public function testEqualTo_TwoModelsAreNotEqualWhenIdIsDifferent() {
+		$product1 = $this->buildMockProduct();
+		$product2 = $this->buildMockProduct();
+		
+		$product1->id(1);
+		$product2->id(10);
+		
+		$this->assertFalse($product1->equalTo($product2));
+		$this->assertFalse($product2->equalTo($product1));
+	}
+	
+	
+	public function testEqualTo_TwoModelsAreNotEqualWhenDifferentType() {
+		$product = $this->buildMockProduct();
+		$user = $this->buildMockModel('user', 'user_id');
+		
+		$product->id(1);
+		$user->id(1);
+		
+		$this->assertFalse($product->equalTo($user));
+		$this->assertFalse($user->equalTo($product));
+	}
+	
+	
 	public function testHasdate_MustBeBoolean() {
 		$model = $this->buildMockModel();
 		$model->hasdate(103);
@@ -171,6 +209,30 @@ class ModelTest extends TestCase {
 		$model->id($id);
 		
 		$this->assertEquals($id, $model->id());
+	}
+	
+	
+	public function testIsA_TwoModelsAreEachOther() {
+		$product1 = $this->buildMockProduct();
+		$product2 = $this->buildMockProduct();
+		
+		$product1->id(1);
+		$product2->id(10);
+		
+		$this->assertTrue($product1->isA($product2));
+		$this->assertTrue($product2->isA($product1));
+	}
+	
+	
+	public function testIsA_TwoDifferentModelsAreNotEachOther() {
+		$product = $this->buildMockProduct();
+		$user = $this->buildMockModel('user', 'user_id');
+		
+		$product->id(1);
+		$user->id(1);
+		
+		$this->assertFalse($product->isA($user));
+		$this->assertFalse($user->isA($product));
 	}
 	
 	
