@@ -16,6 +16,7 @@ abstract class Model {
 	private $hasdate = NULL;
 	private $id = NULL;
 	private $model = array();
+	private $modelId = NULL;
 	private $pkey = NULL;
 	private $table = NULL;
 	
@@ -24,12 +25,13 @@ abstract class Model {
 	
 	
 	public function __construct() {
-		
+		$this->modelId = sha1(get_class($this));
 	}
 	
 	
 	public function __destruct() {
 		$this->model = array();
+		$this->modelId = NULL;
 	}
 	
 	
@@ -100,6 +102,11 @@ abstract class Model {
 	}
 	
 	
+	public function equalTo(Model $model) {
+		return ( $this->isA($model) && $model->id() === $this->id() );
+	}
+	
+	
 	public function exists() {
 		$id = $this->id();
 		return (false === empty($id));
@@ -120,6 +127,11 @@ abstract class Model {
 		}
 		return $this->id;
 	}
+	
+	
+	public function isA(Model $model) {
+		return ( $this->table() === $model->table() && $this->modelId() === $model->modelId() );
+	}
 
 
 	public function model(array $model = array()) {
@@ -132,6 +144,10 @@ abstract class Model {
 			$this->model = $model;
 		}
 		return $this->model;
+	}
+	
+	public function modelId() {
+		return $this->modelId;
 	}
 	
 	
