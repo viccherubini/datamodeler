@@ -4,7 +4,8 @@ declare(encoding='UTF-8');
 namespace DataModelerTest;
 
 use \DataModeler\Iterator,
-	\DataModeler\Model;
+	\DataModeler\Model,
+	\DataModeler\Adapter\Sql;
 
 class TestCase extends \PHPUnit_Framework_TestCase {
 	
@@ -33,6 +34,11 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	public static function assertModel($obj, $message = '') {
 		self::assertTrue(is_object($obj));
 		self::assertTrue($obj instanceof Model);
+	}
+
+	public static function assertSql($obj, $message = '') {
+		self::assertTrue(is_object($obj));
+		self::assertTrue($obj instanceof Sql);
 	}
 
 	
