@@ -82,12 +82,15 @@ class Sql extends Adapter {
 	
 	public function save(Model $model) {
 		$rowCount = 0;
+		$inputParameters = array_values($model->model());
 		
 		if ( $model->exists() ) {
 			if ( $this->shouldPrepareUpdateStatement($model) ) {
 				$setList = implode(' = ?, ', array_keys($model->model())) . ' = ?';
 				$this->prepareQuery("UPDATE {$model->table()} SET {$setList} WHERE {$model->pkey()} = ? LIMIT 1");
 				$this->previousQuery = self::QUERY_UPDATE;
+				
+				$inputParameters[] = $model->id();
 			}
 		} else {
 			if ( $this->shouldPrepareInsertStatement($model) ) {
@@ -101,7 +104,7 @@ class Sql extends Adapter {
 		
 		$this->model = $model;
 		if ( $this->hasStatement() ) {
-			$statementExecute = $this->statement->execute(array_values($model->model()));
+			$statementExecute = $this->statement->execute($inputParameters);
 			
 			if ( $statementExecute ) {
 				if ( !$model->exists() ) {
