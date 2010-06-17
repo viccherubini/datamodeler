@@ -17,9 +17,9 @@ class SqlTest extends TestCase {
 	private $user = NULL;
 	
 	public function setUp() {
-		$this->pdo = new \PDO('sqlite::memory:');
+		$this->pdo = new \PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);
 		
-		$sqlFile = DIRECTORY_DATA . 'SqlTest.sql';
+		$sqlFile = DIRECTORY_DATA . 'SqlTest-' . DB_TYPE . '.sql';
 		if ( true === is_file($sqlFile) ) {
 			$sqlData = @file_get_contents($sqlFile);
 			$this->pdo->exec($sqlData);
