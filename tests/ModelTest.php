@@ -16,7 +16,6 @@ class ModelTest extends TestCase {
 		$this->assertEquals('Vic', $model->getFirstname());
 	}
 
-
 	public function testMagicCaller_SetsModelArrayProperly() {
 		$firstname = 'Vic';
 		$lastname = 'Cherubini';
@@ -28,7 +27,6 @@ class ModelTest extends TestCase {
 		$this->assertEquals(array('firstname' => $firstname, 'lastname' => $lastname), $model->model());
 	}
 	
-	
 	public function testMagicCaller_DoesNotAllowPkeyToBeSet() {
 		$pkey = 'product_id';
 		
@@ -39,7 +37,6 @@ class ModelTest extends TestCase {
 		
 		$this->assertEmptyArray($model->model());
 	}
-	
 
 	public function testMagicGetter_ReturnsValueFromModel() {
 		$firstname = "Vic";
@@ -50,13 +47,11 @@ class ModelTest extends TestCase {
 		$this->assertEquals($firstname, $model->firstname);
 	}
 
-
 	public function testMagicGetter_ReturnsNullWhenKeyDoesNotExist() {
 		$model = $this->buildMockModel();
 		
 		$this->assertNull($model->firstname);
 	}
-	
 	
 	public function testMagicGetter_CanGetPkey() {
 		$product_id = 10;
@@ -68,7 +63,6 @@ class ModelTest extends TestCase {
 		$this->assertEquals($product_id, $model->product_id);
 	}
 
-
 	public function testMagicSetter_SetsValueInModel() {
 		$expected_model_array = array('first_name' => "Vic Cherubini");
 		
@@ -78,7 +72,6 @@ class ModelTest extends TestCase {
 		$this->assertEquals($expected_model_array, $model->model());
 	}
 	
-	
 	public function testMagicSetter_CannotSetPkeyInModel() {
 		$model = $this->buildMockModel();
 		$model->pkey('product_id');
@@ -86,7 +79,6 @@ class ModelTest extends TestCase {
 		$model->product_id = 10;
 		$this->assertEmptyArray($model->model());
 	}
-	
 	
 	public function testMagicSetter_CanSetPkeyInObject() {
 		$pkey = "product_id";
@@ -110,7 +102,6 @@ class ModelTest extends TestCase {
 	
 		$this->assertEmptyArray($model->model());
 	}
-	
 
 	public function testDatetype_IsTimestampByDefault() {
 		$model = $this->buildMockModel();
@@ -119,14 +110,12 @@ class ModelTest extends TestCase {
 		$this->assertEquals(\DataModeler\Model::DATETYPE_TIMESTAMP, $model->datetype());
 	}
 	
-	
 	public function testDatetype_CanBeSqlNow() {
 		$model = $this->buildMockModel();
 		$model->datetype(\DataModeler\Model::DATETYPE_NOW);
 		
 		$this->assertEquals(\DataModeler\Model::DATETYPE_NOW, $model->datetype());
 	}
-	
 	
 	public function testDatetype_CanBeTimestamp() {
 		$model = $this->buildMockModel();
@@ -135,42 +124,54 @@ class ModelTest extends TestCase {
 		$this->assertEquals(\DataModeler\Model::DATETYPE_TIMESTAMP, $model->datetype());
 	}
 	
-	
-	public function testEqualTo_TwoModelsAreEqualWhenIdIsSame() {
+	public function testEqualTo_EqualWhenIdIsSame() {
 		$product1 = $this->buildMockProduct();
-		$product2 = $this->buildMockProduct();
-		
 		$product1->id(1);
+		
+		$product2 = $this->buildMockProduct();
 		$product2->id(1);
 		
 		$this->assertTrue($product1->equalTo($product2));
 		$this->assertTrue($product2->equalTo($product1));
 	}
 	
-	
-	public function testEqualTo_TwoModelsAreNotEqualWhenIdIsDifferent() {
+	public function testEqualTo_NotEqualWhenIdIsDifferent() {
 		$product1 = $this->buildMockProduct();
-		$product2 = $this->buildMockProduct();
-		
 		$product1->id(1);
+		
+		$product2 = $this->buildMockProduct();
 		$product2->id(10);
 		
 		$this->assertFalse($product1->equalTo($product2));
 		$this->assertFalse($product2->equalTo($product1));
 	}
 	
-	
-	public function testEqualTo_TwoModelsAreNotEqualWhenDifferentType() {
+	public function testEqualTo_NotEqualWhenDifferentType() {
 		$product = $this->buildMockProduct();
-		$user = $this->buildMockModel('user', 'user_id');
-		
 		$product->id(1);
+		
+		$user = $this->buildMockModel('user', 'user_id');
 		$user->id(1);
 		
 		$this->assertFalse($product->equalTo($user));
 		$this->assertFalse($user->equalTo($product));
 	}
 	
+	public function testEqualTo_EqualWhenDataIsSame() {
+		$product1 = $this->buildMockProduct();
+		$product1->id(1);
+		$product1->setName('Product Name');
+		$product1->setPrice(10.96);
+		
+		// Notice the order of setName() and setPrice()
+		$product2 = $this->buildMockProduct();
+		$product2->id(1);
+		$product2->setPrice(10.96);
+		$product2->setName('Product Name');
+		
+		$this->assertTrue($product1->equalTo($product2));
+		$this->assertTrue($product2->equalTo($product1));
+	}
 	
 	public function testHasdate_MustBeBoolean() {
 		$model = $this->buildMockModel();
@@ -179,14 +180,12 @@ class ModelTest extends TestCase {
 		$this->assertNull($model->hasdate());
 	}
 	
-	
 	public function testHasdate_CanBeTrue() {
 		$model = $this->buildMockModel();
 		$model->hasdate(true);
 		
 		$this->assertTrue($model->hasdate());
 	}
-	
 	
 	public function testHasdate_CanBeFalse() {
 		$model = $this->buildMockModel();
@@ -195,12 +194,10 @@ class ModelTest extends TestCase {
 		$this->assertFalse($model->hasdate());
 	}
 	
-	
 	public function testId_IsInitiallyEmpty() {
 		$model = $this->buildMockModel();
 		$this->assertNull($model->id());
 	}
-	
 	
 	public function testId_CanBeSet() {
 		$id = 10;
@@ -211,8 +208,7 @@ class ModelTest extends TestCase {
 		$this->assertEquals($id, $model->id());
 	}
 	
-	
-	public function testIsA_TwoModelsAreEachOther() {
+	public function testIsA_SameModelsAreEachOther() {
 		$product1 = $this->buildMockProduct();
 		$product2 = $this->buildMockProduct();
 		
@@ -223,8 +219,7 @@ class ModelTest extends TestCase {
 		$this->assertTrue($product2->isA($product1));
 	}
 	
-	
-	public function testIsA_TwoDifferentModelsAreNotEachOther() {
+	public function testIsA_DifferentModelsAreNotEachOther() {
 		$product = $this->buildMockProduct();
 		$user = $this->buildMockModel('user', 'user_id');
 		
@@ -235,13 +230,11 @@ class ModelTest extends TestCase {
 		$this->assertFalse($user->isA($product));
 	}
 	
-	
 	public function testModel_IsInitiallyEmpty() {
 		$model = $this->buildMockModel();
 		
 		$this->assertEmptyArray($model->model());
 	}
-	
 	
 	/**
 	 * @expectedException PHPUnit_Framework_Error
@@ -251,14 +244,12 @@ class ModelTest extends TestCase {
 		$model->model(10);
 	}
 	
-	
 	public function testModel_FirstElementCanBeFalse() {
 		$model = $this->buildMockModel();
 		$model->model(array(false));
 		
 		$this->assertNotEmptyArray($model->model());
 	}
-	
 	
 	public function testModel_DoesNotAllowPkeyToBeSet() {
 		$array = array('product_id' => 10);
@@ -271,7 +262,6 @@ class ModelTest extends TestCase {
 		$this->assertEmptyArray($model->model());
 	}
 	
-	
 	public function testExists_IsTrueWhenIdIsSet() {
 		$pkey = 'product_id';
 		$id = 10;
@@ -283,13 +273,11 @@ class ModelTest extends TestCase {
 		$this->assertTrue($model->exists());
 	}
 	
-	
 	public function testExists_IsFalseWhenIdIsNotSet() {
 		$model = $this->buildMockModel();
 		
 		$this->assertFalse($model->exists());
 	}
-	
 	
 	public function testPkey_CannotContainBackticks() {
 		$pkey_with_backticks = '`p.product_id`';
@@ -301,6 +289,35 @@ class ModelTest extends TestCase {
 		$this->assertEquals($pkey_without_backticks, $model->pkey());
 	}
 	
+	public function testSimilarTo_SimilarWhenModelsAndKeysAreSame() {
+		$product1 = $this->buildMockProduct();
+		$product1->id(1);
+		$product1->setName('Product 1 Name');
+		$product1->setPrice(27.99);
+		
+		$product2 = $this->buildMockProduct();
+		$product2->id(2);
+		$product2->setPrice(8.56);
+		$product2->setName('Product 2 Name');
+		
+		$this->assertTrue($product1->similarTo($product2));
+		$this->assertTrue($product2->similarTo($product1));
+	}
+	
+	public function testSimilarTo_NotSimilarWhenModelsSameAndKeysDifferent() {
+		$product1 = $this->buildMockProduct();
+		$product1->id(1);
+		$product1->setName('Product 1 Name');
+		$product1->setPrice(27.99);
+		
+		$product2 = $this->buildMockProduct();
+		$product2->id(2);
+		$product2->setPrice(8.56);
+		$product2->setShippingCost(7.99);
+		
+		$this->assertFalse($product1->similarTo($product2));
+		$this->assertFalse($product2->similarTo($product1));
+	}
 	
 	public function testTable_CanBeSet() {
 		$table = 'products';
@@ -310,7 +327,6 @@ class ModelTest extends TestCase {
 		
 		$this->assertEquals($table, $model->table()); 
 	}
-	
 	
 	/**
 	 * @dataProvider providerValidTableName
@@ -322,7 +338,6 @@ class ModelTest extends TestCase {
 		$this->assertEquals($table, $model->table());
 	}
 	
-	
 	public function testTable_CannotContainBackticks() {
 		$table_with_backticks = '`table_name`';
 		$table_without_backticks = 'table_name';
@@ -332,7 +347,6 @@ class ModelTest extends TestCase {
 		
 		$this->assertEquals($table_without_backticks, $model->table());
 	}
-	
 	
 	public function providerValidTableName() {
 		return array(
@@ -344,7 +358,6 @@ class ModelTest extends TestCase {
 			array('p.product-list')
 		);
 	}
-	
 	
 	public function providerInvalidFieldName() {
 		return array(
