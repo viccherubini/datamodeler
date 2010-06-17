@@ -16,3 +16,24 @@ require_once 'lib/Exception.php';
 define('DS', DIRECTORY_SEPARATOR, false);
 define('DIRECTORY_TESTS', $data_modeler_test_path . DS, false);
 define('DIRECTORY_DATA', DIRECTORY_TESTS . '.Data' . DS, false);
+
+$dbType = 'sqlite';
+$dbName = 'datamodeler_tests';
+$dbHost = '127.0.0.1';
+
+switch ( $dbType ) {
+	case 'mysql': {
+		$dbDsn = "dbname={$dbName};host={$dbHost}";
+		break;
+	}
+	
+	case 'sqlite': {
+		$dbDsn = ":memory:";
+		break;
+	}
+}
+
+define('DB_TYPE', $dbType, false);
+define('DB_DSN', "{$dbType}:{$dbDsn}", false);
+define('DB_USERNAME', '', false);
+define('DB_PASSWORD', '', false);
