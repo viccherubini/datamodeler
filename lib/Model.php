@@ -28,12 +28,10 @@ abstract class Model {
 		$this->modelId = sha1(get_class($this));
 	}
 	
-	
 	public function __destruct() {
 		$this->model = array();
 		$this->modelId = NULL;
 	}
-	
 	
 	public function __call($method, $argv) {
 		$argc = count($argv);
@@ -60,7 +58,6 @@ abstract class Model {
 		}
 	}
 	
-	
 	public function __get($key) {
 		$pkey = $this->pkey();
 		
@@ -75,7 +72,6 @@ abstract class Model {
 		return NULL;
 	}
 	
-	
 	public function __set($key, $value) {
 		$pkey = $this->pkey();
 		
@@ -85,10 +81,10 @@ abstract class Model {
 			if ( true === $this->isValidField($key) ) {
 				$this->model[$key] = $value;
 			}
+			ksort($this->model);
 		}
 		return true;
 	}
-	
 	
 	public function datetype($datetype = 0) {
 		$datetype = intval($datetype);
@@ -101,18 +97,19 @@ abstract class Model {
 		return $this->datetype;
 	}
 	
-	
 	public function equalTo(Model $model) {
-		return ( $this->isA($model) && $model->id() === $this->id() );
+		return (
+			$this->isA($model) &&
+			$this->id() === $model->id() &&
+			$this->model() === $model->model()
+		);
 	}
-	
 	
 	public function exists() {
 		$id = $this->id();
 		return (false === empty($id));
 	}
-
-
+	
 	public function hasdate($hasdate = NULL) {
 		if ( true === $hasdate || false === $hasdate ) {
 			$this->hasdate = $hasdate;
@@ -120,7 +117,6 @@ abstract class Model {
 		return $this->hasdate;
 	}
 	
-
 	public function id($id = NULL) {
 		if ( false === empty($id) ) {
 			$this->id = $id;
@@ -128,11 +124,12 @@ abstract class Model {
 		return $this->id;
 	}
 	
-	
 	public function isA(Model $model) {
-		return ( $this->table() === $model->table() && $this->modelId() === $model->modelId() );
+		return (
+			$this->table() === $model->table() &&
+			$this->modelId() === $model->modelId()
+		);
 	}
-
 
 	public function model(array $model = array()) {
 		if ( false !== current($model) || ( count($model) > 0 ) ) {
@@ -150,7 +147,6 @@ abstract class Model {
 		return $this->modelId;
 	}
 	
-	
 	public function pkey($pkey = NULL) {
 		$pkey = trim($pkey);
 		if ( false === empty($pkey) ) {
@@ -159,7 +155,13 @@ abstract class Model {
 		}
 		return $this->pkey;
 	}
-
+	
+	public function similarTo(Model $model) {
+		return (
+			$this->isA($model) &&
+			array_keys($this->model()) === array_keys($model->model())
+		);
+	}
 
 	public function table($table = NULL) {
 		$table = trim($table);
@@ -170,13 +172,11 @@ abstract class Model {
 		return $this->table;
 	}
 
-	
 	private function convertCamelCaseToUnderscores($v) {
 		$v = substr($v, 3);
 		$v = strtolower(substr($v, 0, 1)) . substr($v, 1);
 		$v = preg_replace('/[A-Z]/', '_\\0', $v);
 		$v = strtolower($v);
-		
 		return $v;
 	}
 	
@@ -187,10 +187,7 @@ abstract class Model {
 		return false;
 	}
 	
-	
 	private function removeBackticks($value) {
 		return str_replace('`', NULL, $value);
 	}
-
-
 }
