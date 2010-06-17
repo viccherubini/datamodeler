@@ -11,9 +11,12 @@ class Sql extends Adapter {
 	
 	private $pdo = NULL;
 	private $model = NULL;
-	private $statement = NULL;
-
 	private $prepareCount = 0;
+	private $previousQuery = NULL;
+	private $statement = NULL;
+	
+	const QUERY_INSERT = 2;
+	const QUERY_UPDATE = 4;
 
 	public function getPrepareCount() {
 		return $this->prepareCount;
@@ -33,7 +36,6 @@ class Sql extends Adapter {
 	public function attachPdo(\PDO $pdo) {
 		$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
 		$this->pdo = $pdo;
-		
 		return $this;
 	}
 
@@ -45,11 +47,8 @@ class Sql extends Adapter {
 			if ( empty($where) ) {
 				$where = "{$model->pkey()} = ? LIMIT 1";
 			}
-
-			$this->statement = $this->pdo->prepare("SELECT * FROM {$model->table()} WHERE {$where}");
-			$this->prepareCount++;
+			$this->prepareQuery("SELECT * FROM {$model->table()} WHERE {$where}");
 		}
-		
 		return $this;
 	}
 
@@ -63,34 +62,56 @@ class Sql extends Adapter {
 		return $model;
 	}
 	
+	public function findAll(array $inputParameters) {
+		$modelList = array();
+		if ( $this->hasStatement() ) {
+			$this->statement->execute($inputParameters);
+			$rowDataList = $this->statement->fetchAll(\PDO::FETCH_ASSOC);
+			
+			if ( is_array($rowDataList) ) {
+				foreach ( $rowDataList as $rowData) {
+					$model = clone $this->model;
+					$model->model($rowData);
+					$modelList[] = $model;
+				}
+			}
+		}
+		
+		return $modelList;
+	}
+	
 	public function save(Model $model) {
 		$rowCount = 0;
 		
 		if ( $model->exists() ) {
-			if ( !$this->hasSameModel($model) ) {
+			if ( $this->shouldPrepareUpdateStatement($model) ) {
 				$setList = implode(' = ?, ', array_keys($model->model())) . ' = ?';
-				$this->statement->prepare("UPDATE {$model->table()} SET {$setList} WHERE {$model->pkey()} = ? LIMIT 1");
+				$this->prepareQuery("UPDATE {$model->table()} SET {$setList} WHERE {$model->pkey()} = ? LIMIT 1");
+				$this->previousQuery = self::QUERY_UPDATE;
 			}
 		} else {
-			if ( !$this->hasSameModel($model) ) {
+			if ( $this->shouldPrepareInsertStatement($model) ) {
 				$fieldList = implode(', ', array_keys($model->model()));
 				$valueList = implode(', ', array_fill(0, count($model->model()), '?'));
 				
-				$this->statement->prepare("INSERT INTO {$model->table()} ({$fieldList}) VALUES({$valueList})");
+				$this->prepareQuery("INSERT INTO {$model->table()} ({$fieldList}) VALUES({$valueList})");
+				$this->previousQuery = self::QUERY_INSERT;
 			}
 		}
 		
 		$this->model = $model;
 		if ( $this->hasStatement() ) {
-			$inputParameters = array_values($model->model());
-			$this->statement->execute($inputParameters);
-			$rowCount = $this->statement->rowCount();
+			$statementExecute = $this->statement->execute(array_values($model->model()));
+			
+			if ( $statementExecute ) {
+				if ( !$model->exists() ) {
+					$model->id($this->pdo->lastInsertId());
+				}
+			}
 		}
 		
-		return ( $rowCount > 0 ? true : false );
+		return $model;
 	}
-	
-
 	
 	private function executeFindStatement(array $inputParameters) {
 		$model = clone $this->model;
@@ -107,7 +128,11 @@ class Sql extends Adapter {
 	}
 	
 	private function hasSameModel(Model $model) {
-		return ( $this->model instanceof Model && $this->model->isA($model) );
+		return ( $this->model instanceof Model && $this->model->equalTo($model) );
+	}
+	
+	private function hasSimilarModel(Model $model) {
+		return ( $this->model instanceof Model && $this->model->similarTo($model) );
 	}
 	
 	private function hasStatement() {
@@ -115,10 +140,22 @@ class Sql extends Adapter {
 	}
 	
 	private function hasPdo() {
-		if ( empty($this->pdo) || !($this->pdo instanceof \PDO) ) {
+		if ( !($this->pdo instanceof \PDO) ) {
 			throw new \DataModeler\Exception("Database object has not yet been attached to Sql Adapter.");
 		}
 		return true;
 	}
-
+	
+	private function prepareQuery($sql) {
+		$this->statement = $this->pdo->prepare($sql);
+		$this->prepareCount++;
+	}
+	
+	private function shouldPrepareInsertStatement(Model $model) {
+		return ( $this->previousQuery === self::QUERY_UPDATE || !$this->hasSimilarModel($model) );
+	}
+	
+	private function shouldPrepareUpdateStatement(Model $model) {
+		return ( $this->previousQuery === self::QUERY_INSERT || !$this->hasSimilarModel($model) );
+	}
 }
