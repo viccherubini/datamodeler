@@ -12,43 +12,72 @@ class Sql extends Adapter {
 	private $pdo = NULL;
 	private $model = NULL;
 	private $prepareCount = 0;
-	private $previousQuery = NULL;
+	private $sqlHash = NULL;
 	private $statement = NULL;
 	
-	const QUERY_INSERT = 2;
-	const QUERY_UPDATE = 4;
-
-	public function getPrepareCount() {
-		return $this->prepareCount;
-	}
-
-	public function getStatement() {
-		return $this->statement;
-	}
-	
-	public function getQueryString() {
-		if ( $this->hasStatement() ) {
-			return $this->statement->queryString;
-		}
-		return NULL;
-	}
-
 	public function attachPdo(\PDO $pdo) {
 		$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
 		$this->pdo = $pdo;
 		return $this;
 	}
+	
+	public function getPdo() {
+		return $this->pdo;
+	}
+	
+	public function setModel(Model $model) {
+		$this->model = clone $model;
+		return $this;
+	}
+	
+	public function getModel() {
+		return $this->model;
+	}
+	
+	public function setStatement($statement) {
+		$this->statement = $statement;
+		return $this;
+	}
+	
+	public function getStatement() {
+		return $this->statement;
+	}
+	
+	public function setPrepareCount($prepareCount) {
+		$this->prepareCount = intval($prepareCount);
+		return $this;
+	}
+	
+	public function getPrepareCount() {
+		return $this->prepareCount;
+	}
+	
+	public function getQueryString() {
+		if ( $this->hasStatement() ) {
+			return $this->getStatement()->queryString;
+		}
+		return NULL;
+	}
+	
+	public function setSqlHash($sqlHash) {
+		$this->sqlHash = $sqlHash;
+		return $this;
+	}
+	
+	public function getSqlHash() {
+		return $this->sqlHash;
+	}
 
 	public function prepare(Model $model, $where = NULL) {
 		$this->hasPdo();
 		
-		if ( !$this->hasSameModel($model) ) {
-			$this->model = $model;
-			if ( empty($where) ) {
-				$where = "{$model->pkey()} = ? LIMIT 1";
-			}
-			$this->prepareQuery("SELECT * FROM {$model->table()} WHERE {$where}");
+		if ( empty($where) ) {
+			$where = "{$model->pkey()} = ? LIMIT 1";
 		}
+
+		$this->prepareQuery("SELECT * FROM {$model->table()} WHERE {$where}");
+		$this->setModel($model);
+		
 		return $this;
 	}
 
@@ -64,13 +93,14 @@ class Sql extends Adapter {
 	
 	public function findAll(array $inputParameters) {
 		$modelList = array();
+		
 		if ( $this->hasStatement() ) {
-			$this->statement->execute($inputParameters);
-			$rowDataList = $this->statement->fetchAll(\PDO::FETCH_ASSOC);
+			$this->getStatement()->execute($inputParameters);
+			$rowDataList = $this->getStatement()->fetchAll(\PDO::FETCH_ASSOC);
 			
 			if ( is_array($rowDataList) ) {
 				foreach ( $rowDataList as $rowData) {
-					$model = clone $this->model;
+					$model = clone $this->getModel();
 					$model->model($rowData);
 					$modelList[] = $model;
 				}
@@ -81,46 +111,48 @@ class Sql extends Adapter {
 	}
 	
 	public function save(Model $model) {
-		$rowCount = 0;
 		$inputParameters = array_values($model->model());
 		
 		if ( $model->exists() ) {
-			if ( $this->shouldPrepareUpdateStatement($model) ) {
-				$setList = implode(' = ?, ', array_keys($model->model())) . ' = ?';
-				$this->prepareQuery("UPDATE {$model->table()} SET {$setList} WHERE {$model->pkey()} = ? LIMIT 1");
-				$this->previousQuery = self::QUERY_UPDATE;
-				
-				$inputParameters[] = $model->id();
-			}
+			$setList = implode(' = ?, ', array_keys($model->model())) . ' = ?';
+			$this->prepareQuery("UPDATE {$model->table()} SET {$setList} WHERE {$model->pkey()} = ?");
+			$inputParameters[] = $model->id();
 		} else {
-			if ( $this->shouldPrepareInsertStatement($model) ) {
-				$fieldList = implode(', ', array_keys($model->model()));
-				$valueList = implode(', ', array_fill(0, count($model->model()), '?'));
-				
-				$this->prepareQuery("INSERT INTO {$model->table()} ({$fieldList}) VALUES({$valueList})");
-				$this->previousQuery = self::QUERY_INSERT;
-			}
+			$fieldList = implode(', ', array_keys($model->model()));
+			$valueList = implode(', ', array_fill(0, count($model->model()), '?'));
+			$this->prepareQuery("INSERT INTO {$model->table()} ({$fieldList}) VALUES({$valueList})");
 		}
 		
-		$this->model = $model;
+		$updatedModel = clone $model;
 		if ( $this->hasStatement() ) {
-			$statementExecute = $this->statement->execute($inputParameters);
+			$statementExecute = $this->getStatement()->execute($inputParameters);
 			
 			if ( $statementExecute ) {
-				if ( !$model->exists() ) {
-					$model->id($this->pdo->lastInsertId());
+				if ( !$updatedModel->exists() ) {
+					$updatedModel->id($this->pdo->lastInsertId());
 				}
 			}
 		}
 		
-		return $model;
+		return $updatedModel;
+	}
+	
+	public function query($sql, array $inputParameters = array()) {
+		$this->prepareQuery($sql);
+		
+		if ( $this->hasStatement() ) {
+			$statementExecute = $this->getStatement()->execute($inputParameters);
+		}
+		
+		return $this;
 	}
 	
 	private function executeFindStatement(array $inputParameters) {
 		$model = clone $this->model;
+		
 		if ( $this->hasStatement() ) {
-			$this->statement->execute($inputParameters);
-			$rowData = $this->statement->fetch(\PDO::FETCH_ASSOC);
+			$this->getStatement()->execute($inputParameters);
+			$rowData = $this->getStatement()->fetch(\PDO::FETCH_ASSOC);
 			
 			if ( is_array($rowData) ) {
 				$model->model($rowData);
@@ -130,35 +162,36 @@ class Sql extends Adapter {
 		return $model;
 	}
 	
-	private function hasSameModel(Model $model) {
-		return ( $this->model instanceof Model && $this->model->equalTo($model) );
-	}
-	
-	private function hasSimilarModel(Model $model) {
-		return ( $this->model instanceof Model && $this->model->similarTo($model) );
-	}
-	
 	private function hasStatement() {
-		return ( $this->statement instanceof \PDOStatement );
+		return ( $this->getStatement() instanceof \PDOStatement );
 	}
 	
 	private function hasPdo() {
-		if ( !($this->pdo instanceof \PDO) ) {
+		if ( !($this->getPdo() instanceof \PDO) ) {
 			throw new \DataModeler\Exception("Database object has not yet been attached to Sql Adapter.");
 		}
 		return true;
 	}
 	
 	private function prepareQuery($sql) {
-		$this->statement = $this->pdo->prepare($sql);
+		if ( $this->shouldPrepareStatement($sql) ) {
+			$this->setStatement($this->getPdo()->prepare($sql));
+			$this->updatePrepareCount();
+		}
+		return true;
+	}
+	
+	private function shouldPrepareStatement($sql) {
+		$sqlSha1 = sha1($sql);
+		if ( $sqlSha1 != $this->getSqlHash() ) {
+			$this->setSqlHash($sqlSha1);
+			return true;
+		}
+		return false;
+	}
+	
+	private function updatePrepareCount() {
 		$this->prepareCount++;
-	}
-	
-	private function shouldPrepareInsertStatement(Model $model) {
-		return ( $this->previousQuery === self::QUERY_UPDATE || !$this->hasSimilarModel($model) );
-	}
-	
-	private function shouldPrepareUpdateStatement(Model $model) {
-		return ( $this->previousQuery === self::QUERY_INSERT || !$this->hasSimilarModel($model) );
+		return true;
 	}
 }
