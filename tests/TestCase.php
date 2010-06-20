@@ -40,6 +40,11 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 		self::assertTrue($obj instanceof Model, $message);
 	}
 
+	public static function assertPdoStatement($obj, $message = '') {
+		self::assertTrue(is_object($obj), $message);
+		self::assertTrue($obj instanceof \PDOStatement, $message);
+	}
+
 	public static function assertSql($obj, $message = '') {
 		self::assertTrue(is_object($obj), $message);
 		self::assertTrue($obj instanceof Sql, $message);
