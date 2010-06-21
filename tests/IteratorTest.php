@@ -9,17 +9,38 @@ require_once 'lib/Iterator.php';
 
 class IteratorTest extends TestCase {
 
-	private $iteratorData = array();
+	private $iteratorArrayData = array();
+	private $iteratorModelData = array();
 	
 	public function setUp() {
-		$this->iteratorData = array(
+		$this->iteratorArrayData = array(
 			array('name' => 'Vic Cherubini', 'age' => 18),
 			array('name' => 'Bob Saget', 'age' => 44),
 			array('name' => 'King George', 'age' => 85),
 			array('name' => 'Rodney Dangerfield', 'age' => 88)
 		);
+		
+		$modelList = array();
+		foreach ( $this->iteratorArrayData as $arrayData ) {
+			$model = $this->buildMockModel();
+			$model->model($arrayData);
+			$modelList[] = $model;
+		}
+		
+		$this->iteratorModelData = $modelList;
+	}
+	
+	protected function assertPreConditions() {
+		
+		
 	}
 
+	public function testClone_NewIteratorContainsSameData() {
+		$iterator1 = new Iterator($this->iteratorArrayData);
+		$iterator2 = clone $iterator1;
+		
+		$this->assertEquals($iterator1->getData(), $iterator2->getData());
+	}
 
 	/**
 	 * @dataProvider providerIteratorArray
@@ -194,9 +215,9 @@ class IteratorTest extends TestCase {
 	public function testFetch_ReturnsSameIteratorDataForNoFilters($data) {
 		$iterator = new Iterator($data);
 		
-		$newIterator = $iterator->fetch();
+		$matchedIterator = $iterator->fetch();
 		
-		$this->assertEquals($iterator->getData(), $newIterator->getData());
+		$this->assertEquals($iterator->getData(), $matchedIterator->getData());
 	}
 	
 	
@@ -204,12 +225,12 @@ class IteratorTest extends TestCase {
 	 * @dataProvider providerFilter
 	 */
 	public function testFetch_ReturnsMatchedIteratorForArrays($field, $value, $expected) {
-		$iterator = new Iterator($this->iteratorData);
+		$iterator = new Iterator($this->iteratorArrayData);
 		
 		$iterator->filter($field, $value);
-		$newIterator = $iterator->fetch();
+		$matchedIterator = $iterator->fetch();
 		
-		$this->assertEquals($expected, $newIterator->getData());
+		$this->assertEquals($expected, $matchedIterator->getData());
 	}
 	
 	
@@ -217,46 +238,27 @@ class IteratorTest extends TestCase {
 	 * @dataProvider providerFilterWithLimit
 	 */
 	public function testFetch_ReturnsMatchedIteratorForArraysWithMaxLimit($field, $value, $expected, $limit) {
-		$iterator = new Iterator($this->iteratorData);
+		$iterator = new Iterator($this->iteratorArrayData);
 		
 		$iterator->filter($field, $value);
 		$iterator->limit($limit);
 		
-		$newIterator = $iterator->fetch();
+		$matchedIterator = $iterator->fetch();
 		
-		$this->assertEquals($expected, $newIterator->getData());
+		$this->assertEquals($expected, $matchedIterator->getData());
 	}
-	
-	
-	
+
 	/**
-	 * @_dataProvider providerFilter
+	 * @dataProvider providerFilter
 	 */
-	public function _testFetch_ReturnsMatchedIteratorForModels($field, $value, $expected) {
-		/*$iteratorData = array();
-		$data = array(
-			array('name' => 'Vic Cherubini', 'age' => 18),
-			array('name' => 'Bob Saget', 'age' => 44),
-			array('name' => 'King George', 'age' => 85),
-			array('name' => 'Rodney Dangerfield', 'age' => 88)
-		);
-		
-		$model = $this->buildMockModel();
-		
-		foreach ( $data as $modelData ) {
-			$model->model($modelData);
-			$iteratorData[] = clone $model;
-		}
-		
-		$iterator = new Iterator($iteratorData);
+	public function testFetch_CanFilterOnAnArrayOfModels($field, $value, $expected) {
+		$iterator = new Iterator($this->iteratorModelData);
 		
 		$iterator->filter($field, $value);
-		$newIterator = $iterator->fetch();
+		$matchedIterator = $iterator->fetch();
 		
-		//$this->assertEquals(new Iterator($expected), $newIterator);
-		*/
+		$this->assertEquals(count($expected), $matchedIterator->length());
 	}
-	
 
 	public function providerIteratorArray() {
 		return array(
@@ -269,28 +271,22 @@ class IteratorTest extends TestCase {
 	
 	public function providerFilter() {
 		return array(
-			array('name = ?',  'Vic Cherubini', array(array('name' => 'Vic Cherubini', 'age' => 18))),
+			array('name = ?', 'Vic Cherubini', array(array('name' => 'Vic Cherubini', 'age' => 18))),
 			array('name == ?', 'Vic Cherubini', array(array('name' => 'Vic Cherubini', 'age' => 18))),
-			array('age != ?',  18,              array(array('name' => 'Bob Saget', 'age' => 44), array('name' => 'King George', 'age' => 85), array('name' => 'Rodney Dangerfield', 'age' => 88))),
-			array('age <> ?',  18,              array(array('name' => 'Bob Saget', 'age' => 44), array('name' => 'King George', 'age' => 85), array('name' => 'Rodney Dangerfield', 'age' => 88))),
-			array('age >= ?',  85,              array(array('name' => 'King George', 'age' => 85), array('name' => 'Rodney Dangerfield', 'age' => 88))),
-			array('age <= ?',  44,              array(array('name' => 'Vic Cherubini', 'age' => 18), array('name' => 'Bob Saget', 'age' => 44))),
-			array('age < ?',   44,              array(array('name' => 'Vic Cherubini', 'age' => 18))),
-			array('age > ?',   85,              array(array('name' => 'Rodney Dangerfield', 'age' => 88))
-			)
+			array('age != ?', 18, array(array('name' => 'Bob Saget', 'age' => 44), array('name' => 'King George', 'age' => 85), array('name' => 'Rodney Dangerfield', 'age' => 88))),
+			array('age <> ?', 18, array(array('name' => 'Bob Saget', 'age' => 44), array('name' => 'King George', 'age' => 85), array('name' => 'Rodney Dangerfield', 'age' => 88))),
+			array('age >= ?', 85, array(array('name' => 'King George', 'age' => 85), array('name' => 'Rodney Dangerfield', 'age' => 88))),
+			array('age <= ?', 44, array(array('name' => 'Vic Cherubini', 'age' => 18), array('name' => 'Bob Saget', 'age' => 44))),
+			array('age < ?', 44, array(array('name' => 'Vic Cherubini', 'age' => 18))),
+			array('age > ?', 85, array(array('name' => 'Rodney Dangerfield', 'age' => 88)))
 		);
 	}
 	
-	
 	public function providerFilterWithLimit() {
-		// Ok, this is just awesome.
 		return array_map(function($e) {
-			$e[2] = array(current($e[2]));
+			$e[2] = array($e[2][0]);
 			$e[] = 1;
-			
 			return $e;
 		}, $this->providerFilter());
 	}
-	
-	
 }
