@@ -39,6 +39,33 @@ class SqlTest extends TestCase {
 		$this->assertSql($sql->attachPdo($this->pdo));
 	}
 	
+	public function testGetPdo_ReturnsPdoObject() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$this->assertTrue($sql->getPdo() instanceof \PDO);
+	}
+	
+	/**
+	 * @expectedException \DataModeler\Exception
+	 */
+	public function testSetStatement_OnlyAllowsPdoStatementToBeSet() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$sql->setStatement(false);
+	}
+	
+	public function testSetStatement_AllowsPdoStatementToBeSet() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$statement = $this->pdo->prepare("SELECT * FROM products");
+		$sql->setStatement($statement);
+		
+		$this->assertPdoStatement($sql->getStatement());
+	}
+	
 	public function testGetStatement_ReturnsPdoStatement() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
@@ -47,6 +74,21 @@ class SqlTest extends TestCase {
 		$sql->get(1);
 		
 		$this->assertTrue($sql->getStatement() instanceof \PDOStatement);
+	}
+	
+	public function testSetPrepareCount_OnlyAllowsIntegers() {
+		$sql = new Sql;
+		
+		$sql->setPrepareCount('string');
+		$this->assertType('int', $sql->getPrepareCount());
+	}
+	
+	public function testGetPrepareCount_ReturnsIntegerPrepareCount() {
+		$sql = new Sql;
+		
+		$prepareCount = 10;
+		$sql->setPrepareCount($prepareCount);
+		$this->assertEquals($prepareCount, $sql->getPrepareCount());
 	}
 	
 	public function testGetQueryString_ReturnsUnparsedQuery() {
@@ -64,6 +106,27 @@ class SqlTest extends TestCase {
 		$sql->attachPdo($this->pdo);
 		
 		$this->assertNull($sql->getQueryString());
+	}
+	
+	public function testSetSqlHash_MustBeSha1() {
+		$sql = new Sql;
+		
+		$query = "SELECT * FROM products";
+		$querySha1 = sha1($query);
+		
+		$sql->setSqlHash($querySha1);
+		$this->assertEquals($querySha1, $sql->getSqlHash());
+	}
+	
+	public function testGetSqlHash_MustBeSha1() {
+		// Probably a pointless test
+		$sql = new Sql;
+		
+		$query = "SELECT * FROM products";
+		$querySha1 = sha1($query);
+		
+		$sql->setSqlHash($querySha1);
+		$this->assertEquals(strlen($querySha1), strlen($sql->getSqlHash()));
 	}
 
 	/**
