@@ -35,6 +35,9 @@ class Sql extends Adapter {
 	}
 	
 	public function setStatement($statement) {
+		if ( !($statement instanceof \PDOStatement) ) {
+			throw new \DataModeler\Exception("Only PDOStatement objects can be set.");
+		}
 		$this->statement = $statement;
 		return $this;
 	}
@@ -60,7 +63,9 @@ class Sql extends Adapter {
 	}
 	
 	public function setSqlHash($sqlHash) {
-		$this->sqlHash = $sqlHash;
+		if ( 40 == strlen($sqlHash) ) {
+			$this->sqlHash = $sqlHash;
+		}
 		return $this;
 	}
 	
