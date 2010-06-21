@@ -130,8 +130,6 @@ class Iterator implements \Iterator {
 					$model = $iteratorItem->model();
 				} elseif ( true === is_array($iteratorItem) ) {
 					$model = $iteratorItem;
-				} else {
-					$model = array($iteratorItem);
 				}
 				
 				if ( true === $this->applyFilter($model) ) {
