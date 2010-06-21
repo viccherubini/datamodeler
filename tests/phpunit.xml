@@ -14,5 +14,6 @@
 	
 	<logging>
 		<log type="coverage-html" target="../docs/test-coverage/" charset="UTF-8" yui="true" highlight="true" />
+		<!--<log type="testdox-html" target="../docs/testdox/testdox.html" />-->
 	</logging>
 </phpunit>
