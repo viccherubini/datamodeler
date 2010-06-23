@@ -18,12 +18,22 @@ abstract class Model {
 	private $model = array();
 	private $modelId = NULL;
 	private $pkey = NULL;
+	private $schema = array();
 	private $table = NULL;
 	
 	const DATETYPE_TIMESTAMP = 2;
 	const DATETYPE_NOW = 4;
 	
 	const TYPE_REF = 'ref';
+
+	const TYPE_BOOL = 2;
+	const TYPE_DATE = 4;
+	const TYPE_DATETIME = 8;
+	const TYPE_FLOAT = 16;
+	const TYPE_INTEGER = 32;
+	const TYPE_STRING = 64;
+	const TYPE_TEXT = 128;
+	const TYPE_TIME = 256;
 	
 	public function __construct() {
 		$this->modelId = sha1(get_class($this));
@@ -198,7 +208,7 @@ abstract class Model {
 		
 	}
 	
-	private parseDocComment($comment) {
+	private function parseDocComment($comment) {
 		// Empty method, move the parsing from the buildSchemaTable() method
 		// to here. Return an list of key value pairs.
 		
