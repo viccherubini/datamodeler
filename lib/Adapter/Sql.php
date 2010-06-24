@@ -72,7 +72,33 @@ class Sql extends Adapter {
 	public function getSqlHash() {
 		return $this->sqlHash;
 	}
+	
+	public function now($time = -1) {
+		$time = ( -1 == $time ? time() : $time );
+		return date('Y-m-d H:i:s', $time);
+	}
+	
+	public function begin() {
+		$this->hasPdo();
+		
+		$this->getPdo()->beginTransaction();
+		return true;
+	}
 
+	public function commit() {
+		$this->hasPdo();
+		
+		$this->getPdo()->commit();
+		return true;
+	}
+
+	public function rollback() {
+		$this->hasPdo();
+		
+		$this->getPdo()->rollBack();
+		return true;
+	}
+	
 	public function prepare(Model $model, $where = NULL) {
 		$this->hasPdo();
 		
@@ -151,6 +177,24 @@ class Sql extends Adapter {
 		
 		return $this;
 	}
+	
+	public function countOf(Model $model, $where = NULL, array $inputParameters = array()) {
+		$this->hasPdo();
+		
+		$this->query("SELECT COUNT(*) FROM {$model->table()} {$where}", $inputParameters);
+		
+		$rowCount = 0;
+		if ( $this->hasStatement() ) {
+			$rowCount = $this->getStatement()->fetchColumn(0);
+			$rowCount = intval($rowCount);
+		}
+		
+		return $rowCount;
+	}
+	
+	
+	
+	
 	
 	private function executeFindStatement(array $inputParameters) {
 		$model = clone $this->model;
