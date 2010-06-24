@@ -22,7 +22,22 @@ class SqlTest extends TestCase {
 		$sqlFile = DIRECTORY_DATA . 'SqlTest-' . DB_TYPE . '.sql';
 		if ( true === is_file($sqlFile) ) {
 			$sqlData = @file_get_contents($sqlFile);
-			$this->pdo->exec($sqlData);
+			
+			// Execute the data because in mysql 5.0 exec() keeps the buffer
+			// open so successive queries can not be executed. This was fixed 
+			// in mysql 5.1
+			switch ( DB_TYPE ) {
+				case 'sqlite': {
+					$this->pdo->exec($sqlData);
+					break;
+				}
+				
+				case 'mysql': {
+					$statement = $this->pdo->prepare($sqlData);
+					$statement->execute();
+					break;
+				}
+			}
 		}
 		
 		$this->product = $this->buildMockProduct();
@@ -66,6 +81,13 @@ class SqlTest extends TestCase {
 		$this->assertPdoStatement($sql->getStatement());
 	}
 	
+	public function testSetPrepareCount_OnlyAllowsIntegers() {
+		$sql = new Sql;
+		
+		$sql->setPrepareCount('string');
+		$this->assertType('int', $sql->getPrepareCount());
+	}
+	
 	public function testGetStatement_ReturnsPdoStatement() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
@@ -74,13 +96,6 @@ class SqlTest extends TestCase {
 		$sql->get(1);
 		
 		$this->assertTrue($sql->getStatement() instanceof \PDOStatement);
-	}
-	
-	public function testSetPrepareCount_OnlyAllowsIntegers() {
-		$sql = new Sql;
-		
-		$sql->setPrepareCount('string');
-		$this->assertType('int', $sql->getPrepareCount());
 	}
 	
 	public function testGetPrepareCount_ReturnsIntegerPrepareCount() {
@@ -127,6 +142,55 @@ class SqlTest extends TestCase {
 		
 		$sql->setSqlHash($querySha1);
 		$this->assertEquals(strlen($querySha1), strlen($sql->getSqlHash()));
+	}
+	
+	public function testBegin_StartsATransaction() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$this->assertTrue($sql->begin());
+	}
+
+	public function testCommit_SavesATransaction() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$order1 = $this->buildMockOrder();
+		$order2 = $this->buildMockOrder();
+		
+		$order1->setDateCreated($sql->now())
+			->setCustomerId(mt_rand(1, 100))
+			->setName('My New Order');
+		
+		$sql->begin();
+		$order1 = $sql->save($order1);
+		$sql->commit();
+		
+		// Reload the order
+		$order2 = $sql->prepare($order2)->get($order1->id());
+		
+		$this->assertTrue($order2->exists());
+	}
+	
+	public function testRollback_RevertsATransaction() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$order1 = $this->buildMockOrder();
+		$order2 = $this->buildMockOrder();
+		
+		$order1->setDateCreated($sql->now())
+			->setCustomerId(mt_rand(1, 100))
+			->setName('My New Order');
+		
+		$sql->begin();
+		$order1 = $sql->save($order1);
+		$sql->rollback();
+		
+		// Reload the order
+		$order2 = $sql->prepare($order2)->get($order1->id());
+		
+		$this->assertFalse($order2->exists());
 	}
 
 	/**
@@ -367,6 +431,13 @@ class SqlTest extends TestCase {
 		$largeObject = $sql->save($largeObject);
 		
 		$this->assertTrue($largeObject->exists());
+		
+		$sql->prepare($largeObject)->get($largeObject->id());
+		
+		$this->assertEquals($objectData, $largeObject->getObjectData());
+		
+		unset($objectData);
+		unset($largeObject);
 	}
 	
 	/**
@@ -379,6 +450,23 @@ class SqlTest extends TestCase {
 		$sql->query($query, $inputParameters);
 		
 		$this->assertPdoStatement($sql->getStatement());
+	}
+	
+	public function testCountOf_CanReturnNumberOfRowsInTable() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$rowCount = $sql->countOf($this->buildMockProduct());
+		
+		$this->assertGreaterThan(0, $rowCount);
+	}
+	
+	/**
+	 * @expectedException \DataModeler\Exception
+	 */
+	public function testCountOf_RequiresPdo() {
+		$sql = new Sql;
+		$sql->countOf($this->buildMockProduct());
 	}
 	
 	public function providerFindModel() {
