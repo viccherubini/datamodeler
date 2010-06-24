@@ -21,6 +21,8 @@ abstract class Model {
 	private $schema = array();
 	private $table = NULL;
 	
+	public $properties = array();
+	
 	const DATETYPE_TIMESTAMP = 2;
 	const DATETYPE_NOW = 4;
 	
@@ -37,6 +39,8 @@ abstract class Model {
 	
 	public function __construct() {
 		$this->modelId = sha1(get_class($this));
+		
+		$this->readTableSchema();
 	}
 	
 	public function __destruct() {
@@ -167,6 +171,13 @@ abstract class Model {
 		return $this->pkey;
 	}
 	
+	public function schema($schema = array()) {
+		if ( count($schema) > 0 ) {
+			$this->schema = $schema;
+		}
+		return $this->schema;
+	}
+	
 	public function similarTo(Model $model) {
 		return (
 			$this->isA($model) &&
@@ -196,6 +207,31 @@ abstract class Model {
 			return true;
 		}
 		return false;
+	}
+	
+	private function readTableSchema() {
+		$reflection = new \ReflectionClass(get_class($this));
+		$properties = $reflection->getProperties();
+		
+		$schema = array();
+		
+		foreach ( $properties as $property ) {
+			$schema[$property->getName()] = NULL;
+			
+			$docComment = $property->getDocComment();
+			
+			// Replace the first /** and the last */
+			$docComment = str_replace(array('/**', '*/'), array(NULL, NULL), $docComment);
+			
+			// Pull out each [key value] pair.
+			$matchCount = preg_match_all('#\[[a-z]+ [a-z0-9]+\]+#i', $docComment, $foundMatches);
+			if ( $matchCount > 0 ) {
+				// Build up the schema table based on found properties
+			}
+		}
+		
+		$this->schema($schema);
+		
 	}
 	
 	private function removeBackticks($value) {
