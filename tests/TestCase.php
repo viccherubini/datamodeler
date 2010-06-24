@@ -63,6 +63,11 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 		return $model;
 	}
 	
+	protected function buildMockOrder() {
+		$model = $this->buildMockModel('orders', 'order_id');
+		return $model;
+	}
+	
 	protected function buildMockProduct() {
 		$model = $this->buildMockModel('products', 'id');
 		return $model;
