@@ -3,24 +3,20 @@ DataModeler is a new ORM type framework for bulding Models that can easily speak
 
 This all occurs because, again, the Models are essentially blind as to where they are stored. It is up to each data store adapter to determine how to store that model. Models, however, should be intelligent in that they contain most of the logic your application requires. Remember, you want **F A T** models and skinny controllers.
 
-Using DataModeler is simple. All of your models should extend the `\DataModeler\Model` class (which is fairly simple itself). Next, you will build a `\DataModeler\Loader` and `\DataModeler\Writer` object for loading models and writing them, respectively. A `\DataModeler\Adapater` instance is then built from an Abstract Factory class. Finally, the adapter is connected to through a consistent interface and attached to both the Loader and Writer objects. You can now load and write objects.
+Using DataModeler is simple. All of your models should extend the `\DataModeler\Model` class (which is fairly simple itself). Next, you'll define your Model's field's datatypes along with other Models they reference. This means you can define heirarchial Models and ensure your data is consistent with what is in your datastore.
 
-Of course, the order is not important initially; the Adapter can be built before the Loader and Writer objects. However, to load and write objects, an Adapater much be attached to each of the Loader and Writer.
+Because of the complex nature of how Models can be loaded and written, you must define each Adapter you want to load from/save to. You'll most likely only use one Adapter, but adding a second to your application is simple.
 
-You can attach multiple adapters to a single Writer. Each time `write()` is called on the Writer object, the Model sent to `write()` will be written to each attached Adapter.
-
-## Sample Writer Application
+## Sample Application
 	<?php
 	
 	declare(encoding='UTF-8');
 	
 	use DataModeler\Model,
-		DataModeler\Writer,
 		DataModeler\Adapter\Sql,
 		DataModeler\Adapter\Document\Redis;
 	
 	require_once 'lib/Model.php';
-	require_once 'lib/Writer.php';
 	require_once 'lib/Adapter/Sql.php';
 	require_once 'lib/Adapter/Document/Redis.php';
 	
@@ -28,17 +24,38 @@ You can attach multiple adapters to a single Writer. Each time `write()` is call
 	 * Automatically build an object that models data in a datastore.
 	 */
 	class \Product extends Model {
-	
+		
+		/** [ref \Product\Image on pkey] */
+		private $imageList = array();
+		
+		/** [ref \Product\Description on pid={product_id}] */
+		private $description = NULL;
+		
+		/** [ref \Product\Icon on size=10] */
+		private $iconList = array();
+
+
+		/** [type INTEGER] */
+		private $product_id = 0;
+
+		/** [type STRING] [maxlength 64] */
+		private $name = NULL;
+
+		/** [type FLOAT] [precision 2] */
+		private $price = 0.00;
+		
+		/** [type STRING] [maxlength 32] */
+		private $sku;
 	}
 	
 	/**
 	 * Because the Sql class depends on an external object, the \PDO object,
 	 * the object is constructed externally and added to the Sql object.
 	 */
-	$sql_adapter = new \PDO('sqlite:/path/to/database.sqlite3');
+	$pdo = new \PDO('sqlite:/path/to/database.sqlite3');
 	
-	$sql_adapter = new Sql;
-	$sql_adapter->attachDb($sql);
+	$sql = new Sql;
+	$sql->attachDb($pdo);
 	
 	/**
 	 * If an external \Redis object were ever necessary, it would be constructed
@@ -46,22 +63,41 @@ You can attach multiple adapters to a single Writer. Each time `write()` is call
 	 * management of a Redis connection will be handled internally since there's
 	 * no dependency injection.
 	 */
-	$redis_adapter = new Redis;
-	$redis_adapter->setServer('localhost')
-		->setUsername('username')
-		->setPassword('password')
-		->setDatabase('redisdb');
+	$redis = new Redis;
 	
-	$writer = new Writer();
-	$writer->addAdapter($sql_adapter);
-	$writer->addAdapter($redis_adapter);
-	
+	/**
+	 * Create a new empty product and insert it into the database and Redis server.
+	 */
 	$product = new \Product;
-	$product->setName('Writing Advance PHP Applications: A Book')
-		->setPrice(28.94)
-		->setSku('WAPA');
+	$product->setName('Using DataModeler In All Its Glory')
+		->setPrice(13.99)
+		->setSku('UDMIAIG');
 		
-	$writer->write($product);
+	$sql->save($product);
+	$redis->save($product);
 	
+	/**
+	 * Load the product from the SQL datastore.
+	 */
+	$product = $sql->prepare($product)->get(1);
+	
+	/**
+	 * Because of how $product is defined, when it is retrieved, several
+	 * things will happen: all \Product\Image objects associated with that
+	 * product will be loaded and stored into $imageList, a \Product\Description
+	 * object will be loaded and stored in $description, and all \Product\Icon
+	 * objects who have the size=10 will be loaded into $iconList.
+	 */
+	
+	// $imageList is now an empty array or an array of \Product\Image objects
+	$imageList = $product->getImageList();
+	
+	// $description is a \Product\Description object, even if nothing was found
+	$description = $product->getDescription();
 
-## Sample Loader Application
+
+## Defining References
+DataModeler is powerful because you can define references within a Model. A Model can refer to another Model or list of Models. Recursive loadings can not take place and you should build your databases so they're not required. When you define references, they'll be loaded when the parent Model is loaded, and saved when the parent Model is saved. By their nature, children Models are loaded recursively. As a result, you should be aware of the amount of queries required to load a large parent Model.
+
+## Authors
+Vic Cherubini <vmc@leftnode.com>
