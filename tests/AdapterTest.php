@@ -3,7 +3,7 @@
 declare(encoding='UTF-8');
 namespace DataModelerTest;
 
-require_once 'lib/Adapter.php';
+use \DataModeler\Adapter;
 
 class AdapterTest extends TestCase {
 
@@ -13,7 +13,6 @@ class AdapterTest extends TestCase {
 		$adapter_id = $adapter->getId();
 		$this->assertFalse(empty($adapter_id));
 	}
-
 
 	public function testGetPriority_IsCastToInteger() {
 		$adapter = $this->buildMockAdapter();
