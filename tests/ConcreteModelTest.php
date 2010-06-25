@@ -15,7 +15,7 @@ class Product extends Model {
 	/** [type INTEGER] [maxlength 2] */
 	private $age = NULL;
 	
-	/** [type INTEGSTER] [maxlength 2] */
+	/** [type INTEGER] [maxlength 2] */
 	private $height = NULL;
 }
 
