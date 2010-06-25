@@ -23,6 +23,7 @@ abstract class Model {
 	const DATETYPE_TIMESTAMP = 2;
 	const DATETYPE_NOW = 4;
 	
+	const TYPE_REF = 'ref';
 	
 	public function __construct() {
 		$this->modelId = sha1(get_class($this));
@@ -189,5 +190,17 @@ abstract class Model {
 	
 	private function removeBackticks($value) {
 		return str_replace('`', NULL, $value);
+	}
+	
+	private function buildReferenceTable() {
+		
+		
+		
+	}
+	
+	private parseDocComment($comment) {
+		// Empty method, move the parsing from the buildSchemaTable() method
+		// to here. Return an list of key value pairs.
+		
 	}
 }
