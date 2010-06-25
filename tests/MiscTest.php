@@ -18,6 +18,13 @@ class MiscTest extends TestCase {
 		$this->assertEquals($expectedMatches, $foundMatches);
 	}
 
+	public function testRemovesFirstAndLastCharacters() {
+		$string = '[abc]';
+		$string = substr(substr($string, 1), 0, strlen($string)-2);
+		
+		$this->assertEquals('abc', $string);
+	}
+
 
 	public function providerDocComment() {
 		return array(
