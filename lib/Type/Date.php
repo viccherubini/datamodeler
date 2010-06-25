@@ -5,7 +5,7 @@ namespace DataModeler\Type;
 
 use \DataModeler\Type;
 
-class Bool extends Type {
+class Date extends Type {
 	
 	
 }
