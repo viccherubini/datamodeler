@@ -11,6 +11,7 @@ require_once 'lib/Type/Bool.php';
 class BoolTest extends TestCase {
 	
 	public function testTrue() {
+		$bool = new Bool;
 		$this->assertTrue(true);
 	}
 	
