@@ -21,7 +21,7 @@ abstract class Model {
 	private $schema = array();
 	private $table = NULL;
 	
-	public $properties = array();
+	private $properties = array();
 	
 	const DATETYPE_TIMESTAMP = 2;
 	const DATETYPE_NOW = 4;
@@ -37,10 +37,13 @@ abstract class Model {
 	const TYPE_TEXT = 128;
 	const TYPE_TIME = 256;
 	
+	const MAPITEM_TYPE = 'type';
+	const MAPITEM_MAXLENGTH = 'maxlength';
+	
 	public function __construct() {
 		$this->modelId = sha1(get_class($this));
 		
-		$this->readTableSchema();
+		$this->buildTableSchema();
 	}
 	
 	public function __destruct() {
@@ -209,29 +212,60 @@ abstract class Model {
 		return false;
 	}
 	
-	private function readTableSchema() {
+	private function buildTableSchema() {
 		$reflection = new \ReflectionClass(get_class($this));
 		$properties = $reflection->getProperties();
 		
 		$schema = array();
+		$model = array();
 		
 		foreach ( $properties as $property ) {
-			$schema[$property->getName()] = NULL;
+			$propertyName = $property->getName();
+			$schema[$propertyName] = array();
 			
 			$docComment = $property->getDocComment();
-			
-			// Replace the first /** and the last */
 			$docComment = str_replace(array('/**', '*/'), array(NULL, NULL), $docComment);
 			
-			// Pull out each [key value] pair.
-			$matchCount = preg_match_all('#\[[a-z]+ [a-z0-9]+\]+#i', $docComment, $foundMatches);
+			$matchCount = preg_match_all('#\[([a-z]+ [a-z0-9]+)\]+#i', $docComment, $foundMatches);
 			if ( $matchCount > 0 ) {
-				// Build up the schema table based on found properties
+				$foundMatches = array_pop($foundMatches);
+				
+				foreach ( $foundMatches as $mapItem ) {
+					$mapItemBits = explode(' ', $mapItem);
+					
+					if ( 2 != count($mapItemBits) ) {
+						continue;
+					}
+					
+					$mapItemKey = strtolower(trim($mapItemBits[0]));
+					$mapItemValue = trim($mapItemBits[1]);
+					
+					switch ( $mapItemKey ) {
+						case self::MAPITEM_TYPE: {
+							$mapItemValue = strtoupper($mapItemValue);
+							$mapItemDefine = "self::TYPE_{$mapItemValue}";
+							
+							if ( defined($mapItemDefine) ) {
+								$schema[$propertyName][$mapItemKey] = constant($mapItemDefine);
+							}
+							break;
+						}
+						
+						case self::MAPITEM_MAXLENGTH: {
+							$maxlength = intval($mapItemValue);
+							if ( $maxlength > 0 ) {
+								$schema[$propertyName][$mapItemKey] = $maxlength;
+							}
+							break;
+						}
+					}
+				}
+				
 			}
 		}
 		
 		$this->schema($schema);
-		
+		return true;
 	}
 	
 	private function removeBackticks($value) {
