@@ -24,6 +24,16 @@ class MiscTest extends TestCase {
 		
 		$this->assertEquals('abc', $string);
 	}
+	
+	/**
+	 * @dataProvider providerDate
+	 */
+	public function testDateParse($date, $expected) {
+		$dateParsed = date_parse($date);
+		$valid = ( count($dateParsed['errors']) > 0 ? false : true );
+
+		$this->assertEquals($expected, $valid);
+	}
 
 
 	public function providerDocComment() {
@@ -43,5 +53,18 @@ class MiscTest extends TestCase {
 							*/", array('[type BOOL]', '[maxlength 50]'))
 		);
 	}
+	
+	public function providerDate() {
+		return array(
+			array('2010-06-10', true),
+			array('2010-06-100', false),
+			array('2010-32-99', false),
+			array('0000-00-00', true),
+			array('2009-12-31', true),
+			array('2009-12-32', false),
+			array('2009-2-2', true),
+			array('2009-12-31 00:00:00', true),
+			array('2009-12-31 00:00', true)
+		);
+	}
 }
-
