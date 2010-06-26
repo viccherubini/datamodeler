@@ -26,6 +26,12 @@ class Order extends Model {
 	
 	/** [type STRING] [maxlength 64] */
 	private $name = NULL;
+	
+	public function __construct() {
+		parent::__construct();
+		
+		$this->table('orders');
+	}
 }
 
 class ConcreteModelTest extends TestCase {
