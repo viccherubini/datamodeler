@@ -3,6 +3,17 @@
 declare(encoding='UTF-8');
 namespace DataModeler;
 
+use \DataModeler\Type, \DataModeler\Type\Bool,
+	\DataModeler\Type\Date,
+	\DataModeler\Type\DateTime,
+	\DataModeler\Type\Float,
+	\DataModeler\Type\Integer,
+	\DataModeler\Type\String as DMString,
+	\DataModeler\Type\Text;
+
+require_once 'lib/Type/Integer.php';
+require_once 'lib/Type/String.php';
+
 /**
  * Abstract Model class for building FAT, intelligent models. The model is
  * your primary in memory data store. This class should be extended to another
@@ -26,16 +37,15 @@ abstract class Model {
 	const DATETYPE_TIMESTAMP = 2;
 	const DATETYPE_NOW = 4;
 	
-	const TYPE_REF = 'ref';
-
-	const TYPE_BOOL = 2;
-	const TYPE_DATE = 4;
-	const TYPE_DATETIME = 8;
+	//const TYPE_REF = 'ref';
+	/*const TYPE_BOOL = 'Bool';
+	const TYPE_DATE = 'Date';
+	const TYPE_DATETIME = 'Datetime';
 	const TYPE_FLOAT = 16;
 	const TYPE_INTEGER = 32;
 	const TYPE_STRING = 64;
 	const TYPE_TEXT = 128;
-	const TYPE_TIME = 256;
+	const TYPE_TIME = 256;*/
 	
 	const MAPITEM_TYPE = 'type';
 	const MAPITEM_MAXLENGTH = 'maxlength';
@@ -238,16 +248,19 @@ abstract class Model {
 					}
 					
 					$mapItemKey = strtolower(trim($mapItemBits[0]));
-					$mapItemValue = trim($mapItemBits[1]);
+					$mapItemValue = ucwords(strtolower(trim($mapItemBits[1])));
 					
 					switch ( $mapItemKey ) {
 						case self::MAPITEM_TYPE: {
-							$mapItemValue = strtoupper($mapItemValue);
-							$mapItemDefine = "self::TYPE_{$mapItemValue}";
+							/*$typeClass = "\DataModeler\Type\\{$mapItemValue}";
 							
-							if ( defined($mapItemDefine) ) {
-								$schema[$propertyName][$mapItemKey] = constant($mapItemDefine);
-							}
+							if ( class_exists($typeClass) ) {
+								$obj = new \ReflectionClass("\DataModeler\Type\\{$mapItemValue}");
+								$obj2 = $obj->newInstance();
+							
+								$obj2->setMaxlength(10);
+							}*/
+							
 							break;
 						}
 						
