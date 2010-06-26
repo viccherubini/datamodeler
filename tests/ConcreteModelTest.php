@@ -3,28 +3,35 @@
 declare(encoding='UTF-8');
 namespace DataModelerTest;
 
-use \DataModeler\Model;
+use \DataModeler\Model, \DataModeler\Type, \DataModeler\Type\String;
 
 require_once 'lib/Model.php';
 
-class Product extends Model {
+class Order extends Model {
+	
+	/** [type DATETIME] */
+	private $date_created = NULL;
+	
+	/** [type DATETIME] */
+	private $date_updated = NULL;
+	
+	/** [type DATE] */
+	private $date_available = NULL;
+	
+	/** [type INTEGER] */
+	private $customer_id = 0;
+	
+	/** [type FLOAT] [precision 2] */
+	private $price = 0.00;
 	
 	/** [type STRING] [maxlength 64] */
-	private $field_name = NULL;
-	
-	/** [type INTEGER] [maxlength 2] */
-	private $age = NULL;
-	
-	/** [type INTEGER] [maxlength 2] */
-	private $height = NULL;
+	private $name = NULL;
 }
 
 class ConcreteModelTest extends TestCase {
 
 	public function testConstructor_BuildsSchema() {
-		$product = new Product();
-		
-		print_r($product->schema());
+		$order = new Order();
 	}
 
 }
