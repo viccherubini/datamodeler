@@ -9,7 +9,6 @@ require_once 'Type/AllTests.php';
 require_once 'AdapterTest.php';
 require_once 'ConcreteModelTest.php';
 require_once 'IteratorTest.php';
-require_once 'LoaderTest.php';
 require_once 'MiscTest.php';
 require_once 'ModelTest.php';
 require_once 'TypeTest.php';
@@ -24,7 +23,6 @@ class AllTests {
 		$suite->addTestSuite('\DataModelerTest\AdapterTest');
 		$suite->addTestSuite('\DataModelerTest\ConcreteModelTest');
 		$suite->addTestSuite('\DataModelerTest\IteratorTest');
-		$suite->addTestSuite('\DataModelerTest\LoaderTest');
 		$suite->addTestSuite('\DataModelerTest\MiscTest');
 		$suite->addTestSuite('\DataModelerTest\ModelTest');
 		$suite->addTestSuite('\DataModelerTest\TypeTest');
