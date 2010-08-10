@@ -9,3 +9,4 @@ require_once 'lib/Type/Float.php';
 require_once 'lib/Type/Integer.php';
 require_once 'lib/Type/String.php';
 require_once 'lib/Type/Text.php';
+require_once 'lib/Type/Typeless.php';

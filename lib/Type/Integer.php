@@ -15,12 +15,12 @@ class IntegerType extends Type {
 	}
 	
 	public function setDefault($default) {
-		$this->default = intval($default);
+		$this->data['default'] = intval($default);
 		return $this;
 	}
 	
 	public function setValue($value) {
-		$this->value = intval($value);
+		$this->data['value'] = intval($value);
 		return $this;
 	}
 	

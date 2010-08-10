@@ -7,10 +7,12 @@ abstract class Type {
 
 	public $field = NULL;
 	public $maxlength = -1;
-	public $preicision = -1;
+	public $precision = -1;
+
+	protected $data = array();
 
 	public function __construct() {
-		
+		$this->data = array('default' => NULL, 'value' => NULL);
 	}
 	
 	public function __destruct() {
@@ -36,8 +38,8 @@ abstract class Type {
 	}
 	
 	public function __get($k) {
-		if ( property_exists($this, $k) ) {
-			return $this->$k;
+		if ( array_key_exists($k, $this->data) ) {
+			return $this->data[$k];
 		}
 		return NULL;
 	}

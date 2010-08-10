@@ -13,17 +13,17 @@ class DatetimeType extends Type {
 		parent::__construct();
 		
 		$this->now = date('Y-m-d G:i:s', time());
-		$this->default = NULL;//$this->now;
-		$this->value = NULL;//$this->now;
+		$this->default = $this->now;
+		$this->value = $this->now;
 	}
 	
 	public function setDefault($default) {
-		$this->default = ( !$this->isDate($default) ? $this->now : $default );
+		$this->data['default'] = ( !$this->isDate($default) ? $this->now : $default );
 		return $this;
 	}
 	
 	public function setValue($value) {
-		$this->value = ( !$this->isDate($value) ? $this->now : $value );
+		$this->data['value'] = ( !$this->isDate($value) ? $this->now : $value );
 		return $this;
 	}
 	

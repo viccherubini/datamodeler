@@ -15,12 +15,12 @@ class TextType extends Type {
 	}
 	
 	public function setDefault($default) {
-		$this->default = strval($default);
+		$this->data['default'] = strval($default);
 		return $this;
 	}
 	
 	public function setValue($value) {
-		$this->value = strval($value);
+		$this->data['value'] = strval($value);
 		return $this;
 	}
 	

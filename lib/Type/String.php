@@ -15,12 +15,12 @@ class StringType extends Type {
 	}
 	
 	public function setDefault($default) {
-		$this->default = $this->truncate($default);
+		$this->data['default'] = $this->truncate($default);
 		return $this;
 	}
 	
 	public function setValue($value) {
-		$this->value = $this->truncate($value);
+		$this->data['value'] = $this->truncate($value);
 		return $this;
 	}
 	

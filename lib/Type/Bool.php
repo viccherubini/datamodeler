@@ -15,12 +15,12 @@ class BoolType extends Type {
 	}
 	
 	public function setDefault($default) {
-		$this->default = ( !is_bool($default) ? false : $default );
+		$this->data['default'] = ( !is_bool($default) ? false : $default );
 		return $this;
 	}
 	
 	public function setValue($value) {
-		$this->value = ( !is_bool($value) ? false : $value );
+		$this->data['value'] = ( !is_bool($value) ? false : $value );
 		return $this;
 	}
 	
