@@ -5,17 +5,17 @@ namespace DataModeler\Type;
 
 use \DataModeler\Type;
 
-class Float extends Type {
+class FloatType extends Type {
 	
 	public function __construct() {
 		parent::__construct();
 		
-		$this->defaultValue = 0.0;
+		$this->default = 0.0;
 		$this->value = 0.0;
 	}
 	
-	public function setDefaultValue($defaultValue) {
-		$this->defaultValue = $this->roundTo($defaultValue);
+	public function setDefault($default) {
+		$this->default = $this->roundTo($default);
 		return $this;
 	}
 	
@@ -26,9 +26,8 @@ class Float extends Type {
 	
 	private function roundTo($value) {
 		$value = floatval($value);
-		$precision = $this->getPrecision();
-		if ( $precision > -1 ) {
-			$value = round($value, $precision);
+		if ( $this->precision > -1 ) {
+			$value = round($value, $this->precision);
 		}
 		return $value;
 	}

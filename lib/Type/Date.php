@@ -5,7 +5,7 @@ namespace DataModeler\Type;
 
 use \DataModeler\Type;
 
-class Date extends Type {
+class DateType extends Type {
 
 	private $today = NULL;
 
@@ -13,17 +13,17 @@ class Date extends Type {
 		parent::__construct();
 		
 		$this->today = date('Y-m-d', time());
-		$this->defaultValue = $this->today;
-		$this->value = $this->today;
+		$this->default = NULL;//$this->today;
+		$this->value = NULL;//$this->today;
 	}
 	
-	public function setDefaultValue($defaultValue) {
-		$this->defaultValue = ( !$this->isDate($defaultValue) ? $this->today : $defaultValue );
+	public function setDefault($default) {
+		$this->default = ( !$this->isDate($default) ? $this->today : $default );
 		return $this;
 	}
 	
 	public function setValue($value) {
-		$this->defaultValue = ( !$this->isDate($defaultValue) ? $this->today : $defaultValue );
+		$this->value = ( !$this->isDate($value) ? $this->today : $value );
 		return $this;
 	}
 	

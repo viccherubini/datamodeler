@@ -5,17 +5,17 @@ namespace DataModeler\Type;
 
 use \DataModeler\Type;
 
-class Bool extends Type {
+class BoolType extends Type {
 	
 	public function __construct() {
 		parent::__construct();
 		
-		$this->defaultValue = false;
+		$this->default = false;
 		$this->value = false;
 	}
 	
-	public function setDefaultValue($defaultValue) {
-		$this->defaultValue = ( !is_bool($defaultValue) ? false : $defaultValue );
+	public function setDefault($default) {
+		$this->default = ( !is_bool($default) ? false : $default );
 		return $this;
 	}
 	

@@ -5,17 +5,17 @@ namespace DataModeler\Type;
 
 use \DataModeler\Type;
 
-class String extends Type {
+class StringType extends Type {
 	
 	public function __construct() {
 		parent::__construct();
 		
-		$this->defaultValue = '';
+		$this->default = '';
 		$this->value = '';
 	}
 	
-	public function setDefaultValue($defaultValue) {
-		$this->defaultValue = $this->truncate($defaultValue);
+	public function setDefault($default) {
+		$this->default = $this->truncate($default);
 		return $this;
 	}
 	
@@ -26,9 +26,8 @@ class String extends Type {
 	
 	private function truncate($string) {
 		$string = strval($string);
-		$maxlength = $this->getMaxlength();
-		if ( $maxlength > 0 ) {
-			$string = substr($string, 0, $maxlength);
+		if ( $this->maxlength > 0 ) {
+			$string = substr($string, 0, $this->maxlength);
 		}
 		return $string;
 	}

@@ -5,17 +5,17 @@ namespace DataModeler\Type;
 
 use \DataModeler\Type;
 
-class Text extends Type {
+class TextType extends Type {
 	
 	public function __construct() {
 		parent::__construct();
 		
-		$this->defaultValue = '';
+		$this->default = '';
 		$this->value = '';
 	}
 	
-	public function setDefaultValue($defaultValue) {
-		$this->defaultValue = strval($defaultValue);
+	public function setDefault($default) {
+		$this->default = strval($default);
 		return $this;
 	}
 	

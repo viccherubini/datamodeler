@@ -5,17 +5,17 @@ namespace DataModeler\Type;
 
 use \DataModeler\Type;
 
-class Integer extends Type {
+class IntegerType extends Type {
 	
 	public function __construct() {
 		parent::__construct();
 		
-		$this->defaultValue = 0;
+		$this->default = 0;
 		$this->value = 0;
 	}
 	
-	public function setDefaultValue($defaultValue) {
-		$this->defaultValue = intval($defaultValue);
+	public function setDefault($default) {
+		$this->default = intval($default);
 		return $this;
 	}
 	
