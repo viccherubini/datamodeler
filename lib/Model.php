@@ -10,7 +10,8 @@ use \DataModeler\Type,
 	\DataModeler\Type\FloatType,
 	\DataModeler\Type\IntegerType,
 	\DataModeler\Type\StringType,
-	\DataModeler\Type\TextType;
+	\DataModeler\Type\TextType,
+	\DataModeler\Type\TypelessType;
 
 require_once 'lib/Types.php';
 
@@ -23,31 +24,21 @@ require_once 'lib/Types.php';
  * @version 0.0.10
  */
 abstract class Model {
-	private $datetype = NULL;
-	private $hasdate = NULL;
 	private $id = NULL;
 	private $model = array();
 	private $modelId = NULL;
-	private $pkey = NULL;
-	private $schema = array();
-	private $table = NULL;
 	
-	private $properties = array();
-	
-	const DATETYPE_TIMESTAMP = 2;
-	const DATETYPE_NOW = 4;
+	protected $pkey = NULL;
+	protected $table = NULL;
 
 	const SCHEMA_DEFAULT = 'default';
 	const SCHEMA_MAXLENGTH = 'maxlength';
 	const SCHEMA_PRECISION = 'precision';
 	const SCHEMA_TYPE = 'type';
 	
-	const SCHEMA_META = 'meta';
-	
 	public function __construct() {
 		$this->modelId = sha1(get_class($this));
-		
-		$this->buildTableSchema();
+		$this->buildSchema();
 	}
 	
 	public function __destruct() {
@@ -66,64 +57,54 @@ abstract class Model {
 			return $v;
 		} else {
 			$v = current($argv);
-			
-			/* If the key is the pkey of the object, don't allow that to be set. */
-			$pkey = $this->pkey();
-			if ( $k === $pkey ) {
-				$this->id($v);
-			} else {
-				/* Else assume its a set with the first element of $argv. */
-				$this->__set($k, $v);
-			}
+			$this->__set($k, $v);
 			
 			return $this;
 		}
 	}
 	
 	public function __get($key) {
-		$pkey = $this->pkey();
-		
-		if ( $pkey === $key ) {
-			return $this->id();
+		if ( $key === $this->pkey ) {
+			return $this->id;
 		} else {
-			$model = $this->model();
-			if ( true === isset($model[$key]) ) {
-				return $model[$key];
+			if ( isset($this->model[$key]) && is_object($this->model[$key]) ) {
+				return $this->model[$key]->value;
 			}
 		}
+		
 		return NULL;
 	}
 	
 	public function __set($key, $value) {
-		$pkey = $this->pkey();
-		
-		if ( $key === $pkey ) {
-			$this->id($value);
-		} else {
-			if ( true === $this->isValidField($key) ) {
-				$this->model[$key] = $value;
+		if ( isset($this->model[$key]) && is_object($this->model[$key]) ) {
+			$this->model[$key]->value = $value;
+			
+			if ( $key === $this->pkey ) {
+				$this->id = $this->model[$key]->value;
 			}
-			ksort($this->model);
 		}
+		
+		ksort($this->model);
+
 		return true;
 	}
 	
-	public function datetype($datetype = 0) {
-		$datetype = intval($datetype);
-		if ( $datetype > 0 ) {
-			if ( $datetype != self::DATETYPE_TIMESTAMP && $datetype != self::DATETYPE_NOW ) {
-				$datetype = self::DATETYPE_TIMESTAMP;
-			}
-			$this->datetype = $datetype;
-		}
-		return $this->datetype;
-	}
-	
 	public function equalTo(Model $model) {
+		$modelEquals = true;
+		
+		$thisModel = $this->model();
+		$thatModel = $model->model();
+		
+		foreach ( $thisModel as $k => $type ) {
+			if ( $thisModel[$k]->value !== $thatModel[$k]->value ) {
+				$modelEquals = false;
+			}
+		}
+		
 		return (
 			$this->isA($model) &&
 			$this->id() === $model->id() &&
-			$this->model() === $model->model()
+			$modelEquals
 		);
 	}
 	
@@ -132,16 +113,16 @@ abstract class Model {
 		return (false === empty($id));
 	}
 	
-	public function hasdate($hasdate = NULL) {
-		if ( true === $hasdate || false === $hasdate ) {
-			$this->hasdate = $hasdate;
-		}
-		return $this->hasdate;
+	public function field($field, \DataModeler\Type $type) {
+		$this->model[$field] = clone $type;
+		ksort($this->model);
+		
+		return $this;
 	}
 	
 	public function id($id = NULL) {
-		if ( false === empty($id) ) {
-			$this->id = $id;
+		if ( !empty($id) ) {
+			$this->__set($this->pkey, $id);
 		}
 		return $this->id;
 	}
@@ -153,36 +134,21 @@ abstract class Model {
 		);
 	}
 
-	public function model(array $model = array()) {
-		if ( false !== current($model) || ( count($model) > 0 ) ) {
-			$pkey = $this->pkey();
-			if ( true === isset($model[$pkey]) ) {
-				$this->id($model[$pkey]);
-				unset($model[$pkey]);
-			}
-			$this->model = $model;
-		}
+	public function model() {
 		return $this->model;
 	}
-	
+
 	public function modelId() {
 		return $this->modelId;
 	}
 	
 	public function pkey($pkey = NULL) {
 		$pkey = trim($pkey);
-		if ( false === empty($pkey) ) {
+		if ( !empty($pkey) ) {
 			$pkey = $this->removeBackticks($pkey);
 			$this->pkey = $pkey;
 		}
 		return $this->pkey;
-	}
-	
-	public function schema($schema = array()) {
-		if ( count($schema) > 0 ) {
-			$this->schema = $schema;
-		}
-		return $this->schema;
 	}
 	
 	public function similarTo(Model $model) {
@@ -194,7 +160,7 @@ abstract class Model {
 
 	public function table($table = NULL) {
 		$table = trim($table);
-		if ( false === empty($table) ) {
+		if ( !empty($table) ) {
 			$table = $this->removeBackticks($table);
 			$this->table = $table;
 		}
@@ -209,64 +175,75 @@ abstract class Model {
 		return $v;
 	}
 	
-	private function isValidField($field) {
-		if ( 1 === preg_match('/^[a-z0-9_\-.]+$/i', $field) ) {
-			return true;
-		}
-		return false;
-	}
-	
-	private function buildTableSchema() {
+	private function buildSchema() {
 		$reflection = new \ReflectionClass(get_class($this));
 		$propertyList = $reflection->getProperties();
 		
 		$namespace = __NAMESPACE__;
 		
+		$metaFieldList = array(
+			self::SCHEMA_DEFAULT => true,
+			self::SCHEMA_MAXLENGTH => true,
+			self::SCHEMA_PRECISION => true
+		);
+		
+		$model = array();
 		$schema = array();
 		$schemaMeta = array();
-		$schemaMetaList = array();
 		
 		foreach ( $propertyList as $property ) {
+			$metaList = array();
+			$metaType = NULL;
+			
 			$schemaField = $property->getName();
 			
 			$docComment = trim($property->getDocComment());
 			$docComment = str_replace(array('/**', '*/'), array(NULL, NULL), $docComment);
-			$matchCount = preg_match_all('#\[([a-z]+ [a-z0-9 ]+)\]+#i', $docComment, $schemaMetaList);
+			$matchCount = preg_match_all('#\[([a-z]+) ([a-z0-9 ]+)\]+#i', $docComment, $metaList);
 
 			if ( $matchCount > 0 ) {
-				// Remove the fully matched [key value] results
-				$schemaMetaList = array_pop($schemaMetaList);
-
-				$typeObject = NULL;
+				array_shift($metaList);
 				
-				foreach ( $schemaMetaList as $schemaMetaItem ) {
-					preg_match('/^([a-z]+ )(.*)$/i', $schemaMetaItem, $schemaMeta);
-					array_shift($schemaMeta);
+				$len = count($metaList[0]);
+				for ( $i=0; $i<$len; $i++ ) {
+					$meta = trim(strtolower($metaList[0][$i]));
 					
-					$schemaMetaType = strtolower(trim($schemaMeta[0]));
-					
-					if ( self::SCHEMA_TYPE == $schemaMetaType ) {
-						$typeClass = ucwords(strtolower($schemaMeta[1]));
-						$typeClass = "\\{$namespace}\\Type\\{$typeClass}Type";
-
-						if ( class_exists($typeClass) ) {
-							$typeObject = new $typeClass;
-							$typeObject->field = $schemaField;
-						}
-					} else {
-						if ( is_object($typeObject) ) {
-							$typeObject->$schemaMetaType = $schemaMeta[1];
+					if ( self::SCHEMA_TYPE == $meta ) {
+						$class = ucwords(strtolower($metaList[1][$i]));
+						$class = "\\{$namespace}\\Type\\{$class}Type";
+						
+						if ( class_exists($class) ) {
+							$metaType = new $class;
 						}
 					}
 				}
+			}
+
+			if ( is_null($metaType) ) {
+				$metaType = new \DataModeler\Type\TypelessType;
+			}
+			
+			$metaType->field = $schemaField;
+			
+			if ( $matchCount > 0 ) {
+				$len = count($metaList[0]);
 				
-				if ( is_object($typeObject) ) {
-					$schema[$schemaField] = $typeObject;
+				for ( $i=0; $i<$len; $i++ ) {
+					$meta = trim(strtolower($metaList[0][$i]));
+					
+					if ( isset($metaFieldList[$meta]) ) {
+						$metaType->$meta = $metaList[1][$i];
+						if ( self::SCHEMA_DEFAULT == $meta ) {
+							$metaType->value = $metaList[1][$i];
+						}
+					}
 				}
 			}
+			
+			$model[$schemaField] = $metaType;
 		}
 		
-		//print_r($schema);
+		$this->model = $model;
 		
 		return true;
 	}
@@ -275,15 +252,4 @@ abstract class Model {
 		return str_replace('`', NULL, $value);
 	}
 	
-	private function buildReferenceTable() {
-		
-		
-		
-	}
-	
-	private function parseDocComment($comment) {
-		// Empty method, move the parsing from the buildSchemaTable() method
-		// to here. Return an list of key value pairs.
-		
-	}
 }
