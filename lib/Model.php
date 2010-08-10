@@ -3,16 +3,16 @@
 declare(encoding='UTF-8');
 namespace DataModeler;
 
-use \DataModeler\Type, \DataModeler\Type\Bool,
-	\DataModeler\Type\Date,
-	\DataModeler\Type\DateTime,
-	\DataModeler\Type\Float,
-	\DataModeler\Type\Integer,
-	\DataModeler\Type\String as DMString,
-	\DataModeler\Type\Text;
+use \DataModeler\Type,
+	\DataModeler\Type\BoolType,
+	\DataModeler\Type\DateType,
+	\DataModeler\Type\DateTimeType,
+	\DataModeler\Type\FloatType,
+	\DataModeler\Type\IntegerType,
+	\DataModeler\Type\StringType,
+	\DataModeler\Type\TextType;
 
-require_once 'lib/Type/Integer.php';
-require_once 'lib/Type/String.php';
+require_once 'lib/Types.php';
 
 /**
  * Abstract Model class for building FAT, intelligent models. The model is
@@ -36,19 +36,13 @@ abstract class Model {
 	
 	const DATETYPE_TIMESTAMP = 2;
 	const DATETYPE_NOW = 4;
+
+	const SCHEMA_DEFAULT = 'default';
+	const SCHEMA_MAXLENGTH = 'maxlength';
+	const SCHEMA_PRECISION = 'precision';
+	const SCHEMA_TYPE = 'type';
 	
-	//const TYPE_REF = 'ref';
-	/*const TYPE_BOOL = 'Bool';
-	const TYPE_DATE = 'Date';
-	const TYPE_DATETIME = 'Datetime';
-	const TYPE_FLOAT = 16;
-	const TYPE_INTEGER = 32;
-	const TYPE_STRING = 64;
-	const TYPE_TEXT = 128;
-	const TYPE_TIME = 256;*/
-	
-	const MAPITEM_TYPE = 'type';
-	const MAPITEM_MAXLENGTH = 'maxlength';
+	const SCHEMA_META = 'meta';
 	
 	public function __construct() {
 		$this->modelId = sha1(get_class($this));
@@ -224,60 +218,56 @@ abstract class Model {
 	
 	private function buildTableSchema() {
 		$reflection = new \ReflectionClass(get_class($this));
-		$properties = $reflection->getProperties();
+		$propertyList = $reflection->getProperties();
+		
+		$namespace = __NAMESPACE__;
 		
 		$schema = array();
-		$model = array();
+		$schemaMeta = array();
+		$schemaMetaList = array();
 		
-		foreach ( $properties as $property ) {
-			$propertyName = $property->getName();
-			$schema[$propertyName] = array();
+		foreach ( $propertyList as $property ) {
+			$schemaField = $property->getName();
 			
-			$docComment = $property->getDocComment();
+			$docComment = trim($property->getDocComment());
 			$docComment = str_replace(array('/**', '*/'), array(NULL, NULL), $docComment);
-			
-			$matchCount = preg_match_all('#\[([a-z]+ [a-z0-9]+)\]+#i', $docComment, $foundMatches);
+			$matchCount = preg_match_all('#\[([a-z]+ [a-z0-9 ]+)\]+#i', $docComment, $schemaMetaList);
+
 			if ( $matchCount > 0 ) {
-				$foundMatches = array_pop($foundMatches);
+				// Remove the fully matched [key value] results
+				$schemaMetaList = array_pop($schemaMetaList);
+
+				$typeObject = NULL;
 				
-				foreach ( $foundMatches as $mapItem ) {
-					$mapItemBits = explode(' ', $mapItem);
+				foreach ( $schemaMetaList as $schemaMetaItem ) {
+					preg_match('/^([a-z]+ )(.*)$/i', $schemaMetaItem, $schemaMeta);
+					array_shift($schemaMeta);
 					
-					if ( 2 != count($mapItemBits) ) {
-						continue;
-					}
+					$schemaMetaType = strtolower(trim($schemaMeta[0]));
 					
-					$mapItemKey = strtolower(trim($mapItemBits[0]));
-					$mapItemValue = ucwords(strtolower(trim($mapItemBits[1])));
-					
-					switch ( $mapItemKey ) {
-						case self::MAPITEM_TYPE: {
-							/*$typeClass = "\DataModeler\Type\\{$mapItemValue}";
-							
-							if ( class_exists($typeClass) ) {
-								$obj = new \ReflectionClass("\DataModeler\Type\\{$mapItemValue}");
-								$obj2 = $obj->newInstance();
-							
-								$obj2->setMaxlength(10);
-							}*/
-							
-							break;
+					if ( self::SCHEMA_TYPE == $schemaMetaType ) {
+						$typeClass = ucwords(strtolower($schemaMeta[1]));
+						$typeClass = "\\{$namespace}\\Type\\{$typeClass}Type";
+
+						if ( class_exists($typeClass) ) {
+							$typeObject = new $typeClass;
+							$typeObject->field = $schemaField;
 						}
-						
-						case self::MAPITEM_MAXLENGTH: {
-							$maxlength = intval($mapItemValue);
-							if ( $maxlength > 0 ) {
-								$schema[$propertyName][$mapItemKey] = $maxlength;
-							}
-							break;
+					} else {
+						if ( is_object($typeObject) ) {
+							$typeObject->$schemaMetaType = $schemaMeta[1];
 						}
 					}
 				}
 				
+				if ( is_object($typeObject) ) {
+					$schema[$schemaField] = $typeObject;
+				}
 			}
 		}
 		
-		$this->schema($schema);
+		print_r($schema);
+		
 		return true;
 	}
 	
