@@ -3,7 +3,9 @@
 declare(encoding='UTF-8');
 namespace DataModelerTest;
 
-use \DataModeler\Model, \DataModeler\Type, \DataModeler\Type\String;
+use \DataModeler\Model,
+	\DataModeler\Type,
+	\DataModeler\Type\String;
 
 require_once 'lib/Model.php';
 
@@ -26,6 +28,9 @@ class Order extends Model {
 	
 	/** [type STRING] [maxlength 64] */
 	private $name = NULL;
+	
+	/** [type STRING] [maxlength 64] [default my store name] */
+	private $store;
 	
 	public function __construct() {
 		parent::__construct();
