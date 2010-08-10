@@ -9,14 +9,14 @@ require_once 'lib/Model.php';
 
 class ModelTest extends TestCase {
 
-	public function testMagicCaller_CanSetAndGetValue() {
+	public function test__Call_CanSetAndGetValue() {
 		$model = $this->buildMockModel();
 		$model->setFirstname('Vic');
 		
 		$this->assertEquals('Vic', $model->getFirstname());
 	}
 
-	public function testMagicCaller_SetsModelArrayProperly() {
+	public function test__Call_SetsModelArrayProperly() {
 		$firstname = 'Vic';
 		$lastname = 'Cherubini';
 		
@@ -27,7 +27,7 @@ class ModelTest extends TestCase {
 		$this->assertEquals(array('firstname' => $firstname, 'lastname' => $lastname), $model->model());
 	}
 	
-	public function testMagicCaller_DoesNotAllowPkeyToBeSet() {
+	public function test__Call_DoesNotAllowPkeyToBeSet() {
 		$pkey = 'product_id';
 		
 		$model = $this->buildMockModel();
@@ -38,7 +38,7 @@ class ModelTest extends TestCase {
 		$this->assertEmptyArray($model->model());
 	}
 
-	public function testMagicGetter_ReturnsValueFromModel() {
+	public function test__Get_ReturnsValueFromModel() {
 		$firstname = "Vic";
 		
 		$model = $this->buildMockModel();
@@ -47,13 +47,13 @@ class ModelTest extends TestCase {
 		$this->assertEquals($firstname, $model->firstname);
 	}
 
-	public function testMagicGetter_ReturnsNullWhenKeyDoesNotExist() {
+	public function test__Get_ReturnsNullWhenKeyDoesNotExist() {
 		$model = $this->buildMockModel();
 		
 		$this->assertNull($model->firstname);
 	}
 	
-	public function testMagicGetter_CanGetPkey() {
+	public function test__Get_CanGetPkey() {
 		$product_id = 10;
 		
 		$model = $this->buildMockModel();
@@ -63,7 +63,7 @@ class ModelTest extends TestCase {
 		$this->assertEquals($product_id, $model->product_id);
 	}
 
-	public function testMagicSetter_SetsValueInModel() {
+	public function test__Set_SetsValueInModel() {
 		$expected_model_array = array('first_name' => "Vic Cherubini");
 		
 		$model = $this->buildMockModel();
@@ -72,7 +72,7 @@ class ModelTest extends TestCase {
 		$this->assertEquals($expected_model_array, $model->model());
 	}
 	
-	public function testMagicSetter_CannotSetPkeyInModel() {
+	public function test__Set_CannotSetPkeyInModel() {
 		$model = $this->buildMockModel();
 		$model->pkey('product_id');
 		
@@ -80,7 +80,7 @@ class ModelTest extends TestCase {
 		$this->assertEmptyArray($model->model());
 	}
 	
-	public function testMagicSetter_CanSetPkeyInObject() {
+	public function test__Set_CanSetPkeyInObject() {
 		$pkey = "product_id";
 		$product_id = 10;
 		
@@ -94,7 +94,7 @@ class ModelTest extends TestCase {
 	/**
 	 * @dataProvider providerInvalidFieldName
 	 */
-	public function testMagicSetter_DoesNotAllowMalignedFieldToBeSet($field) {
+	public function test__Set_DoesNotAllowMalignedFieldToBeSet($field) {
 		$value = "invalid value";
 		
 		$model = $this->buildMockModel();
