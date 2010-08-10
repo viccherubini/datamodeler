@@ -3,9 +3,7 @@
 declare(encoding='UTF-8');
 namespace DataModelerTest;
 
-use \DataModeler\Model,
-	\DataModeler\Type,
-	\DataModeler\Type\String;
+use \DataModeler\Model;
 
 require_once 'lib/Model.php';
 
