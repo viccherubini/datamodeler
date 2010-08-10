@@ -16,7 +16,7 @@ require_once 'lib/Exception.php';
 
 define('DS', DIRECTORY_SEPARATOR, false);
 define('DIRECTORY_TESTS', $data_modeler_test_path . DS, false);
-define('DIRECTORY_DATA', DIRECTORY_TESTS . '__Data' . DS, false);
+define('DIRECTORY_DATA', DIRECTORY_TESTS . 'data' . DS, false);
 
 $dbType = 'sqlite';
 $dbName = 'datamodeler_tests';

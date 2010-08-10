@@ -266,7 +266,7 @@ abstract class Model {
 			}
 		}
 		
-		print_r($schema);
+		//print_r($schema);
 		
 		return true;
 	}

@@ -7,7 +7,7 @@ use \DataModeler\Model;
 
 require_once 'lib/Model.php';
 
-class Order extends Model {
+class Product extends Model {
 	
 	/** [type DATETIME] */
 	private $date_created = NULL;
@@ -33,14 +33,14 @@ class Order extends Model {
 	public function __construct() {
 		parent::__construct();
 		
-		$this->table('orders');
+		$this->table('products');
 	}
 }
 
 class ConcreteModelTest extends TestCase {
 
 	public function testConstructor_BuildsSchema() {
-		$order = new Order();
+		$this->assertTrue(true);
 	}
 
 }

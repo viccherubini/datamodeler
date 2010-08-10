@@ -4,14 +4,14 @@ declare(encoding='UTF-8');
 namespace DataModelerTest\Type;
 
 use DataModelerTest\TestCase,
-	DataModeler\Type\Bool;
+	DataModeler\Type\BoolType;
 
 require_once 'lib/Type/Bool.php';
 
-class BoolTest extends TestCase {
+class BoolTypeTest extends TestCase {
 	
 	public function testTrue() {
-		$bool = new Bool;
+		$bool = new BoolType;
 		$this->assertTrue(true);
 	}
 	

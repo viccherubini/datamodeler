@@ -4,11 +4,11 @@ declare(encoding='UTF-8');
 namespace DataModelerTest\Type;
 
 use DataModelerTest\TestCase,
-	DataModeler\Type\Integer;
+	DataModeler\Type\IntegerType;
 
 require_once 'lib/Type/Integer.php';
 
-class IntegerTest extends TestCase {
+class IntegerTypeTest extends TestCase {
 	
 	public function testTrue() {
 		$this->assertTrue(true);
