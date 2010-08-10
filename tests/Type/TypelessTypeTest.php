@@ -4,11 +4,11 @@ declare(encoding='UTF-8');
 namespace DataModelerTest\Type;
 
 use DataModelerTest\TestCase,
-	DataModeler\Type\Date;
+	DataModeler\Type\TypelessType;
 
-require_once 'lib/Type/Date.php';
+require_once 'lib/Type/Typeless.php';
 
-class DateTest extends TestCase {
+class TypelessTypeTest extends TestCase {
 	
 	public function testTrue() {
 		$this->assertTrue(true);

@@ -12,8 +12,7 @@ INSERT INTO users VALUES(NULL, 'ggottfried', 'password3', 52, 'Its The Whiskey T
 INSERT INTO users VALUES(NULL, 'howard_stern', 'password4', 56, 'Private Parts');
 
 DROP TABLE IF EXISTS large_object;
-CREATE TABLE large_object (large_object_id SMALLINT(3) NOT NULL AUTO_INCREMENT PRIMARY KEY, object_data LONGTEXT NOT NULL) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+CREATE TABLE large_object (large_object_id SMALLINT(3) NOT NULL AUTO_INCREMENT PRIMARY KEY, object_data LONGBLOB NOT NULL) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 DROP TABLE IF EXISTS orders;
-CREATE TABLE orders (order_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, date_created DATETIME NOT NULL, date_updated DATETIME NOT NULL, customer_id INT NOT NULL, name VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-ALTER TABLE orders CHANGE date_updated date_updated DATETIME NULL DEFAULT NULL;
+CREATE TABLE orders (order_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, date_created DATETIME NOT NULL, date_updated DATETIME NULL DEFAULT NULL, date_available DATE NOT NULL, customer_id INT NOT NULL, total FLOAT NOT NULL, name VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_unicode_ci;

@@ -20,23 +20,26 @@ class SqlTest extends TestCase {
 		$this->pdo = new \PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);
 		
 		$sqlFile = DIRECTORY_DATA . 'SqlTest-' . DB_TYPE . '.sql';
-		if ( true === is_file($sqlFile) ) {
-			$sqlData = @file_get_contents($sqlFile);
+
+		if ( !is_file($sqlFile) ) {
+			throw new \Exception("Failed to load file {$sqlFile}.");
+		}
+
+		$sqlData = @file_get_contents($sqlFile);
+		
+		// Execute the data because in mysql 5.0 exec() keeps the buffer
+		// open so successive queries can not be executed. This was fixed 
+		// in mysql 5.1
+		switch ( DB_TYPE ) {
+			case 'sqlite': {
+				$this->pdo->exec($sqlData);
+				break;
+			}
 			
-			// Execute the data because in mysql 5.0 exec() keeps the buffer
-			// open so successive queries can not be executed. This was fixed 
-			// in mysql 5.1
-			switch ( DB_TYPE ) {
-				case 'sqlite': {
-					$this->pdo->exec($sqlData);
-					break;
-				}
-				
-				case 'mysql': {
-					$statement = $this->pdo->prepare($sqlData);
-					$statement->execute();
-					break;
-				}
+			case 'mysql': {
+				$statement = $this->pdo->prepare($sqlData);
+				$statement->execute();
+				break;
 			}
 		}
 		
