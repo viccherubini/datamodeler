@@ -37,7 +37,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 
 	public static function assertModel($obj, $message = '') {
 		self::assertTrue(is_object($obj), $message);
-		self::assertTrue($obj instanceof Model, $message);
+		self::assertTrue($obj instanceof \DataModeler\Model, $message);
 	}
 
 	public static function assertPdoStatement($obj, $message = '') {
@@ -47,16 +47,16 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 
 	public static function assertSql($obj, $message = '') {
 		self::assertTrue(is_object($obj), $message);
-		self::assertTrue($obj instanceof Sql, $message);
+		self::assertTrue($obj instanceof \DataModeler\Adapter\Sql, $message);
 	}
 	
 	protected function buildMockAdapter() {
-		$adapter = $this->getMockForAbstractClass('\DataModeler\Adapter');
+		$adapter = $this->getMockForAbstractClass('\\DataModeler\\Adapter');
 		return $adapter;
 	}
 	
 	protected function buildMockModel($table = NULL, $pkey = NULL) {
-		$model = $this->getMockForAbstractClass('\DataModeler\Model');
+		$model = $this->getMockForAbstractClass('\\DataModeler\\Model');
 		$model->table($table);
 		$model->pkey($pkey);
 		
@@ -81,5 +81,10 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	protected function buildMockPdo($dsn) {
 		$pdo = $this->getMock('\PDO', array(), array($dsn));
 		return $pdo;
+	}
+	
+	protected function buildMockType() {
+		$type = $this->getMockForAbstractClass('\\DataModeler\\Type');
+		return $type;
 	}
 }

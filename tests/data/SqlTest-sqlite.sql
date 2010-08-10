@@ -15,4 +15,4 @@ DROP TABLE IF EXISTS large_object;
 CREATE TABLE large_object (large_object_id INTEGER PRIMARY KEY, object_data TEXT);
 
 DROP TABLE IF EXISTS orders;
-CREATE TABLE orders (order_id INTEGER PRIMARY KEY, date_created TEXT, date_updated TEXT NULL DEFAULT NULL, customer_id INTEGER, name TEXT);
+CREATE TABLE orders (order_id INTEGER PRIMARY KEY, date_created TEXT, date_updated TEXT NULL DEFAULT NULL, date_available TEXT, customer_id INTEGER, total REAL, name TEXT);

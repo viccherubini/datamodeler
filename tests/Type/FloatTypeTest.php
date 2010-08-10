@@ -4,11 +4,11 @@ declare(encoding='UTF-8');
 namespace DataModelerTest\Type;
 
 use DataModelerTest\TestCase,
-	DataModeler\Type\Float;
+	DataModeler\Type\FloatType;
 
 require_once 'lib/Type/Float.php';
 
-class FloatTest extends TestCase {
+class FloatTypeTest extends TestCase {
 	
 	public function testTrue() {
 		$this->assertTrue(true);
