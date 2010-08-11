@@ -3,9 +3,10 @@
 declare(encoding='UTF-8');
 namespace DataModelerTest;
 
-use DataModeler\Iterator;
+use DataModeler\Iterator, DataModeler\Model;
 
 require_once 'lib/Iterator.php';
+require_once DIRECTORY_MODELS . 'Product.php';
 
 class IteratorTest extends TestCase {
 
@@ -14,28 +15,25 @@ class IteratorTest extends TestCase {
 	
 	public function setUp() {
 		$this->iteratorArrayData = array(
-			array('name' => 'Vic Cherubini', 'age' => 18),
-			array('name' => 'Bob Saget', 'age' => 44),
-			array('name' => 'King George', 'age' => 85),
-			array('name' => 'Rodney Dangerfield', 'age' => 88)
+			array('name' => 'Product 1', 'price' => 18.88),
+			array('name' => 'Product 2', 'price' => 44.92),
+			array('name' => 'Product 3', 'price' => 85.73),
+			array('name' => 'Product 4', 'price' => 88.90)
 		);
 		
 		$modelList = array();
 		foreach ( $this->iteratorArrayData as $arrayData ) {
-			$model = $this->buildMockModel();
-			$model->model($arrayData);
-			$modelList[] = $model;
+			$product = new Product;
+			foreach ( $arrayData as $k => $v ) {
+				$product->$k = $v;
+			}
+			$modelList[] = $product;
 		}
 		
 		$this->iteratorModelData = $modelList;
 	}
 	
-	protected function assertPreConditions() {
-		
-		
-	}
-
-	public function testClone_NewIteratorContainsSameData() {
+	public function test__Clone_NewIteratorContainsSameData() {
 		$iterator1 = new Iterator($this->iteratorArrayData);
 		$iterator2 = clone $iterator1;
 		
@@ -271,14 +269,14 @@ class IteratorTest extends TestCase {
 	
 	public function providerFilter() {
 		return array(
-			array('name = ?', 'Vic Cherubini', array(array('name' => 'Vic Cherubini', 'age' => 18))),
-			array('name == ?', 'Vic Cherubini', array(array('name' => 'Vic Cherubini', 'age' => 18))),
-			array('age != ?', 18, array(array('name' => 'Bob Saget', 'age' => 44), array('name' => 'King George', 'age' => 85), array('name' => 'Rodney Dangerfield', 'age' => 88))),
-			array('age <> ?', 18, array(array('name' => 'Bob Saget', 'age' => 44), array('name' => 'King George', 'age' => 85), array('name' => 'Rodney Dangerfield', 'age' => 88))),
-			array('age >= ?', 85, array(array('name' => 'King George', 'age' => 85), array('name' => 'Rodney Dangerfield', 'age' => 88))),
-			array('age <= ?', 44, array(array('name' => 'Vic Cherubini', 'age' => 18), array('name' => 'Bob Saget', 'age' => 44))),
-			array('age < ?', 44, array(array('name' => 'Vic Cherubini', 'age' => 18))),
-			array('age > ?', 85, array(array('name' => 'Rodney Dangerfield', 'age' => 88)))
+			array('name = ?', 'Product 1', array(array('name' => 'Product 1', 'price' => 18.88))),
+			array('name == ?', 'Product 1', array(array('name' => 'Product 1', 'price' => 18.88))),
+			array('price != ?', 18.88, array(array('name' => 'Product 2', 'price' => 44.92), array('name' => 'Product 3', 'price' => 85.73), array('name' => 'Product 4', 'price' => 88.90))),
+			array('price <> ?', 18.88, array(array('name' => 'Product 2', 'price' => 44.92), array('name' => 'Product 3', 'price' => 85.73), array('name' => 'Product 4', 'price' => 88.90))),
+			array('price >= ?', 85.73, array(array('name' => 'Product 3', 'price' => 85.73), array('name' => 'Product 4', 'price' => 88.90))),
+			array('price <= ?', 44.92, array(array('name' => 'Product 1', 'price' => 18.88), array('name' => 'Product 2', 'price' => 44.92))),
+			array('price < ?', 44.92, array(array('name' => 'Product 1', 'price' => 18.88))),
+			array('price > ?', 85.73, array(array('name' => 'Product 4', 'price' => 88.90)))
 		);
 	}
 	
@@ -289,4 +287,5 @@ class IteratorTest extends TestCase {
 			return $e;
 		}, $this->providerFilter());
 	}
+	
 }
