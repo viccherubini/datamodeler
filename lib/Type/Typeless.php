@@ -7,14 +7,8 @@ use \DataModeler\Type;
 
 class TypelessType extends Type {
 	
-	public function setDefault($default) {
-		$this->data['default'] = $default;
-		return $this;
-	}
-	
-	public function setValue($value) {
-		$this->data['value'] = $value;
-		return $this;
+	public function value($v) {
+		return $v;
 	}
 	
 }

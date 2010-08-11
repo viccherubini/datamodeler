@@ -27,30 +27,21 @@ class Iterator implements \Iterator {
 	private $limit = -1;
 	private $page = 0;
 	
-	
 	public function __construct(array $data) {
 		$this->data = $data;
 		$this->key = 0;
 		$this->length = count($data);
 	}
 	
-	
 	public function __destruct() {
 		$this->data = array();
 	}
-	
 	
 	public function __clone() {
 		$this->length = count($this->data);
 		$this->rewind();
 	}
-	
-	
-	
-	
-	
-	
-	
+
 	public function current() {
 		if ( true === isset($this->data[$this->key]) ) {
 			return $this->data[$this->key];
@@ -58,12 +49,10 @@ class Iterator implements \Iterator {
 		
 		return current($this->data);
 	}
-	
 
 	public function getData() {
 		return $this->data;
 	}
-	
 
 	public function rewind() {
 		if ( $this->page > 0 && $this->limit > -1 ) {
@@ -77,47 +66,37 @@ class Iterator implements \Iterator {
 		return $this;
 	}
 	
-
-	
-	
 	public function last() {
 		return end($this->data);
 	}
 	
-	
 	public function key() {
 		return $this->key;
 	}
-	
 
 	public function next() {
 		$this->key++;
 		return next($this->data);
 	}
-	
 
 	public function valid() {
 		return ( $this->key != $this->length && true === isset($this->data[$this->key]) );
 	}
-
 
 	public function page($page) {
 		$this->page = abs(intval($page));
 		return $this;
 	}
 
-
 	public function limit($limit) {
 		$this->limit = intval($limit);
 		return $this;
 	}
 
-
 	public function length() {
 		return $this->length;
 	}
 	
-
 	public function fetch() {
 		$fetchList = $this->data;
 		
@@ -126,8 +105,8 @@ class Iterator implements \Iterator {
 			$fetchList = array();
 			
 			foreach ( $this->data as $iteratorItem ) {
-				if ( true === $iteratorItem instanceof Model ) {
-					$model = $iteratorItem->model();
+				if ( true === $iteratorItem instanceof \DataModeler\Model ) {
+					$model = $iteratorItem->nvp();
 				} elseif ( true === is_array($iteratorItem) ) {
 					$model = $iteratorItem;
 				}

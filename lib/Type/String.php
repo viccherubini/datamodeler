@@ -14,14 +14,8 @@ class StringType extends Type {
 		$this->value = '';
 	}
 	
-	public function setDefault($default) {
-		$this->data['default'] = $this->truncate($default);
-		return $this;
-	}
-	
-	public function setValue($value) {
-		$this->data['value'] = $this->truncate($value);
-		return $this;
+	public function value($v) {
+		return $this->truncate($v);
 	}
 	
 	private function truncate($string) {

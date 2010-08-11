@@ -17,14 +17,8 @@ class DatetimeType extends Type {
 		$this->value = $this->now;
 	}
 	
-	public function setDefault($default) {
-		$this->data['default'] = ( !$this->isDate($default) ? $this->now : $default );
-		return $this;
-	}
-	
-	public function setValue($value) {
-		$this->data['value'] = ( !$this->isDate($value) ? $this->now : $value );
-		return $this;
+	public function value($v) {
+		return ( !$this->isDate($v) ? $this->now : $v );
 	}
 	
 	private function isDate($value) {

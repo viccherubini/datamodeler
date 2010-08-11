@@ -14,14 +14,7 @@ class TextType extends Type {
 		$this->value = '';
 	}
 	
-	public function setDefault($default) {
-		$this->data['default'] = strval($default);
-		return $this;
+	public function value($v) {
+		return strval($v);
 	}
-	
-	public function setValue($value) {
-		$this->data['value'] = strval($value);
-		return $this;
-	}
-	
 }

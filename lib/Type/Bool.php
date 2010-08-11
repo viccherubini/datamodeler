@@ -14,14 +14,7 @@ class BoolType extends Type {
 		$this->value = false;
 	}
 	
-	public function setDefault($default) {
-		$this->data['default'] = ( !is_bool($default) ? false : $default );
-		return $this;
+	public function value($v) {
+		return ( !is_bool($v) ? false : $v );
 	}
-	
-	public function setValue($value) {
-		$this->data['value'] = ( !is_bool($value) ? false : $value );
-		return $this;
-	}
-	
 }

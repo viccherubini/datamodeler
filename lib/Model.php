@@ -149,6 +149,14 @@ abstract class Model {
 		return $this->modelId;
 	}
 	
+	public function nvp() {
+		$nvp = array();
+		foreach ( $this->model as $k => $type ) {
+			$nvp[$k] = $type->value;
+		}
+		return $nvp;
+	}
+	
 	public function pkey($pkey = NULL) {
 		$pkey = trim($pkey);
 		if ( !empty($pkey) ) {
@@ -184,7 +192,7 @@ abstract class Model {
 	
 	private function buildSchema() {
 		$reflection = new \ReflectionClass(get_class($this));
-		$propertyList = $reflection->getProperties();
+		$propertyList = $reflection->getProperties(\ReflectionProperty::IS_PRIVATE);
 		
 		$namespace = __NAMESPACE__;
 		

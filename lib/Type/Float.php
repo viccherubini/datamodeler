@@ -14,14 +14,8 @@ class FloatType extends Type {
 		$this->value = 0.0;
 	}
 	
-	public function setDefault($default) {
-		$this->data['default'] = $this->roundTo($default);
-		return $this;
-	}
-	
-	public function setValue($value) {
-		$this->data['value'] = $this->roundTo($value);
-		return $this;
+	public function value($v) {
+		return $this->roundTo($v);
 	}
 	
 	private function roundTo($value) {

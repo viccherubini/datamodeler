@@ -11,6 +11,8 @@ abstract class Type {
 
 	protected $data = array();
 
+	const VALUE_NULL = 'NULL';
+
 	public function __construct() {
 		$this->data = array('default' => NULL, 'value' => NULL);
 	}
@@ -22,16 +24,14 @@ abstract class Type {
 	public function __set($k, $v) {
 		$k = strtolower($k);
 		
-		switch ( $k ) {
-			case 'default': {
-				$this->setDefault($v);
-				break;
+		if ( array_key_exists($k, $this->data) ) {
+			if ( self::VALUE_NULL == strtoupper($v) ) {
+				$v = NULL;
+			} else {
+				$v = $this->value($v);
 			}
 			
-			case 'value': {
-				$this->setValue($v);
-				break;
-			}
+			$this->data[$k] = $v;
 		}
 		
 		return true;
@@ -44,7 +44,5 @@ abstract class Type {
 		return NULL;
 	}
 
-	abstract public function setDefault($default);
-	abstract public function setValue($value);
-	
+	abstract public function value($v);
 }
