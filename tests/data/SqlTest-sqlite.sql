@@ -1,8 +1,9 @@
 DROP TABLE IF EXISTS products;
-CREATE TABLE products (id INTEGER PRIMARY KEY, name TEXT, price REAL, sku TEXT);
-INSERT INTO products VALUES (NULL, 'Product 1', 10.95, 'P1');
-INSERT INTO products VALUES (NULL, 'Product 2', 18.95, 'P2');
-INSERT INTO products VALUES (NULL, 'Product 3', 22.97, 'P3');
+CREATE TABLE IF NOT EXISTS products (product_id integer PRIMARY KEY, date_created TEXT NOT NULL, date_updated TEXT DEFAULT NULL, date_available TEXT NOT NULL, customer_id INTEGER NOT NULL, price REAL NOT NULL, `name` TEXT NOT NULL, sku TEXT NOT NULL, field TEXT NOT NULL);
+INSERT INTO products VALUES(1, '0000-00-00 00:00:00', NULL, '0000-00-00', 0, 0, 'Product 1', 'P1', '');
+INSERT INTO products VALUES(2, '0000-00-00 00:00:00', NULL, '0000-00-00', 0, 0, 'Product 2', 'P2', '');
+INSERT INTO products VALUES(3, '0000-00-00 00:00:00', NULL, '0000-00-00', 0, 0, 'Product 3', 'P3', '');
+
 
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT, password TEXT, age INTEGER, favorite_book TEXT);
