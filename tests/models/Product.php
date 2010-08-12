@@ -33,8 +33,8 @@ class Product extends Model {
 	/** [type STRING] [maxlength 64] */
 	private $name = NULL;
 	
-	/** [type STRING] [maxlength 64] [default my store name] */
-	private $store;
+	/** [type STRING] [maxlength 12] [default SKUP1] */
+	private $sku;
 	
 	private $field = NULL;
 }

@@ -10,6 +10,7 @@ class Sql {
 	
 	private $model = NULL;
 	private $pdo = NULL;
+	private $sqlHash = NULL;
 	private $statement = NULL;
 	
 	private $prepareCount = 0;
@@ -28,6 +29,14 @@ class Sql {
 		
 		return $this;
 	}
+	
+	public function attachModel(\DataModeler\Model $model) {
+		$this->model = clone $model;
+		
+		return $this;
+	}
+	
+	
 	
 	public function begin() {
 		$this->checkPdo();
@@ -50,11 +59,36 @@ class Sql {
 		return true;
 	}
 	
-	public function singleQuery(\DataModeler\Model $model, $sql, $parameters) {
+	public function singleQuery(\DataModeler\Model $model, $where, array $parameters) {
+		$this->checkPdo();
 		
+		if ( !empty($where) ) {
+			$where = "WHERE {$where}";
+		}
+		
+		$sql = "SELECT * FROM {$model->table()} {$where}";
+		$statement = $this->pdo->prepare($sql);
+		
+		if ( $statement instanceof \PDOStatement ) {
+			$statement->execute($parameters);
+			$rowData = $statement->fetch(\PDO::FETCH_ASSOC);
+			unset($statement);
+			
+			if ( is_array($rowData) ) {
+				$model->load($rowData);
+			}
+		}
+		
+		return $model;
 	}
 	
-	public function multiQuery(\DataModeler\Model $model, $sql) {
+	public function multiQuery(\DataModeler\Model $model, $where) {
+		$this->checkPdo();
+		
+		if ( !empty($where) ) {
+			$where = "WHERE {$where}";
+		}
+		
 		
 	}
 	
@@ -78,24 +112,31 @@ class Sql {
 	}
 	
 	public function save(\DataModeler\Model $model) {
-/*
-		$inputParameters = array_values($model->model());
+		$modelNvp = $model->nvp();
+		$parameters = array_values($modelNvp);
 		
 		if ( $model->exists() ) {
-			$setList = implode(' = ?, ', array_keys($model->model())) . ' = ?';
-			$this->prepareQuery("UPDATE {$model->table()} SET {$setList} WHERE {$model->pkey()} = ?");
-			$inputParameters[] = $model->id();
+			$setList = implode(' = ?, ', array_keys($modelNvp)) . ' = ?';
+			$sql = "UPDATE {$model->table()} SET {$setList} WHERE {$model->pkey()} = ?";
+			$parameters[] = $model->id();
 		} else {
-			$fieldList = implode(', ', array_keys($model->model()));
-			$valueList = implode(', ', array_fill(0, count($model->model()), '?'));
-			$this->prepareQuery("INSERT INTO {$model->table()} ({$fieldList}) VALUES({$valueList})");
+			$fieldList = implode(', ', array_keys($modelNvp));
+			$valueList = implode(', ', array_fill(0, count($modelNvp), '?'));
+			$sql = "INSERT INTO {$model->table()} ({$fieldList}) VALUES({$valueList})";
+		}
+
+		$hash = sha1($sql);
+		if ( $hash != $this->sqlHash ) {
+			$this->statement = $this->pdo->prepare($sql);
+			$this->sqlHash = $hash;
+			$this->prepareCount++;
 		}
 		
 		$updatedModel = clone $model;
 		if ( $this->hasStatement() ) {
-			$statementExecute = $this->getStatement()->execute($inputParameters);
-			
-			if ( $statementExecute ) {
+			$execute = $this->statement->execute($parameters);
+
+			if ( $execute ) {
 				if ( !$updatedModel->exists() ) {
 					$updatedModel->id($this->pdo->lastInsertId());
 				}
@@ -103,7 +144,6 @@ class Sql {
 		}
 		
 		return $updatedModel;
-*/
 	}
 	
 	public function now($time = -1) {
@@ -136,5 +176,9 @@ class Sql {
 			throw new \DataModeler\Exception('sql_pdo_not_attached');
 		}
 		return true;
+	}
+	
+	private function hasStatement() {
+		return ( $this->statement instanceof \PDOStatement );
 	}
 }

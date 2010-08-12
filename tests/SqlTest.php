@@ -3,16 +3,21 @@
 declare(encoding='UTF-8');
 namespace DataModelerTest;
 
-use DataModelerTest\TestCase,
-	DataModeler\Model,
-	DataModeler\Sql,
-	DataModeler\Iterator;
+use \DataModelerTest\TestCase,
+	\DataModeler\Model,
+	\DataModeler\Sql,
+	\DataModeler\Iterator;
 
 require_once 'lib/Sql.php';
+
+require_once DIRECTORY_MODELS . 'Order.php';
+require_once DIRECTORY_MODELS . 'Product.php';
+require_once DIRECTORY_MODELS . 'User.php';
 
 class SqlTest extends TestCase {
 	
 	private $pdo = NULL;
+	private $order = NULL;
 	private $product = NULL;
 	private $user = NULL;
 	
@@ -43,8 +48,9 @@ class SqlTest extends TestCase {
 			}
 		}
 		
-		//$this->product = $this->buildMockProduct();
-		//$this->user = $this->buildMockUser();
+		$this->order = new Order;
+		$this->product = new Product;
+		$this->user = new User;
 	}
 
 	public function tearDown() {
@@ -60,57 +66,11 @@ class SqlTest extends TestCase {
 		$sql->attachPdo(NULL);
 	}
 	
-	public function _testGetPdo_ReturnsPdoObject() {
+	public function testGetPdo_ReturnsPdoObject() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
 		$this->assertTrue($sql->getPdo() instanceof \PDO);
-	}
-	
-	public function _testGetPrepareCount_ReturnsIntegerPrepareCount() {
-		$sql = new Sql;
-		
-		$prepareCount = 10;
-		$sql->setPrepareCount($prepareCount);
-		$this->assertEquals($prepareCount, $sql->getPrepareCount());
-	}
-	
-	public function _testGetQueryString_ReturnsUnparsedQuery() {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		$sql->prepare($this->product);
-		$sql->get(1);
-		
-		$this->assertType('string', $sql->getQueryString());
-	}
-	
-	public function _testGetQueryString_ReturnsNullWhenNoQuery() {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		$this->assertNull($sql->getQueryString());
-	}
-	
-	public function _testSetSqlHash_MustBeSha1() {
-		$sql = new Sql;
-		
-		$query = "SELECT * FROM products";
-		$querySha1 = sha1($query);
-		
-		$sql->setSqlHash($querySha1);
-		$this->assertEquals($querySha1, $sql->getSqlHash());
-	}
-	
-	public function _testGetSqlHash_MustBeSha1() {
-		// Probably a pointless test
-		$sql = new Sql;
-		
-		$query = "SELECT * FROM products";
-		$querySha1 = sha1($query);
-		
-		$sql->setSqlHash($querySha1);
-		$this->assertEquals(strlen($querySha1), strlen($sql->getSqlHash()));
 	}
 	
 	public function testBegin_StartsTransaction() {
@@ -124,101 +84,65 @@ class SqlTest extends TestCase {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
-/*
-		$order1 = $this->buildMockOrder();
-		$order2 = $this->buildMockOrder();
+		$order1 = clone $this->order;
+		$order2 = clone $this->order;
 		
 		$order1->setDateCreated($sql->now())
 			->setCustomerId(mt_rand(1, 100))
+			->setTotal(193.336421344)
 			->setName('My New Order');
 		
 		$sql->begin();
-		$order1 = $sql->save($order1);
+			$order1 = $sql->save($order1);
 		$sql->commit();
 		
 		// Reload the order
-		$order2 = $sql->prepare($order2)->get($order1->id());
+		$order2 = $sql->singleQuery($order2, 'order_id = ?', array($order1->id()));
 		
 		$this->assertTrue($order2->exists());
-*/
 	}
 	
 	public function testRollback_RevertsATransaction() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
-/*
-		$order1 = $this->buildMockOrder();
-		$order2 = $this->buildMockOrder();
+		$order1 = clone $this->order;
+		$order2 = clone $this->order;
 		
 		$order1->setDateCreated($sql->now())
 			->setCustomerId(mt_rand(1, 100))
 			->setName('My New Order');
 		
 		$sql->begin();
-		$order1 = $sql->save($order1);
+			$order1 = $sql->save($order1);
 		$sql->rollback();
 		
 		// Reload the order
-		$order2 = $sql->prepare($order2)->get($order1->id());
+		$order2 = $sql->singleQuery($order2, 'order_id = ?', array($order1->id()));
 		
 		$this->assertFalse($order2->exists());
-*/
 	}
 	
-	
-	/**
-	 * @_dataProvider providerFindModel
-	 */
-	public function _testFind_ReturnsModel(Model $model, $where, $inputParameters) {
+	public function testSave_SetsInsertId() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
-		$this->assertFalse($model->exists());
+		$this->product->setName('Product 1');
+		$this->product->setPrice(10.99);
 		
-		$sql->prepare($model, $where);
-		$model = $sql->find($inputParameters);
-		
-		$this->assertModel($model);
-		$this->assertTrue($model->exists());
-	}
-	
-	/**
-	 * @_dataProvider providerFindModel
-	 */
-	public function _testFindAll_ReturnsListOfModels(Model $model, $where, $inputParameters) {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		$this->assertFalse($model->exists());
-		
-		$sql->prepare($model, $where);
-		$modelList = $sql->findAll($inputParameters);
-		
-		$this->assertModelList($modelList);
-	}
-	
-	public function _testSave_SetsInsertId() {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		$product = $this->buildMockProduct();
-		$product->setName('Product 1');
-		$product->setPrice(10.99);
-		
-		$product = $sql->save($product);
+		$product = $sql->save($this->product);
 		
 		$this->assertGreaterThan(0, $product->id());
 	}
 	
-	public function _testSave_PreparesOnceForSameModel() {
+	public function testSave_PreparesOnceForSameModel() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
 		for ( $i=0; $i<10; $i++ ) {
 			$price = round(mt_rand(1, 25) + (mt_rand(1, 25) / mt_rand(1, 25)), 2);
 			
-			$product = $this->buildMockProduct();
+			$product = clone $this->product;
 			$product->setName("Product {$i}");
 			$product->setPrice($price);
 			$product->setSku("P{$i}");
@@ -229,16 +153,16 @@ class SqlTest extends TestCase {
 		$this->assertEquals(1, $sql->getPrepareCount());
 	}
 	
-	public function _testSave_PreparesTwiceForDifferentModels() {
+	public function testSave_PreparesTwiceForDifferentModels() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
-		$product = $this->buildMockProduct();
+		$product = clone $this->product;
 		$product->setName('Product 4');
 		$product->setPrice(10.99);
 		$product->setSku('P4');
 		
-		$user = $this->buildMockUser();
+		$user = clone $this->user;
 		$user->setUsername('leftnode');
 		$user->setPassword('password_test');
 		
@@ -248,18 +172,18 @@ class SqlTest extends TestCase {
 		$this->assertEquals(2, $sql->getPrepareCount());
 	}
 	
-	public function _testSave_PreparesTwiceForDifferentSaveTypes() {
+	public function testSave_PreparesTwiceForDifferentSaveTypes() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
-		$product1 = $this->buildMockProduct();
+		$product1 = clone $this->product;
 		$product1->id(1);
 		$product1->setName('Product 1 *Updated*');
 		$product1->setPrice(42.56);
 		$product1->setSku('P1_NEW');
 		
-		$product2 = $this->buildMockProduct();
-		$product2->setName('Product 2');
+		$product2 = clone $this->product;
+		$product2->setName('Product 2 *Updated*');
 		$product2->setPrice(8.56);
 		$product2->setSku('P5');
 		
@@ -269,11 +193,11 @@ class SqlTest extends TestCase {
 		$this->assertEquals(2, $sql->getPrepareCount());
 	}
 	
-	public function _testSave_PreparesOnceForUpdatingSameModel() {
+	public function testSave_PreparesOnceForUpdatingSameModel() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
-		$product1 = $this->buildMockProduct();
+		$product1 = clone $this->product;
 		$product1->id(1);
 		$product1->setName('Product 1 *updated*');
 		
@@ -285,11 +209,11 @@ class SqlTest extends TestCase {
 		$this->assertEquals(1, $sql->getPrepareCount());
 	}
 	
-	public function _testSave_PreparesTwiceForInsertAndTwoUpdatesOnSameModel() {
+	public function testSave_PreparesTwiceForInsertAndTwoUpdatesOnSameModel() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
-		$product = $this->buildMockProduct();
+		$product = clone $this->product;
 		$product->setName('New Product');
 		$product->setPrice(93.22);
 		$product->setSku('AKDUU_DKAE19');
@@ -304,31 +228,6 @@ class SqlTest extends TestCase {
 		
 		$this->assertTrue($product->exists());
 		$this->assertEquals(2, $sql->getPrepareCount());
-	}
-	
-	public function _testSave_PreparesEachTimeForNewAttributes() {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		$productNameUpdated = 'Product 1 Prime';
-		
-		$product = $this->buildMockProduct();
-		$product->id(1); // fake load
-		$product->setPrice(99.33);
-		
-		$sql->save($product); // update, first prepare
-		
-		$product->setName($productNameUpdated);
-		$sql->save($product); // update, but should prepare again
-		
-		$this->assertEquals(2, $sql->getPrepareCount());
-		
-		// Reload the product to test values were actually updated
-		$sql->prepare($product);
-		$product = $sql->get(1);
-		
-		$this->assertEquals($productNameUpdated, $product->getName());
-		$this->assertEquals(3, $sql->getPrepareCount());
 	}
 	
 	public function _testSave_CanInsertLargeObjects() {
@@ -351,18 +250,6 @@ class SqlTest extends TestCase {
 		
 		unset($objectData);
 		unset($largeObject);
-	}
-	
-	/**
-	 * @dataProvider providerQueryAndInputParameters
-	 */
-	public function _testQuery_CanExecuteValidQuery($query, $inputParameters) {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		$sql->query($query, $inputParameters);
-		
-		$this->assertPdoStatement($sql->getStatement());
 	}
 	
 	public function testCountOf_ReturnsRowCount() {
