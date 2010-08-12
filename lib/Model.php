@@ -140,6 +140,13 @@ abstract class Model {
 			$this->modelId() === $model->modelId()
 		);
 	}
+	
+	public function load(array $nvp) {
+		foreach ( $nvp as $k => $v ) {
+			$this->$k = $v;
+		}
+		return $this;
+	}
 
 	public function model() {
 		return $this->model;
