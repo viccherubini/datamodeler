@@ -306,9 +306,21 @@ class SqlTest extends TestCase {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
-		$rowCount = $sql->countOf($this->buildMockProduct());
+		$rowCount = $sql->countOf($this->product);
 		
 		$this->assertGreaterThan(0, $rowCount);
+	}
+	
+	/**
+	 * @dataProvider providerProductWhereClause
+	 */
+	public function testCountOf_UsesWhere($where, $parameters) {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$countOf = $sql->countOf($this->product, $where, $parameters);
+		
+		$this->assertGreaterThan(0, $countOf);
 	}
 	
 	/**
@@ -340,6 +352,15 @@ class SqlTest extends TestCase {
 			array($user, 'username = :username', array('username' => 'vcherubini')),
 			array($user, 'username = :username AND password = :password', array('username' => 'vcherubini', 'password' => 'password1')),
 			array($user, 'age = :age AND favorite_book = :favorite_book', array('age' => 25, 'favorite_book' => 'xUnit Test Patterns'))
+		);
+	}
+	
+	public function providerProductWhereClause() {
+		return array(
+			array('product_id = ?', array(1)),
+			array('product_id > ?', array(1)),
+			array('product_id != ?', array(2)),
+			array('product_id != ? AND name != ?', array(2, 'Product 1'))
 		);
 	}
 	
