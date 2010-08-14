@@ -114,7 +114,12 @@ class Sql {
 	public function countOf(\DataModeler\Model $model, $where=NULL, $parameters=array()) {
 		$this->checkPdo();
 		
-		$statement = $this->pdo->prepare("SELECT COUNT(*) FROM {$model->table()} {$where}");
+		if ( !empty($where) ) {
+			$where = "WHERE {$where}";
+		}
+		
+		$sql = "SELECT COUNT(*) FROM {$model->table()} {$where}";
+		$statement = $this->pdo->prepare($sql);
 		$statement->execute($parameters);
 		
 		$rowCount = 0;
