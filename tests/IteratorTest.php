@@ -5,7 +5,7 @@ namespace DataModelerTest;
 
 use DataModeler\Iterator, DataModeler\Model;
 
-require_once 'lib/Iterator.php';
+require_once 'DataModeler/Iterator.php';
 require_once DIRECTORY_MODELS . 'Product.php';
 
 class IteratorTest extends TestCase {

@@ -6,7 +6,7 @@ namespace DataModelerTest\Type;
 use DataModelerTest\TestCase,
 	DataModeler\Type\IntegerType;
 
-require_once 'lib/Type/Integer.php';
+require_once 'DataModeler/Type/Integer.php';
 
 class IntegerTypeTest extends TestCase {
 	

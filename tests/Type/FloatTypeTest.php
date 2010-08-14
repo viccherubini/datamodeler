@@ -6,7 +6,7 @@ namespace DataModelerTest\Type;
 use DataModelerTest\TestCase,
 	DataModeler\Type\FloatType;
 
-require_once 'lib/Type/Float.php';
+require_once 'DataModeler/Type/Float.php';
 
 class FloatTypeTest extends TestCase {
 	

@@ -6,7 +6,7 @@ namespace DataModelerTest\Type;
 use DataModelerTest\TestCase,
 	DataModeler\Type\TypelessType;
 
-require_once 'lib/Type/Typeless.php';
+require_once 'DataModeler/Type/Typeless.php';
 
 class TypelessTypeTest extends TestCase {
 	

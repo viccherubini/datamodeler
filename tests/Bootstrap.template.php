@@ -8,10 +8,10 @@ require_once 'TestCase.php';
 
 $data_modeler_test_path = dirname(__FILE__);
 $data_modeler_lib_path  = $data_modeler_test_path . '/../';
-set_include_path(get_include_path() . PATH_SEPARATOR . $data_modeler_lib_path . PATH_SEPARATOR . $data_modeler_test_path);
+set_include_path($data_modeler_lib_path . PATH_SEPARATOR . $data_modeler_test_path . PATH_SEPARATOR . get_include_path());
 
-require_once 'lib/Type.php';
-require_once 'lib/Exception.php';
+require_once 'DataModeler/Type.php';
+require_once 'DataModeler/Exception.php';
 
 define('DS', DIRECTORY_SEPARATOR, false);
 define('DIRECTORY_TESTS', $data_modeler_test_path . DS, false);

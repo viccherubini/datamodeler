@@ -36,8 +36,6 @@ class Sql {
 		return $this;
 	}
 	
-	
-	
 	public function begin() {
 		$this->checkPdo();
 		$this->getPdo()->beginTransaction();
@@ -59,7 +57,7 @@ class Sql {
 		return true;
 	}
 	
-	public function singleQuery(\DataModeler\Model $model, $where, array $parameters) {
+	public function singleQuery(\DataModeler\Model $model, $where=NULL, array $parameters=array()) {
 		$this->checkPdo();
 		
 		if ( !empty($where) ) {
@@ -82,18 +80,35 @@ class Sql {
 		return $model;
 	}
 	
-	public function multiQuery(\DataModeler\Model $model, $where) {
+	public function multiQuery(\DataModeler\Model $model, $where=NULL) {
 		$this->checkPdo();
+		$this->attachModel($model);
 		
 		if ( !empty($where) ) {
 			$where = "WHERE {$where}";
 		}
 		
+		$sql = "SELECT * FROM {$model->table()} {$where}";
+		$this->prepare($sql);
 		
+		return $this;
 	}
 	
-	public function fetch($parameters) {
+	public function fetch(array $parameters=array()) {
+		$this->checkPdo();
+		$this->checkModel();
 		
+		$model = clone $this->model;
+		if ( $this->hasStatement() ) {
+			$this->statement->execute($parameters);
+			$rowData = $this->statement->fetch(\PDO::FETCH_ASSOC);
+			
+			if ( is_array($rowData) ) {
+				$model->load($rowData);
+			}
+		}
+		
+		return $model;
 	}
 	
 	public function countOf(\DataModeler\Model $model, $where=NULL, $parameters=array()) {
@@ -112,6 +127,8 @@ class Sql {
 	}
 	
 	public function save(\DataModeler\Model $model) {
+		$this->checkPdo();
+
 		$modelNvp = $model->nvp();
 		$parameters = array_values($modelNvp);
 		
@@ -125,12 +142,7 @@ class Sql {
 			$sql = "INSERT INTO {$model->table()} ({$fieldList}) VALUES({$valueList})";
 		}
 
-		$hash = sha1($sql);
-		if ( $hash != $this->sqlHash ) {
-			$this->statement = $this->pdo->prepare($sql);
-			$this->sqlHash = $hash;
-			$this->prepareCount++;
-		}
+		$this->prepare($sql);
 		
 		$updatedModel = clone $model;
 		if ( $this->hasStatement() ) {
@@ -153,22 +165,25 @@ class Sql {
 		return $date;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	public function getPdo() {
 		return $this->pdo;
 	}
 
 	public function getPrepareCount() {
 		return $this->prepareCount;
+	}
+	
+	private function prepare($sql) {
+		$hash = sha1($sql);
+		
+		if ( $hash != $this->sqlHash ) {
+			$this->statement = $this->pdo->prepare($sql);
+			
+			$this->sqlHash = $hash;
+			$this->prepareCount++;
+		}
+		
+		return true;
 	}
 	
 	private function checkPdo() {
@@ -178,7 +193,15 @@ class Sql {
 		return true;
 	}
 	
+	private function checkModel() {
+		if ( !($this->model instanceof \DataModeler\Model) ) {
+			throw new \DataModeler\Exception('sql_model_not_attached');
+		}
+		return true;
+	}
+	
 	private function hasStatement() {
 		return ( $this->statement instanceof \PDOStatement );
 	}
+	
 }

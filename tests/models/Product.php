@@ -5,7 +5,7 @@ namespace DataModelerTest;
 
 use \DataModeler\Model;
 
-require_once 'lib/Model.php';
+require_once 'DataModeler/Model.php';
 
 class Product extends Model {
 	protected $table = 'products';

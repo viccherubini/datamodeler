@@ -13,14 +13,14 @@ use \DataModeler\Type,
 	\DataModeler\Type\TextType,
 	\DataModeler\Type\TypelessType;
 
-require_once 'lib/Type/Bool.php';
-require_once 'lib/Type/Date.php';
-require_once 'lib/Type/Datetime.php';
-require_once 'lib/Type/Float.php';
-require_once 'lib/Type/Integer.php';
-require_once 'lib/Type/String.php';
-require_once 'lib/Type/Text.php';
-require_once 'lib/Type/Typeless.php';
+require_once 'DataModeler/Type/Bool.php';
+require_once 'DataModeler/Type/Date.php';
+require_once 'DataModeler/Type/Datetime.php';
+require_once 'DataModeler/Type/Float.php';
+require_once 'DataModeler/Type/Integer.php';
+require_once 'DataModeler/Type/String.php';
+require_once 'DataModeler/Type/Text.php';
+require_once 'DataModeler/Type/Typeless.php';
 
 /**
  * Abstract Model class for building FAT, intelligent models. The model is

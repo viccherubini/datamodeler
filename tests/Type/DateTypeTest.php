@@ -6,7 +6,7 @@ namespace DataModelerTest\Type;
 use DataModelerTest\TestCase,
 	DataModeler\Type\DateType;
 
-require_once 'lib/Type/Date.php';
+require_once 'DataModeler/Type/Date.php';
 
 class DateTypeTest extends TestCase {
 	

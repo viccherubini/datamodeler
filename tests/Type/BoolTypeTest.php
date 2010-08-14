@@ -6,7 +6,7 @@ namespace DataModelerTest\Type;
 use DataModelerTest\TestCase,
 	DataModeler\Type\BoolType;
 
-require_once 'lib/Type/Bool.php';
+require_once 'DataModeler/Type/Bool.php';
 
 class BoolTypeTest extends TestCase {
 	

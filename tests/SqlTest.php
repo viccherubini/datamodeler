@@ -8,7 +8,7 @@ use \DataModelerTest\TestCase,
 	\DataModeler\Sql,
 	\DataModeler\Iterator;
 
-require_once 'lib/Sql.php';
+require_once 'DataModeler/Sql.php';
 
 require_once DIRECTORY_MODELS . 'Order.php';
 require_once DIRECTORY_MODELS . 'Product.php';
@@ -60,17 +60,67 @@ class SqlTest extends TestCase {
 	/**
 	 * @expectedException PHPUnit_Framework_Error
 	 */
-	public function testAttachPdo_AttachesPdo() {
+	public function testAttachPdo_MustBePdo() {
 		$sql = new Sql;
 		
 		$sql->attachPdo(NULL);
 	}
 	
-	public function testGetPdo_ReturnsPdoObject() {
+	/**
+	 * @expectedException PHPUnit_Framework_Error
+	 */
+	public function testAttachModel_MustBeModel() {
+		$sql = new Sql;
+		
+		$sql->attachModel(new \stdClass);
+	}
+	
+	/**
+	 * @dataProvider providerModelAndParameters
+	 */
+	public function testSingleQuery_FindsModel($model, $where, $parameters) {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
-		$this->assertTrue($sql->getPdo() instanceof \PDO);
+		$matchedModel = $sql->singleQuery($model, $where, $parameters);
+		
+		$this->assertModel($matchedModel);
+		$this->assertTrue($matchedModel->exists());
+	}
+	
+	public function testSingleQuery_EmptyModelWhenNotFound() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$matchedModel = $sql->singleQuery($this->product, 'product_id > ?', array(100));
+		
+		$this->assertModel($matchedModel);
+		$this->assertFalse($matchedModel->exists());
+	}
+	
+	/**
+	 * @expectedException \DataModeler\Exception
+	 */
+	public function testMultiQuery_PdoMustBeAttached() {
+		$sql = new Sql;
+		
+		$sql->multiQuery($this->product, 'product_id > ?', array(100));
+	}
+	
+	public function testMultiQuery_PreparesOnceForMultipleFetches() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$sql->multiQuery($this->product, 'id != ?');
+		
+		//$product1 = $sql->fetch(array(1));
+		//$product2 = $sql->fetch(array(2));
+		
+		//$this->assertTrue($product1->exists());
+		//$this->assertTrue($product2->exists());
+		
+		//$this->assertFalse($product1->equalTo($product2));
+		//$this->assertFalse($product2->equalTo($product1));
 	}
 	
 	public function testBegin_StartsTransaction() {
@@ -269,15 +319,22 @@ class SqlTest extends TestCase {
 		$sql->countOf($this->buildMockProduct());
 	}
 	
-	public function providerFindModel() {
-		$user = $this->buildMockUser();
-		$product = $this->buildMockProduct();
+	public function testGetPdo_ReturnsPdoObject() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$this->assertTrue($sql->getPdo() instanceof \PDO);
+	}
+	
+	public function providerModelAndParameters() {
+		$product = new Product;
+		$user = new User;
 		
 		return array(
-			array($product, 'id = :id', array('id' => 1)),
-			array($product, 'id = ?', array(1)),
-			array($product, 'id = :id OR sku = :sku', array('id' => 1, 'sku' => 'P2')),
-			array($product, 'id = :id AND sku = :sku', array('id' => 1, 'sku' => 'P1')),
+			array($product, 'product_id = :product_id', array('product_id' => 1)),
+			array($product, 'product_id = ?', array(1)),
+			array($product, 'product_id = :product_id OR sku = :sku', array('product_id' => 1, 'sku' => 'P2')),
+			array($product, 'product_id = :product_id AND sku = :sku', array('product_id' => 1, 'sku' => 'P1')),
 			array($product, 'price > :price', array('price' => 10.99)),
 			array($product, 'name = :name', array('name' => 'Product 1')),
 			array($user, 'username = :username', array('username' => 'vcherubini')),
