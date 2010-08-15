@@ -1,4 +1,2 @@
-config/configure.php
 tests/Bootstrap.php
-tests/__Coverage
 tests/coverage
