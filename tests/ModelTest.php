@@ -6,7 +6,8 @@ namespace DataModelerTest;
 use \DataModeler\Model,
 	\DataModelerTest\Product;
 
-require_once DIRECTORY_MODELS . 'Product.php';
+require_once 'Product.php';
+require_once 'Order.php';
 
 class ModelTest extends TestCase {
 
@@ -108,12 +109,46 @@ class ModelTest extends TestCase {
 		$this->assertEquals(0, $product->id());
 	}
 	
+	public function testIsA_SameModels() {
+		$product1 = new Product;
+		$product2 = new Product;
+		$order = new Order;
+		
+		$this->assertTrue($product1->isA($product2));
+		$this->assertTrue($product2->isA($product1));
+		$this->assertFalse($order->isA($product1));
+		$this->assertFalse($order->isA($product2));
+	}
+	
+	public function testLoad_InsertsValues() {
+		$productId = 89;
+		$customerId = 10;
+		$price = 10.85;
+		$product = new Product;
+		
+		$this->assertFalse($product->exists());
+		$this->assertTrue(is_null($product->id()));
+		
+		$product->load(array('customer_id' => $customerId, 'price' => $price));
+		$this->assertEquals($customerId, $product->getCustomerId());
+		$this->assertEquals($price, $product->getPrice());
+		$this->assertFalse($product->exists());
+		
+		$product->load(array('product_id' => $productId));
+		$this->assertEquals($productId, $product->id());
+		$this->assertTrue($product->exists());
+	}
+	
 	public function testNvp_ReturnsNameValuePairHash() {
 		$product = new Product;
+		$pkey = $product->pkey();
+		$nvp = $product->nvp();
+		
 		$reflection = new \ReflectionClass($product);
 		$properties = $reflection->getProperties(\ReflectionProperty::IS_PRIVATE);
+		$properties = array_filter($properties, function($v) use ($pkey) { return $v->name != $pkey; });
 		
-		$this->assertEquals(count($properties), count($product->nvp()));
+		$this->assertEquals(count($nvp), count($properties));
 	}
 	
 	public function testPkey_CannotContainBackticks() {

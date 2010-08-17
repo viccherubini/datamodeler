@@ -159,7 +159,9 @@ abstract class Model {
 	public function nvp() {
 		$nvp = array();
 		foreach ( $this->model as $k => $type ) {
-			$nvp[$k] = $type->value;
+			if ( $k !== $this->pkey ) {
+				$nvp[$k] = $type->value;
+			}
 		}
 		return $nvp;
 	}
