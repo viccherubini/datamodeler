@@ -6,21 +6,23 @@ namespace DataModelerTest;
 require_once 'PHPUnit/Framework.php';
 require_once 'TestCase.php';
 
-$data_modeler_test_path = dirname(__FILE__);
-$data_modeler_lib_path  = $data_modeler_test_path . '/../';
-set_include_path($data_modeler_lib_path . PATH_SEPARATOR . $data_modeler_test_path . PATH_SEPARATOR . get_include_path());
+$dataModelerTestPath = dirname(__FILE__);
+$dataModelerLibPath  = $dataModelerTestPath . '/../';
 
 require_once 'DataModeler/Type.php';
 require_once 'DataModeler/Exception.php';
 
 define('DS', DIRECTORY_SEPARATOR, false);
-define('DIRECTORY_TESTS', $data_modeler_test_path . DS, false);
+define('DIRECTORY_TESTS', $dataModelerTestPath . DS, false);
 define('DIRECTORY_DATA', DIRECTORY_TESTS . 'data' . DS, false);
 define('DIRECTORY_MODELS', DIRECTORY_TESTS . 'models' . DS, false);
 
-$dbType = 'sqlite';
+$includeList = array(DIRECTORY_MODELS, $dataModelerLibPath, $dataModelerTestPath, get_include_path());
+set_include_path(implode(PATH_SEPARATOR, $includeList));
+
+$dbType = 'mysql';
 $dbName = 'datamodeler_tests';
-$dbHost = '127.0.0.1';
+$dbHost = 'localhost';
 
 switch ( $dbType ) {
 	case 'mysql': {
