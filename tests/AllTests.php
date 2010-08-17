@@ -9,6 +9,7 @@ require_once 'IteratorTest.php';
 require_once 'MiscTest.php';
 require_once 'ModelTest.php';
 require_once 'SqlTest.php';
+require_once 'SqlResultTest.php';
 require_once 'TypeTest.php';
 
 class AllTests {
@@ -21,6 +22,7 @@ class AllTests {
 		$suite->addTestSuite('\DataModelerTest\MiscTest');
 		$suite->addTestSuite('\DataModelerTest\ModelTest');
 		$suite->addTestSuite('\DataModelerTest\SqlTest');
+		$suite->addTestSuite('\DataModelerTest\SqlResultTest');
 		$suite->addTestSuite('\DataModelerTest\TypeTest');
 		
 		return $suite;
