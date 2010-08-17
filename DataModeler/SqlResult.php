@@ -31,8 +31,21 @@ class SqlResult {
 		return $this;
 	}
 
-	public function findFirst() {
+	public function findFirst($parameters=array()) {
+		$this->checkModel();
+		$this->checkStatement();
 		
+		$executed = $this->statement->execute($parameters);
+		
+		$model = clone $this->model;
+		if ( $executed ) {
+			$dataRow = $this->statement->fetch(\PDO::FETCH_ASSOC);
+			if ( is_array($dataRow) ) {
+				$model->load($dataRow);
+			}
+		}
+		
+		return $model;
 	}
 	
 	public function findAll() {
@@ -48,4 +61,17 @@ class SqlResult {
 	}
 
 
+	private function checkModel() {
+		if ( is_null($this->model) ) {
+			throw new \DataModeler\Exception('model_not_attached');
+		}
+		return true;
+	}
+	
+	public function checkStatement() {
+		if ( is_null($this->statement) ) {
+			throw new \DataModeler\Exception('pdostatement_not_attached');
+		}
+		return true;
+	}
 }

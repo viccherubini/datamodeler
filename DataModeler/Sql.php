@@ -3,7 +3,8 @@
 declare(encoding='UTF-8');
 namespace DataModeler;
 
-use \DataModeler\Model, \DataModeler\SqlResult;
+use \DataModeler\Model,
+	\DataModeler\SqlResult;
 
 class Sql {
 	
@@ -102,7 +103,27 @@ class Sql {
 	}
 	
 	public function delete(\DataModeler\Model $model) {
+		$this->checkPdo();
 		
+		if ( !$model->exists() ) {
+			throw new \DataModeler\Exception('model_does_not_exist');
+		}
+		
+		$id = $model->id();
+		$pdo = $this->getPdo();
+		
+		$sql = "DELETE FROM {$model->table()} WHERE {$model->pkey()} = ?";
+		$statement = $pdo->prepare($sql);
+		
+		if ( !$statement) {
+			throw new \DataModeler\Exception("preparation_failed: {$sql}");
+		}
+		
+		$statement->execute(array($id));
+		
+		$affectedRows = $statement->rowCount();
+		
+		return ( $affectedRows > 0 ? true : false );
 	}
 	
 	public function countOf(\DataModeler\Model $model, $where=NULL, $parameters=array()) {
@@ -125,9 +146,10 @@ class Sql {
 		return $rowCount;
 	}
 	
-	public function now($time=0) {
+	public function now($time=0, $short=false) {
 		$time = ( 0 === $time ? time() : $time );
-		$date = date('Y-m-d H:i:s', $time); 
+		$format = ( false === $short ? 'Y-m-d H:i:s' : 'Y-m-d' );
+		$date = date($format, $time); 
 		
 		return $date;
 	}

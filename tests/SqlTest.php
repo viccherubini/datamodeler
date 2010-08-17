@@ -9,7 +9,10 @@ use \DataModelerTest\TestCase,
 	\DataModeler\SqlResult;
 
 require_once 'DataModeler/Sql.php';
+require_once 'DataModeler/SqlResult.php';
 
+require_once 'Missing.php';
+require_once 'Product.php';
 require_once 'User.php';
 
 class SqlTest extends TestCase {
@@ -49,21 +52,20 @@ class SqlTest extends TestCase {
 		$sql->prepare($this->buildMockModel());
 	}
 	
-	/**
-	 * @expectedException \DataModeler\Exception
-	 */
-	public function _testPrepare_UsesWrongFieldInWhere() {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		$sql->prepare($this->buildMockProduct(), 'price_not_existing_field > ?');
-	}
-	
 	public function testPrepare_ReturnsSqlResult() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
 		$sqlResult = $sql->prepare($this->buildMockProduct(), 'price > ?');
+		
+		$this->assertTrue($sqlResult instanceof \DataModeler\SqlResult);
+	}
+	
+	public function testPreparePkey_ReturnsSqlResult() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$sqlResult = $sql->preparePkey($this->buildMockProduct());
 		
 		$this->assertTrue($sqlResult instanceof \DataModeler\SqlResult);
 	}
@@ -81,6 +83,50 @@ class SqlTest extends TestCase {
 		$product = $sql->save($product);
 		
 		$this->assertGreaterThan(0, $product->id());
+	}
+	
+	/**
+	 * @expectedException PHPUnit_Framework_Error
+	 */
+	public function testDelete_RequiresModel() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$sql->delete(NULL);
+	}
+	
+	/**
+	 * @expectedException \DataModeler\Exception
+	 */
+	public function testDelete_ModelMustExist() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$sql->delete($this->buildMockProduct());
+	}
+
+	public function testDelete_CanDeleteModel() {
+		$product = new Product;
+		$product->id(1); // Fake Load
+		
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$deleted = $sql->delete($product);
+		
+		$this->assertTrue($deleted);
+	}
+	
+	public function testDelete_CannotDeleteModel() {
+		$product = new Product;
+		$product->id(mt_rand(5000, 10000));
+		
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$deleted = $sql->delete($product);
+		
+		$this->assertFalse($deleted);
 	}
 	
 	/**
@@ -103,7 +149,7 @@ class SqlTest extends TestCase {
 		$sql->countOf($this->buildMockProduct());
 	}
 	
-	public function testNow_ReturnsDate() {
+	public function testNow_ReturnsDatetime() {
 		$sql = new Sql;
 		
 		$parsedDate = date_parse($sql->now());
@@ -113,6 +159,19 @@ class SqlTest extends TestCase {
 		$this->assertEquals(0, count($parsedDate['errors']));
 		
 		$parsedDate = date_parse($sql->now(103990239));
+		$this->assertEquals(0, count($parsedDate['errors']));
+	}
+	
+	public function testNow_ReturnsDate() {
+		$sql = new Sql;
+		
+		$parsedDate = date_parse($sql->now(0, true));
+		$this->assertEquals(0, count($parsedDate['errors']));
+		
+		$parsedDate = date_parse($sql->now(-1000, true));
+		$this->assertEquals(0, count($parsedDate['errors']));
+		
+		$parsedDate = date_parse($sql->now(103990239, true));
 		$this->assertEquals(0, count($parsedDate['errors']));
 	}
 	

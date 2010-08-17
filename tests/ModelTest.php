@@ -109,6 +109,15 @@ class ModelTest extends TestCase {
 		$this->assertEquals(0, $product->id());
 	}
 	
+	public function testId_ReturnsId() {
+		$productId = 10;
+		
+		$product = new Product;
+		$product->id($productId);
+		
+		$this->assertEquals($productId, $product->id());
+	}
+	
 	public function testIsA_SameModels() {
 		$product1 = new Product;
 		$product2 = new Product;
