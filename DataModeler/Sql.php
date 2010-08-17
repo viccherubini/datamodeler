@@ -3,12 +3,10 @@
 declare(encoding='UTF-8');
 namespace DataModeler;
 
-use \DataModeler\Model,
-	\DataModeler\Iterator;
+use \DataModeler\Model, \DataModeler\SqlResult;
 
 class Sql {
 	
-	private $model = NULL;
 	private $pdo = NULL;
 	private $sqlHash = NULL;
 	private $statement = NULL;
@@ -29,35 +27,8 @@ class Sql {
 		
 		return $this;
 	}
-	
-	public function attachModel(\DataModeler\Model $model) {
-		$this->model = clone $model;
-		
-		return $this;
-	}
-	
-	public function begin() {
-		$this->checkPdo();
-		$this->getPdo()->beginTransaction();
-		
-		return true;
-	}
 
-	public function commit() {
-		$this->checkPdo();
-		$this->getPdo()->commit();
-		
-		return true;
-	}
-
-	public function rollback() {
-		$this->checkPdo();
-		$this->getPdo()->rollBack();
-		
-		return true;
-	}
-	
-	public function singleQuery(\DataModeler\Model $model, $where=NULL, array $parameters=array()) {
+	public function prepare(\DataModeler\Model $model, $where=NULL) {
 		$this->checkPdo();
 		
 		if ( !empty($where) ) {
@@ -67,48 +38,71 @@ class Sql {
 		$sql = "SELECT * FROM {$model->table()} {$where}";
 		$statement = $this->pdo->prepare($sql);
 		
-		if ( $statement instanceof \PDOStatement ) {
-			$statement->execute($parameters);
-			$rowData = $statement->fetch(\PDO::FETCH_ASSOC);
-			unset($statement);
-			
-			if ( is_array($rowData) ) {
-				$model->load($rowData);
+		if ( !$statement ) {
+			throw new \DataModeler\Exception("preparation_failed: {$sql}");
+		}
+		
+		$sqlResult = new SqlResult;
+		$sqlResult->attachModel($model)
+			->attachStatement($statement);
+		
+		return $sqlResult;
+	}
+	
+	public function preparePkey(\DataModeler\Model $model) {
+		return $this->prepare($model, "{$model->pkey()} = ?");
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public function save(\DataModeler\Model $model) {
+		$this->checkPdo();
+
+		$nvp = $model->nvp();
+		$parameters = array_values($nvp);
+		
+		if ( $model->exists() ) {
+			$setList = implode(' = ?, ', array_keys($nvp)) . ' = ?';
+			$sql = "UPDATE {$model->table()} SET {$setList} WHERE {$model->pkey()} = ?";
+			$parameters[] = $model->id();
+		} else {
+			$fieldList = implode(', ', array_keys($nvp));
+			$valueList = implode(', ', array_fill(0, count($nvp), '?'));
+			$sql = "INSERT INTO {$model->table()} ({$fieldList}) VALUES({$valueList})";
+		}
+
+		$hash = sha1($sql);
+		if ( $hash !== $this->sqlHash ) {
+			$this->statement = $this->pdo->prepare($sql);
+			$this->sqlHash = $hash;
+			$this->prepareCount++;
+		}
+		
+		if ( !$this->statement ) {
+			throw new \DataModeler\Exception("preparation_failed: {$sql}");
+		}
+
+		$model = clone $model;
+		$execute = $this->statement->execute($parameters);
+
+		if ( $execute ) {
+			if ( !$model->exists() ) {
+				$model->id($this->pdo->lastInsertId());
 			}
 		}
 		
 		return $model;
 	}
 	
-	public function multiQuery(\DataModeler\Model $model, $where=NULL) {
-		$this->checkPdo();
-		$this->attachModel($model);
+	public function delete(\DataModeler\Model $model) {
 		
-		if ( !empty($where) ) {
-			$where = "WHERE {$where}";
-		}
-		
-		$sql = "SELECT * FROM {$model->table()} {$where}";
-		$this->prepare($sql);
-		
-		return $this;
-	}
-	
-	public function fetch(array $parameters=array()) {
-		$this->checkPdo();
-		$this->checkModel();
-		
-		$model = clone $this->model;
-		if ( $this->hasStatement() ) {
-			$this->statement->execute($parameters);
-			$rowData = $this->statement->fetch(\PDO::FETCH_ASSOC);
-			
-			if ( is_array($rowData) ) {
-				$model->load($rowData);
-			}
-		}
-		
-		return $model;
 	}
 	
 	public function countOf(\DataModeler\Model $model, $where=NULL, $parameters=array()) {
@@ -131,40 +125,8 @@ class Sql {
 		return $rowCount;
 	}
 	
-	public function save(\DataModeler\Model $model) {
-		$this->checkPdo();
-
-		$modelNvp = $model->nvp();
-		$parameters = array_values($modelNvp);
-		
-		if ( $model->exists() ) {
-			$setList = implode(' = ?, ', array_keys($modelNvp)) . ' = ?';
-			$sql = "UPDATE {$model->table()} SET {$setList} WHERE {$model->pkey()} = ?";
-			$parameters[] = $model->id();
-		} else {
-			$fieldList = implode(', ', array_keys($modelNvp));
-			$valueList = implode(', ', array_fill(0, count($modelNvp), '?'));
-			$sql = "INSERT INTO {$model->table()} ({$fieldList}) VALUES({$valueList})";
-		}
-
-		$this->prepare($sql);
-		
-		$updatedModel = clone $model;
-		if ( $this->hasStatement() ) {
-			$execute = $this->statement->execute($parameters);
-
-			if ( $execute ) {
-				if ( !$updatedModel->exists() ) {
-					$updatedModel->id($this->pdo->lastInsertId());
-				}
-			}
-		}
-		
-		return $updatedModel;
-	}
-	
-	public function now($time = -1) {
-		$time = ( -1 == $time ? time() : $time );
+	public function now($time=0) {
+		$time = ( 0 === $time ? time() : $time );
 		$date = date('Y-m-d H:i:s', $time); 
 		
 		return $date;
@@ -178,35 +140,11 @@ class Sql {
 		return $this->prepareCount;
 	}
 	
-	private function prepare($sql) {
-		$hash = sha1($sql);
-		
-		if ( $hash != $this->sqlHash ) {
-			$this->statement = $this->pdo->prepare($sql);
-			
-			$this->sqlHash = $hash;
-			$this->prepareCount++;
-		}
-		
-		return true;
-	}
-	
 	private function checkPdo() {
 		if ( !($this->pdo instanceof \PDO) ) {
-			throw new \DataModeler\Exception('sql_pdo_not_attached');
+			throw new \DataModeler\Exception('not_attached');
 		}
 		return true;
-	}
-	
-	private function checkModel() {
-		if ( !($this->model instanceof \DataModeler\Model) ) {
-			throw new \DataModeler\Exception('sql_model_not_attached');
-		}
-		return true;
-	}
-	
-	private function hasStatement() {
-		return ( $this->statement instanceof \PDOStatement );
 	}
 	
 }
