@@ -26,13 +26,13 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	public static function assertModelList($modelList, $message = '') {
 		self::assertArray($modelList, $message);
 		foreach ( $modelList as $model ) {
-			self::assertTrue($model instanceof Model, $message);
+			self::assertTrue($model instanceof \DataModeler\Model, $message);
 		}
 	}
 	
 	public static function assertIterator($obj, $message = '') {
 		self::assertTrue(is_object($obj), $message);
-		self::assertTrue($obj instanceof Iterator, $message);
+		self::assertTrue($obj instanceof \DataModeler\Iterator, $message);
 	}
 
 	public static function assertModel($obj, $message = '') {
@@ -47,12 +47,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 
 	public static function assertSql($obj, $message = '') {
 		self::assertTrue(is_object($obj), $message);
-		self::assertTrue($obj instanceof \DataModeler\Adapter\Sql, $message);
-	}
-	
-	protected function buildMockAdapter() {
-		$adapter = $this->getMockForAbstractClass('\\DataModeler\\Adapter');
-		return $adapter;
+		self::assertTrue($obj instanceof \DataModeler\Sql, $message);
 	}
 	
 	protected function buildMockModel($table = NULL, $pkey = NULL) {
@@ -69,7 +64,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	}
 	
 	protected function buildMockProduct() {
-		$model = $this->buildMockModel('products', 'id');
+		$model = $this->buildMockModel('products', 'product_id');
 		return $model;
 	}
 	
@@ -79,7 +74,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	}
 	
 	protected function buildMockPdo($dsn) {
-		$pdo = $this->getMock('\PDO', array(), array($dsn));
+		$pdo = $this->getMock('\\PDO', array(), array($dsn));
 		return $pdo;
 	}
 	
