@@ -11,23 +11,13 @@ use \DataModelerTest\TestCase,
 require_once 'DataModeler/Sql.php';
 require_once 'DataModeler/SqlResult.php';
 
-require_once 'Missing.php';
 require_once 'Product.php';
 require_once 'User.php';
 
 class SqlTest extends TestCase {
 	
-	private $pdo = NULL;
-	
 	public function setUp() {
-		$sqlFile = DIRECTORY_DATA . DB_TYPE . '.sql';
-
-		if ( !is_file($sqlFile) ) {
-			throw new \Exception("Failed to load file {$sqlFile}.");
-		}
-
-		$this->pdo = new \PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);
-		$this->pdo->exec(file_get_contents($sqlFile));
+		$this->buildPdo();
 	}
 
 	public function tearDown() {

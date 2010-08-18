@@ -9,6 +9,8 @@ use \DataModeler\Iterator,
 
 class TestCase extends \PHPUnit_Framework_TestCase {
 	
+	protected $pdo = NULL;
+	
 	public static function assertArray($a, $message = '') {
 		self::assertThat(is_array($a), self::isTrue(), $message);
 	}
@@ -81,5 +83,15 @@ class TestCase extends \PHPUnit_Framework_TestCase {
 	protected function buildMockType() {
 		$type = $this->getMockForAbstractClass('\\DataModeler\\Type');
 		return $type;
+	}
+	
+	
+	protected function buildPdo() {
+		$this->pdo = new \PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);
+		
+		$sqlFile = DIRECTORY_DATA . DB_TYPE . '.sql';
+		if ( is_file($sqlFile) ) {
+			$this->pdo->exec(file_get_contents($sqlFile));
+		}
 	}
 }
