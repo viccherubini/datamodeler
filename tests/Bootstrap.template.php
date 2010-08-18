@@ -9,9 +9,6 @@ require_once 'TestCase.php';
 $dataModelerTestPath = dirname(__FILE__);
 $dataModelerLibPath  = $dataModelerTestPath . '/../';
 
-require_once 'DataModeler/Type.php';
-require_once 'DataModeler/Exception.php';
-
 define('DS', DIRECTORY_SEPARATOR, false);
 define('DIRECTORY_TESTS', $dataModelerTestPath . DS, false);
 define('DIRECTORY_DATA', DIRECTORY_TESTS . 'data' . DS, false);
@@ -20,7 +17,11 @@ define('DIRECTORY_MODELS', DIRECTORY_TESTS . 'models' . DS, false);
 $includeList = array(DIRECTORY_MODELS, $dataModelerLibPath, $dataModelerTestPath, get_include_path());
 set_include_path(implode(PATH_SEPARATOR, $includeList));
 
-$dbType = 'mysql';
+require_once 'DataModeler/Exception.php';
+require_once 'DataModeler/Lib.php';
+require_once 'DataModeler/Type.php';
+
+$dbType = 'sqlite';
 $dbName = 'datamodeler_tests';
 $dbHost = 'localhost';
 
