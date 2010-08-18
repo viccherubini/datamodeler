@@ -3,8 +3,12 @@
 declare(encoding='UTF-8');
 namespace DataModeler;
 
-use \DataModeler\Iterator;
-	
+use \DataModeler\Iterator,
+	\DataModeler\is_scalar_array,
+	\DataModeler\object_to_array;
+
+require_once 'DataModeler/Lib.php';
+
 class SqlResult {
 
 	private $closureList = array();
@@ -26,26 +30,51 @@ class SqlResult {
 		return $this;
 	}
 	
-	public function attachStatement(\PDOStatement $statement) {
-		$this->statement = clone $statement;
+	public function attachPdoStatement(\PDOStatement $statement) {
+		$this->statement = $statement;
 		return $this;
 	}
 
-	public function findFirst($parameters=array()) {
-		$this->checkModel();
-		$this->checkStatement();
+	public function findFirst() {
+		$statement = $this->checkPdoStatement();
 		
-		$executed = $this->statement->execute($parameters);
+		$parameters = array();
+		$argv = func_get_args();
+		$argc = func_num_args();
 		
-		$model = clone $this->model;
-		if ( $executed ) {
-			$dataRow = $this->statement->fetch(\PDO::FETCH_ASSOC);
-			if ( is_array($dataRow) ) {
-				$model->load($dataRow);
+		if ( is_scalar_array($argv) ) {
+			$parameters = $argv;
+		} else {
+			if ( $argc > 0 ) {
+				if ( is_scalar_array($argv[0]) ) {
+					$parameters = $argv[0];
+				} elseif ( is_object($argv[0]) ) {
+					
+				}
 			}
 		}
 		
-		return $model;
+		$executed = $statement->execute($parameters);
+		
+		$row = array();
+		if ( $executed ) {
+			$row = $statement->fetch(\PDO::FETCH_ASSOC);
+		}
+		
+		if ( !$row ) {
+			return false;
+		}
+		
+		if ( $this->hasModel() ) {
+			$model = clone $this->getModel();
+			if ( is_array($row) ) {
+				$model->load($row);
+			}
+			
+			return $model;
+		}
+		
+		return $row;
 	}
 	
 	public function findAll() {
@@ -57,21 +86,35 @@ class SqlResult {
 	}
 	
 	public function free() {
-		
+		unset($this->statement);
+		$this->statement = NULL;
 	}
 
+	public function getModel() {
+		return $this->model;
+	}
+	
+	public function getPdoStatement() {
+		return $this->statement;
+	}
 
 	private function checkModel() {
-		if ( is_null($this->model) ) {
+		if ( !($this->model instanceof \DataModeler\Model) ) {
 			throw new \DataModeler\Exception('model_not_attached');
 		}
 		return true;
 	}
 	
-	public function checkStatement() {
-		if ( is_null($this->statement) ) {
+	public function checkPdoStatement() {
+		if ( !($this->statement instanceof \PDOStatement) ) {
 			throw new \DataModeler\Exception('pdostatement_not_attached');
 		}
-		return true;
+		return $this->statement;
 	}
+	
+	private function hasModel() {
+		return ( $this->model instanceof \DataModeler\Model );
+	}
+	
+	
 }
