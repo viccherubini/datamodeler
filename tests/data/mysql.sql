@@ -11,9 +11,9 @@ CREATE TABLE IF NOT EXISTS products (
 	field text DEFAULT NULL,
 	PRIMARY KEY (product_id)
 ) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-INSERT INTO products VALUES(1, '0000-00-00 00:00:00', NULL, '0000-00-00', 0, 0, 'Product 1', 'P1', NULL);
-INSERT INTO products VALUES(2, '0000-00-00 00:00:00', NULL, '0000-00-00', 0, 0, 'Product 2', 'P2', NULL);
-INSERT INTO products VALUES(3, '0000-00-00 00:00:00', NULL, '0000-00-00', 0, 0, 'Product 3', 'P3', NULL);
+INSERT INTO products VALUES(1, '0000-00-00 00:00:00', NULL, '0000-00-00', 0, 19.33, 'Product 1', 'P1', NULL);
+INSERT INTO products VALUES(2, '0000-00-00 00:00:00', NULL, '0000-00-00', 0, 24.56, 'Product 2', 'P2', NULL);
+INSERT INTO products VALUES(3, '0000-00-00 00:00:00', NULL, '0000-00-00', 0, 8.56, 'Product 3', 'P3', NULL);
 
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
