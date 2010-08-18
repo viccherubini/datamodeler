@@ -29,19 +29,23 @@ class Sql {
 		return $this;
 	}
 
+	public function attachPdoStatement($statement) {
+		$this->statement = $statement;
+		return $this;
+	}
+
 	public function prepare(\DataModeler\Model $model, $where=NULL) {
 		$this->checkPdo();
+		$pdo = $this->getPdo();
 		
 		if ( !empty($where) ) {
 			$where = "WHERE {$where}";
 		}
 		
 		$sql = "SELECT * FROM {$model->table()} {$where}";
-		$statement = $this->pdo->prepare($sql);
+		$statement = $pdo->prepare($sql);
 		
-		if ( !$statement ) {
-			throw new \DataModeler\Exception("preparation_failed: {$sql}");
-		}
+		$this->checkPdoStatement($statement);
 		
 		$sqlResult = new SqlResult;
 		$sqlResult->attachModel($model)
@@ -54,17 +58,9 @@ class Sql {
 		return $this->prepare($model, "{$model->pkey()} = ?");
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	public function save(\DataModeler\Model $model) {
 		$this->checkPdo();
+		$pdo = $this->getPdo();
 
 		$nvp = $model->nvp();
 		$parameters = array_values($nvp);
@@ -81,21 +77,21 @@ class Sql {
 
 		$hash = sha1($sql);
 		if ( $hash !== $this->sqlHash ) {
-			$this->statement = $this->pdo->prepare($sql);
+			$this->attachPdoStatement($pdo->prepare($sql));
+			
 			$this->sqlHash = $hash;
 			$this->prepareCount++;
 		}
-		
-		if ( !$this->statement ) {
-			throw new \DataModeler\Exception("preparation_failed: {$sql}");
-		}
+
+		$pdoStatement = $this->getPdoStatement();
+		$this->checkPdoStatement($pdoStatement);
 
 		$model = clone $model;
-		$execute = $this->statement->execute($parameters);
+		$execute = $pdoStatement->execute($parameters);
 
 		if ( $execute ) {
 			if ( !$model->exists() ) {
-				$model->id($this->pdo->lastInsertId());
+				$model->id($pdo->lastInsertId());
 			}
 		}
 		
@@ -104,41 +100,51 @@ class Sql {
 	
 	public function delete(\DataModeler\Model $model) {
 		$this->checkPdo();
+		$pdo = $this->getPdo();
 		
 		if ( !$model->exists() ) {
 			throw new \DataModeler\Exception('model_does_not_exist');
 		}
 		
 		$id = $model->id();
-		$pdo = $this->getPdo();
 		
 		$sql = "DELETE FROM {$model->table()} WHERE {$model->pkey()} = ?";
 		$statement = $pdo->prepare($sql);
 		
-		if ( !$statement) {
-			throw new \DataModeler\Exception("preparation_failed: {$sql}");
-		}
+		$this->checkPdoStatement($statement);
 		
 		$statement->execute(array($id));
-		
 		$affectedRows = $statement->rowCount();
 		
 		return ( $affectedRows > 0 ? true : false );
 	}
 	
+	public function query($sql) {
+		$this->checkPdo();
+		$pdo = $this->getPdo();
+		
+		$statement = $pdo->prepare($sql);
+		$this->checkPdoStatement($statement);
+		
+		$sqlResult = new SqlResult;
+		$sqlResult->attachStatement($statement);
+	}
+	
 	public function countOf(\DataModeler\Model $model, $where=NULL, $parameters=array()) {
 		$this->checkPdo();
+		$pdo = $this->getPdo();
 		
 		if ( !empty($where) ) {
 			$where = "WHERE {$where}";
 		}
 		
 		$sql = "SELECT COUNT(*) FROM {$model->table()} {$where}";
-		$statement = $this->pdo->prepare($sql);
-		$statement->execute($parameters);
-		
+		$statement = $pdo->prepare($sql);
+	
 		$rowCount = 0;
 		if ( $statement instanceof \PDOStatement ) {
+			$statement->execute($parameters);
+			
 			$rowCount = $statement->fetchColumn(0);
 			$rowCount = intval($rowCount);
 		}
@@ -158,12 +164,23 @@ class Sql {
 		return $this->pdo;
 	}
 
+	public function getPdoStatement() {
+		return $this->statement;
+	}
+
 	public function getPrepareCount() {
 		return $this->prepareCount;
 	}
 	
 	private function checkPdo() {
 		if ( !($this->pdo instanceof \PDO) ) {
+			throw new \DataModeler\Exception('not_attached');
+		}
+		return true;
+	}
+	
+	private function checkPdoStatement($statement) {
+		if ( !($statement instanceof \PDOStatement) ) {
 			throw new \DataModeler\Exception('not_attached');
 		}
 		return true;
