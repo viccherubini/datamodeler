@@ -3,10 +3,11 @@
 declare(encoding='UTF-8');
 namespace DataModelerTest;
 
-use DataModeler\Iterator, DataModeler\Model;
+use DataModeler\Iterator,
+	DataModeler\Model;
 
 require_once 'DataModeler/Iterator.php';
-require_once DIRECTORY_MODELS . 'Product.php';
+require_once 'Product.php';
 
 class IteratorTest extends TestCase {
 
