@@ -273,6 +273,28 @@ class SqlTest extends TestCase {
 	}
 	
 	/**
+	 * @dataProvider providerSql
+	 */
+	public function testQuery_ReturnsSqlResult($query) {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$sqlResult = $sql->query($query);
+		
+		$this->assertTrue($sqlResult instanceof \DataModeler\SqlResult);
+	}
+	
+	/**
+	 * @expectedException \DataModeler\Exception
+	 */
+	public function testQuery_RequiresValidQuery() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$sql->query('SELECT COUNT FROM missing_table where id = ?');
+	}
+	
+	/**
 	 * @expectedException \DataModeler\Exception
 	 */
 	public function testCountOf_RequiresPdo() {
@@ -346,4 +368,15 @@ class SqlTest extends TestCase {
 			array('product_id != ? AND name != ?', array(2, 'Product 1'))
 		);
 	}
+	
+	public function providerSql() {
+		return array(
+			array('SELECT * FROM products WHERE product_id > ?'),
+			array('SELECT * FROM orders INNER JOIN products USING(customer_id) WHERE order_id > ?'),
+			array('SELECT * FROM orders LEFT JOIN products USING(customer_id) WHERE order_id > ?'),
+			array('SELECT * FROM orders INNER JOIN users ON customer_id = id WHERE username <> ? AND favorite_book = ?'),
+			array('SELECT SUM(o.total) FROM orders o WHERE o.total > 0')
+		);
+	}
+	
 }

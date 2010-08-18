@@ -128,6 +128,8 @@ class Sql {
 		
 		$sqlResult = new SqlResult;
 		$sqlResult->attachStatement($statement);
+		
+		return $sqlResult;
 	}
 	
 	public function countOf(\DataModeler\Model $model, $where=NULL, $parameters=array()) {
