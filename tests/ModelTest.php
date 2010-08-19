@@ -3,8 +3,7 @@
 declare(encoding='UTF-8');
 namespace DataModelerTest;
 
-use \DataModeler\Model,
-	\DataModelerTest\Product;
+use \DataModeler\Model;
 
 require_once 'Product.php';
 require_once 'Order.php';
