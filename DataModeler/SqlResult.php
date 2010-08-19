@@ -3,11 +3,7 @@
 declare(encoding='UTF-8');
 namespace DataModeler;
 
-use \DataModeler\Iterator,
-	\DataModeler\is_scalar_array,
-	\DataModeler\object_to_array;
-
-require_once 'DataModeler/Lib.php';
+use \DataModeler\Iterator;
 
 class SqlResult {
 
@@ -35,7 +31,7 @@ class SqlResult {
 		return $this;
 	}
 
-	public function find($parameters) {
+	public function find($parameters=array()) {
 		$statement = $this->checkPdoStatement();
 		
 		if ( is_scalar($parameters) ) {
@@ -64,6 +60,42 @@ class SqlResult {
 		
 		return $row;
 	}
+	
+	public function findAll($parameters=array()) {
+		$statement = $this->checkPdoStatement();
+		
+		if ( is_scalar($parameters) ) {
+			$parameters = array($parameters);
+		}
+		
+		$executed = $statement->execute($parameters);
+		
+		$rows = array();
+		if ( $executed ) {
+			$rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
+		}
+		
+		if ( !$rows ) {
+			return false;
+		}
+		
+		if ( $this->hasModel() ) {
+			$modelList = array();
+			foreach ( $rows as $row ) {
+				$model = clone $this->getModel();
+				$model->load($row);
+				
+				$modelList[] = $model;
+			}
+			
+			$iterator = new Iterator($modelList);
+		} else {
+			$iterator = new Iterator($rows);
+		}
+
+		return $iterator;
+	}
+	
 	
 	public function free() {
 		unset($this->statement);
