@@ -35,23 +35,11 @@ class SqlResult {
 		return $this;
 	}
 
-	public function findFirst() {
+	public function find($parameters) {
 		$statement = $this->checkPdoStatement();
 		
-		$parameters = array();
-		$argv = func_get_args();
-		$argc = func_num_args();
-		
-		if ( is_scalar_array($argv) ) {
-			$parameters = $argv;
-		} else {
-			if ( $argc > 0 ) {
-				if ( is_scalar_array($argv[0]) ) {
-					$parameters = $argv[0];
-				} elseif ( is_object($argv[0]) ) {
-					
-				}
-			}
+		if ( is_scalar($parameters) ) {
+			$parameters = array($parameters);
 		}
 		
 		$executed = $statement->execute($parameters);
@@ -77,14 +65,6 @@ class SqlResult {
 		return $row;
 	}
 	
-	public function findAll() {
-		
-	}
-	
-	public function map(\Closure $closure) {
-		
-	}
-	
 	public function free() {
 		unset($this->statement);
 		$this->statement = NULL;
@@ -93,18 +73,7 @@ class SqlResult {
 	public function getModel() {
 		return $this->model;
 	}
-	
-	public function getPdoStatement() {
-		return $this->statement;
-	}
 
-	private function checkModel() {
-		if ( !($this->model instanceof \DataModeler\Model) ) {
-			throw new \DataModeler\Exception('model_not_attached');
-		}
-		return true;
-	}
-	
 	public function checkPdoStatement() {
 		if ( !($this->statement instanceof \PDOStatement) ) {
 			throw new \DataModeler\Exception('pdostatement_not_attached');
