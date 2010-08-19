@@ -9,6 +9,8 @@ use \DataModelerTest\TestCase,
 require_once 'DataModeler/Model.php';
 require_once 'DataModeler/SqlResult.php';
 
+require_once 'Product.php';
+
 class SqlResultTest extends TestCase {
 	
 	/**
@@ -26,41 +28,76 @@ class SqlResultTest extends TestCase {
 		$sqlResult = new SqlResult;
 		$sqlResult->attachPdoStatement(NULL);
 	}
-	
-	/**
-	 * @dataProvider providerFindParameters
-	 */
-	public function testFindFirst_ReturnsNvpArrayWithSingleParameter($parameters) {
+
+	public function testFind_ArrayWithParameter() {
 		$this->buildPdo();
 		$statement = $this->pdo->prepare('SELECT * FROM products WHERE product_id = ?');
 		
 		$sqlResult = new SqlResult;
 		$sqlResult->attachPdoStatement($statement);
 
-		$row = $sqlResult->findFirst($parameters);
+		$row = $sqlResult->find(1);
 		
 		$this->assertTrue(is_array($row));
 		$this->assertGreaterThan(0, count($row));
 	}
 	
-	public function _testFindFirst_ReturnsNvpArrayWithMultipleParameters() {
+	public function testFind_ArrayWithParameters() {
 		$this->buildPdo();
 		$statement = $this->pdo->prepare('SELECT * FROM products WHERE product_id = ? AND price > ?');
 		
 		$sqlResult = new SqlResult;
 		$sqlResult->attachPdoStatement($statement);
 
-		$row = $sqlResult->findFirst(1, 8.00);
-	
+		$row = $sqlResult->find(array(2, 0.50));
+		
+		$this->assertTrue(is_array($row));
 		$this->assertGreaterThan(0, count($row));
 	}
 	
+	public function testFind_RowExists() {
+		$this->buildPdo();
+		$statement = $this->pdo->prepare('SELECT * FROM products WHERE product_id = ?');
+		
+		$sqlResult = new SqlResult;
+		$sqlResult->attachPdoStatement($statement);
+		
+		$row = $sqlResult->find(1000);
+		$this->assertFalse($row);
+		
+		$row = $sqlResult->find(array(1000));
+		$this->assertFalse($row);
+	}
 	
+	public function testFind_ModelWithParameter() {
+		$this->buildPdo();
+		$statement = $this->pdo->prepare('SELECT * FROM products WHERE product_id = ?');
+		
+		$product = new Product;
+		
+		$sqlResult = new SqlResult;
+		$sqlResult->attachPdoStatement($statement)
+			->attachModel($product);
+
+		$productFound = $sqlResult->find(1);
+		
+		$this->assertTrue($productFound->exists());
+	}
 	
-	
-	
-	
-	
+	public function testFind_ModelWithParameters() {
+		$this->buildPdo();
+		$statement = $this->pdo->prepare('SELECT * FROM products WHERE product_id = ? AND price > ?');
+		
+		$product = new Product;
+		
+		$sqlResult = new SqlResult;
+		$sqlResult->attachPdoStatement($statement)
+			->attachModel($product);
+
+		$productFound = $sqlResult->find(array(2, 0.50));
+		
+		$this->assertTrue($productFound->exists());
+	}
 	
 	/**
 	 * @expectedException \DataModeler\Exception
@@ -72,21 +109,10 @@ class SqlResultTest extends TestCase {
 		$sqlResult = new SqlResult;
 		$sqlResult->attachPdoStatement($statement);
 		
-		$sqlResult->findFirst(1);
+		$sqlResult->find(1);
 		$sqlResult->free();
 		
-		$sqlResult->findFirst(1);
-	}
-	
-	public function providerFindParameters() {
-		$obj = new \stdClass;
-		$obj->product_id = 1;
-		
-		return array(
-			array(1),
-			array(array(1)),
-			array($obj)
-		);
+		$sqlResult->find(1);
 	}
 	
 }
