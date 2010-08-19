@@ -6,6 +6,7 @@ namespace DataModelerTest;
 require_once 'Type/AllTests.php';
 
 require_once 'IteratorTest.php';
+require_once 'LibTest.php';
 require_once 'MiscTest.php';
 require_once 'ModelTest.php';
 require_once 'SqlTest.php';
@@ -19,6 +20,7 @@ class AllTests {
 		$suite->addTestSuite(\DataModelerTest\Type\AllTests::suite());
 		
 		$suite->addTestSuite('\DataModelerTest\IteratorTest');
+		$suite->addTestSuite('\DataModelerTest\LibTest');
 		$suite->addTestSuite('\DataModelerTest\MiscTest');
 		$suite->addTestSuite('\DataModelerTest\ModelTest');
 		$suite->addTestSuite('\DataModelerTest\SqlTest');
