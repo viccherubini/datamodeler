@@ -49,7 +49,7 @@ class Sql {
 		
 		$sqlResult = new SqlResult;
 		$sqlResult->attachModel($model)
-			->attachStatement($statement);
+			->attachPdoStatement($statement);
 		
 		return $sqlResult;
 	}
@@ -127,7 +127,7 @@ class Sql {
 		$this->checkPdoStatement($statement);
 		
 		$sqlResult = new SqlResult;
-		$sqlResult->attachStatement($statement);
+		$sqlResult->attachPdoStatement($statement);
 		
 		return $sqlResult;
 	}
