@@ -24,7 +24,7 @@ require_once 'DataModeler/Type/Typeless.php';
 
 /**
  * Abstract Model class for building FAT, intelligent models. The model is
- * your primary in memory data store. This class should be extended to another
+ * your primary in memory data store. This class should be extended by another
  * class that is a 1:1 relationship with a table or document.
  * 
  * @author vmc <vmc@leftnode.com>
@@ -94,6 +94,13 @@ abstract class Model {
 		ksort($this->model);
 
 		return true;
+	}
+	
+	public function __clone() {
+		// Deep cloning for the types
+		foreach ( $this->model as $k => $v ) {
+			$this->model[$k] = clone $v;
+		}
 	}
 	
 	public function equalTo(Model $model) {
