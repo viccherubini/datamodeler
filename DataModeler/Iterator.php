@@ -28,9 +28,7 @@ class Iterator implements \Iterator {
 	private $page = 0;
 	
 	public function __construct(array $data) {
-		$this->data = $data;
-		$this->key = 0;
-		$this->length = count($data);
+		$this->init($data);
 	}
 	
 	public function __destruct() {
@@ -40,6 +38,12 @@ class Iterator implements \Iterator {
 	public function __clone() {
 		$this->length = count($this->data);
 		$this->rewind();
+	}
+	
+	public function init(array $data) {
+		$this->data = $data;
+		$this->key = 0;
+		$this->length = count($data);
 	}
 
 	public function current() {
@@ -124,14 +128,12 @@ class Iterator implements \Iterator {
 		return (new Iterator($fetchList));
 	}
 	
-	
 	public function filter($field, $value) {
 		$this->limit = -1;
 		$this->filter[] = array($field, $value);
 		$this->filterCount++;
 		return $this;
 	}
-	
 	
 	public function hasFilter() {
 		if ( true === is_array($this->filter) && $this->filterCount > 0 ) {
