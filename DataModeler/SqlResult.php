@@ -45,7 +45,12 @@ class SqlResult {
 		
 		if ( $this->hasModel() ) {
 			$model = clone $this->getModel();
+			
 			$model->load($row);
+			$pkey = $model->pkey();
+			if ( isset($row[$pkey]) ) {
+				$model->id($row[$pkey]);
+			}
 			
 			return $model;
 		}
@@ -66,10 +71,15 @@ class SqlResult {
 		
 		if ( $this->hasModel() ) {
 			$modelList = array();
-			
+
 			foreach ( $rows as $row ) {
 				$m = clone $this->getModel();
 				$m->load($row);
+				
+				$pkey = $m->pkey();
+				if ( isset($row[$pkey]) ) {
+					$m->id($row[$pkey]);
+				}
 				
 				array_push($modelList, $m);
 			}

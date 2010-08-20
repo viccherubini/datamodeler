@@ -3,25 +3,6 @@
 declare(encoding='UTF-8');
 namespace DataModeler;
 
-use \DataModeler\Type,
-	\DataModeler\Type\BoolType,
-	\DataModeler\Type\DateType,
-	\DataModeler\Type\DateTimeType,
-	\DataModeler\Type\FloatType,
-	\DataModeler\Type\IntegerType,
-	\DataModeler\Type\StringType,
-	\DataModeler\Type\TextType,
-	\DataModeler\Type\TypelessType;
-
-require_once 'DataModeler/Type/Bool.php';
-require_once 'DataModeler/Type/Date.php';
-require_once 'DataModeler/Type/Datetime.php';
-require_once 'DataModeler/Type/Float.php';
-require_once 'DataModeler/Type/Integer.php';
-require_once 'DataModeler/Type/String.php';
-require_once 'DataModeler/Type/Text.php';
-require_once 'DataModeler/Type/Typeless.php';
-
 /**
  * Abstract Model class for building FAT, intelligent models. The model is
  * your primary in memory data store. This class should be extended by another
@@ -31,17 +12,19 @@ require_once 'DataModeler/Type/Typeless.php';
  * @version 0.0.10
  */
 abstract class Model {
-	private $id = NULL;
+	private $_id = NULL;
+	
 	private $model = array();
+	private $modelMeta = array();
 	private $modelId = NULL;
 	
 	protected $pkey = NULL;
 	protected $table = NULL;
 
-	const SCHEMA_DEFAULT = 'default';
 	const SCHEMA_MAXLENGTH = 'maxlength';
 	const SCHEMA_PRECISION = 'precision';
 	const SCHEMA_TYPE = 'type';
+	const SCHEMA_TYPE_TYPELESS = 'TYPELESS';
 	
 	public function __construct() {
 		$this->modelId = sha1(get_class($this));
@@ -72,35 +55,33 @@ abstract class Model {
 	
 	public function __get($key) {
 		if ( $key === $this->pkey ) {
-			return $this->id;
+			return $this->_id;
 		} else {
-			if ( isset($this->model[$key]) && is_object($this->model[$key]) ) {
-				return $this->model[$key]->value;
+			if ( isset($this->model[$key]) ) {
+				return $this->model[$key];
 			}
 		}
 		
 		return NULL;
 	}
 	
-	public function __set($key, $value) {
-		if ( isset($this->model[$key]) && is_object($this->model[$key]) ) {
-			$this->model[$key]->value = $value;
+	public function __set($field, $value) {
+		if ( isset($this->modelMeta[$field]) ) {
+			$type = $this->modelMeta[$field][self::SCHEMA_TYPE];
+			$method = "type{$type}";
 			
-			if ( $key === $this->pkey ) {
-				$this->id = $this->model[$key]->value;
+			if ( method_exists($this, $method) ) {
+				$this->model[$field] = $this->$method($field, $value);
+			}
+			
+			if ( $field == $this->pkey ) {
+				$this->_id = $this->model[$field];
 			}
 		}
 		
 		ksort($this->model);
 
 		return true;
-	}
-	
-	public function __clone() {
-		// Deep cloning for the types
-		foreach ( $this->model as $k => $v ) {
-			$this->model[$k] = clone $v;
-		}
 	}
 	
 	public function equalTo(Model $model) {
@@ -134,11 +115,11 @@ abstract class Model {
 		return $this;
 	}
 	
-	public function id($id = NULL) {
-		if ( !empty($id) ) {
-			$this->__set($this->pkey, $id);
+	public function id($id = 0) {
+		if ( $id > 0 ) {
+			$this->_id = $id;
 		}
-		return $this->id;
+		return $this->_id;
 	}
 	
 	public function isA(Model $model) {
@@ -150,7 +131,7 @@ abstract class Model {
 	
 	public function load(array $nvp) {
 		foreach ( $nvp as $k => $v ) {
-			$this->$k = $v;
+			$this->__set($k, $v);
 		}
 		return $this;
 	}
@@ -161,16 +142,6 @@ abstract class Model {
 
 	public function modelId() {
 		return $this->modelId;
-	}
-	
-	public function nvp() {
-		$nvp = array();
-		foreach ( $this->model as $k => $type ) {
-			if ( $k !== $this->pkey ) {
-				$nvp[$k] = $type->value;
-			}
-		}
-		return $nvp;
 	}
 	
 	public function pkey($pkey = NULL) {
@@ -211,14 +182,9 @@ abstract class Model {
 		$propertyList = $reflection->getProperties(\ReflectionProperty::IS_PRIVATE);
 		
 		$namespace = __NAMESPACE__;
-		
-		$metaFieldList = array(
-			self::SCHEMA_DEFAULT => true,
-			self::SCHEMA_MAXLENGTH => true,
-			self::SCHEMA_PRECISION => true
-		);
-		
+
 		$model = array();
+		
 		$schema = array();
 		$schemaMeta = array();
 		
@@ -226,61 +192,105 @@ abstract class Model {
 			$metaList = array();
 			$metaType = NULL;
 			
+			$maxlength = -1;
+			$precision = -1;
+			
+			$property->setAccessible(true);
+			$defaultValue = $property->getValue($this);
 			$schemaField = $property->getName();
 			
 			$docComment = trim($property->getDocComment());
 			$docComment = str_replace(array('/**', '*/'), array(NULL, NULL), $docComment);
 			$matchCount = preg_match_all('#\[([a-z]+) ([a-z0-9 ]+)\]+#i', $docComment, $metaList);
-
+	
 			if ( $matchCount > 0 ) {
 				array_shift($metaList);
 				
 				$len = count($metaList[0]);
 				for ( $i=0; $i<$len; $i++ ) {
 					$meta = trim(strtolower($metaList[0][$i]));
-					
 					if ( self::SCHEMA_TYPE == $meta ) {
-						$class = ucwords(strtolower($metaList[1][$i]));
-						$class = "\\{$namespace}\\Type\\{$class}Type";
-						
-						if ( class_exists($class) ) {
-							$metaType = new $class;
-						}
+						$metaType = strtoupper($metaList[1][$i]);
+					} else {
+						$this->modelMeta[$schemaField][$meta] = $metaList[1][$i];
 					}
 				}
 			}
 
-			if ( is_null($metaType) ) {
-				$metaType = new \DataModeler\Type\TypelessType;
+			if ( empty($metaType) ) {
+				$metaType = self::SCHEMA_TYPE_TYPELESS;
 			}
 			
-			$metaType->field = $schemaField;
-			
-			if ( $matchCount > 0 ) {
-				$len = count($metaList[0]);
-				
-				for ( $i=0; $i<$len; $i++ ) {
-					$meta = trim(strtolower($metaList[0][$i]));
-					
-					if ( isset($metaFieldList[$meta]) ) {
-						$metaType->$meta = $metaList[1][$i];
-						if ( self::SCHEMA_DEFAULT == $meta ) {
-							$metaType->value = $metaList[1][$i];
-						}
-					}
-				}
-			}
-			
-			$model[$schemaField] = $metaType;
+			$this->modelMeta[$schemaField][self::SCHEMA_TYPE] = $metaType;
+			$this->__set($schemaField, $defaultValue);
 		}
-		
-		$this->model = $model;
 		
 		return true;
 	}
 	
 	private function removeBackticks($value) {
 		return str_replace('`', NULL, $value);
+	}
+	
+	
+	
+	private function typeBOOL($field, $boolean) {
+		$boolean = ( !is_bool($boolean) ? false : $boolean );
+		return $boolean;
+	}
+	
+	private function typeDATE($field, $date) {
+		$parsedDate = date_parse($date);
+		if ( count($parsedDate['errors']) > 0 ) {
+			$date = NULL;
+		}
+		return $date;
+	}
+	
+	private function typeDATETIME($field, $datetime) {
+		$parsedDate = date_parse($datetime);
+		if ( count($parsedDate['errors']) > 0 ) {
+			$datetime = NULL;
+		}
+		return $datetime;
+	}
+	
+	private function typeINTEGER($field, $integer) {
+		return (int)$integer;
+	}
+
+	private function typeFLOAT($field, $number) {
+		$precision = -1;
+		if ( isset($this->modelMeta[$field][self::SCHEMA_PRECISION]) ) {
+			$precision = (int)$this->modelMeta[$field][self::SCHEMA_PRECISION];
+		}
+		
+		$number = (float)$number;
+		if ( $precision > -1 ) {
+			$number = round($number, $precision);
+		}
+		
+		return $number;
+	}
+
+	private function typeSTRING($field, $string) {
+		$maxlength = -1;
+		if ( isset($this->modelMeta[$field][self::SCHEMA_MAXLENGTH]) ) {
+			$maxlength = (int)$this->modelMeta[$field][self::SCHEMA_MAXLENGTH];
+		}
+		
+		if ( $maxlength > 0 ) {
+			$string = substr($string, 0, $maxlength);
+		}
+		return $string;
+	}
+	
+	private function typeTEXT($field, $text) {
+		return (string)$text;
+	}
+
+	private function typeTYPELESS($field, $text) {
+		return $text;
 	}
 	
 }

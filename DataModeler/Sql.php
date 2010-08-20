@@ -63,21 +63,21 @@ class Sql {
 		$pdo = $this->getPdo();
 
 		$table = $model->table();
-		$nvp = $model->nvp();
-		$parameters = array_values($nvp);
+		$modelData = $model->model();
+		$parameters = array_values($modelData);
 		
-		$fieldList = array_map(function($v) use ($table) { return "{$table}.{$v}"; }, array_keys($nvp));
+		$fieldList = array_map(function($v) use ($table) { return "{$table}.{$v}"; }, array_keys($modelData));
 		
 		if ( $model->exists() ) {
-			$setList = implode(' = ?, ', $fieldList) . ' = ?';
+			$setList = implode(' = ?, ', $fieldList);
 			
-			$sql = "UPDATE {$table} SET {$setList} WHERE {$model->pkey()} = ?";
+			$sql = "UPDATE {$table} SET {$setList} = ? WHERE {$model->pkey()} = ?";
 			$parameters[] = $model->id();
 		} else {
 			$fieldList = implode(', ', $fieldList);
-			$valueList = implode(', ', array_fill(0, count($nvp), '?'));
+			$valueList = implode(', ', array_fill(0, count($modelData), '?'));
 			
-			$sql = "INSERT INTO {$model->table()} ({$fieldList}) VALUES({$valueList})";
+			$sql = "INSERT INTO {$table} ({$fieldList}) VALUES({$valueList})";
 		}
 
 		$hash = sha1($sql);

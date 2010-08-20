@@ -109,13 +109,13 @@ class Iterator implements \Iterator {
 			$fetchList = array();
 			
 			foreach ( $this->data as $iteratorItem ) {
-				if ( true === $iteratorItem instanceof \DataModeler\Model ) {
-					$model = $iteratorItem->nvp();
-				} elseif ( true === is_array($iteratorItem) ) {
-					$model = $iteratorItem;
+				if ( ($iteratorItem instanceof \DataModeler\Model) ) {
+					$data = $iteratorItem->model();
+				} elseif ( is_array($iteratorItem) ) {
+					$data = $iteratorItem;
 				}
 				
-				if ( true === $this->applyFilter($model) ) {
+				if ( $this->applyFilter($data) ) {
 					$fetchList[] = $iteratorItem;
 				}
 			}
@@ -124,6 +124,9 @@ class Iterator implements \Iterator {
 				$fetchList = array_slice($fetchList, 0, $this->limit);
 			}
 		}
+		
+		$this->filter = array();
+		$this->filterCount = 0;
 
 		return (new Iterator($fetchList));
 	}
