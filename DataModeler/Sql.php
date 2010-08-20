@@ -62,16 +62,21 @@ class Sql {
 		$this->checkPdo();
 		$pdo = $this->getPdo();
 
+		$table = $model->table();
 		$nvp = $model->nvp();
 		$parameters = array_values($nvp);
 		
+		$fieldList = array_map(function($v) use ($table) { return "{$table}.{$v}"; }, array_keys($nvp));
+		
 		if ( $model->exists() ) {
-			$setList = implode(' = ?, ', array_keys($nvp)) . ' = ?';
-			$sql = "UPDATE {$model->table()} SET {$setList} WHERE {$model->pkey()} = ?";
+			$setList = implode(' = ?, ', $fieldList) . ' = ?';
+			
+			$sql = "UPDATE {$table} SET {$setList} WHERE {$model->pkey()} = ?";
 			$parameters[] = $model->id();
 		} else {
-			$fieldList = implode(', ', array_keys($nvp));
+			$fieldList = implode(', ', $fieldList);
 			$valueList = implode(', ', array_fill(0, count($nvp), '?'));
+			
 			$sql = "INSERT INTO {$model->table()} ({$fieldList}) VALUES({$valueList})";
 		}
 
