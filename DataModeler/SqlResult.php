@@ -18,7 +18,6 @@ class SqlResult {
 	
 	public function __destruct() {
 	
-	
 	}
 
 	public function attachModel(\DataModeler\Model $model) {
@@ -33,27 +32,20 @@ class SqlResult {
 
 	public function find($parameters=array()) {
 		$statement = $this->checkPdoStatement();
-		
-		if ( is_scalar($parameters) ) {
-			$parameters = array($parameters);
-		}
-		
-		$executed = $statement->execute($parameters);
+		$executed = $this->compile($parameters);
 		
 		$row = array();
 		if ( $executed ) {
 			$row = $statement->fetch(\PDO::FETCH_ASSOC);
 		}
 		
-		if ( !$row ) {
+		if ( !$row || !is_array($row) ) {
 			return false;
 		}
 		
 		if ( $this->hasModel() ) {
 			$model = clone $this->getModel();
-			if ( is_array($row) ) {
-				$model->load($row);
-			}
+			$model->load($row);
 			
 			return $model;
 		}
@@ -63,36 +55,30 @@ class SqlResult {
 	
 	public function findAll($parameters=array()) {
 		$statement = $this->checkPdoStatement();
-		
-		if ( is_scalar($parameters) ) {
-			$parameters = array($parameters);
-		}
-		
-		$executed = $statement->execute($parameters);
+		$executed = $this->compile($parameters);
 		
 		$rows = array();
 		if ( $executed ) {
 			$rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
 		}
 		
-		if ( !$rows ) {
-			return false;
-		}
+		$iterator = new Iterator(array());
 		
 		if ( $this->hasModel() ) {
 			$modelList = array();
+			
 			foreach ( $rows as $row ) {
-				$model = clone $this->getModel();
-				$model->load($row);
+				$m = clone $this->getModel();
+				$m->load($row);
 				
-				$modelList[] = $model;
+				array_push($modelList, $m);
 			}
 			
-			$iterator = new Iterator($modelList);
+			$iterator->init($modelList);
 		} else {
-			$iterator = new Iterator($rows);
+			$iterator->init($rows);
 		}
-
+		
 		return $iterator;
 	}
 	
@@ -106,7 +92,7 @@ class SqlResult {
 		return $this->model;
 	}
 
-	public function checkPdoStatement() {
+	private function checkPdoStatement() {
 		if ( !($this->statement instanceof \PDOStatement) ) {
 			throw new \DataModeler\Exception('pdostatement_not_attached');
 		}
@@ -117,5 +103,14 @@ class SqlResult {
 		return ( $this->model instanceof \DataModeler\Model );
 	}
 	
-	
+	private function compile($parameters) {
+		$statement = $this->checkPdoStatement();
+		
+		if ( is_scalar($parameters) ) {
+			$parameters = array($parameters);
+		}
+		
+		$executed = $statement->execute($parameters);
+		return $executed;
+	}
 }
