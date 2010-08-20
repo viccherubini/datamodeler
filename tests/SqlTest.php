@@ -203,7 +203,7 @@ class SqlTest extends TestCase {
 			->setCustomerId(mt_rand(1, 1000));
 		$product = $sql->save($product); // Prepare #1 - INSERT
 		
-		$product->setname('Product N *updated*');
+		$product->setName('Product N *updated*');
 		$sql->save($product); // Prepare #2 - UPDATE
 		
 		$this->assertEquals(2, $sql->getPrepareCount());
@@ -291,7 +291,7 @@ class SqlTest extends TestCase {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
-		$sql->query('SELECT COUNT FROM missing_table where id = ?');
+		$sql->query('SELECT COUNT FROM missing_table WHERE id = ?');
 	}
 	
 	/**
