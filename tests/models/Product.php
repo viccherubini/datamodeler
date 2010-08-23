@@ -8,6 +8,7 @@ use \DataModeler\Model;
 require_once 'DataModeler/Model.php';
 
 class Product extends Model {
+	
 	protected $table = 'products';
 	protected $pkey = 'product_id';
 	
@@ -23,17 +24,24 @@ class Product extends Model {
 	/** [type DATE] */
 	public $date_available = self::SCHEMA_TYPE_DATE_VALUE;
 	
-	/** [type INTEGER] */
-	public $customer_id = 0;
-	
-	/** [type FLOAT] [precision 2] */
-	public $price = 87.65;
-	
 	/** [type STRING] [maxlength 64] */
 	public $name = NULL;
 	
-	/** [type STRING] [maxlength 12] */
-	public $sku = 'SKUP1';
+	/** [type FLOAT] [precision 2] */
+	public $price = 0.00;
 	
-	public $field = NULL;
+	/** [type STRING] [maxlength 12] */
+	public $sku = 'SKU1';
+	
+	/** [type TEXT] */
+	public $description = NULL;
+	
+	/** [type STRING] [maxlength 128] */
+	public $image = NULL;
+	
+	/** [type BOOL] */
+	public $available = false;
+	
+	public $store_name = NULL;
+	
 }

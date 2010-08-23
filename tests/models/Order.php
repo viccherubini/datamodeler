@@ -8,17 +8,17 @@ use \DataModeler\Model;
 require_once 'DataModeler/Model.php';
 
 class Order extends Model {
-	protected $table = 'orders';
 	
+	protected $table = 'orders';
 	protected $pkey = 'order_id';
 	
 	/** [type INTEGER] */
 	public $order_id = 0;
 	
 	/** [type DATETIME] */
-	public $date_created = NULL;
+	public $date_created = self::SCHEMA_TYPE_DATETIME_VALUE;
 	
-	/** [type DATETIME] [default NULL] */
+	/** [type DATETIME] */
 	public $date_updated = NULL;
 	
 	/** [type DATE] */
@@ -32,4 +32,8 @@ class Order extends Model {
 	
 	/** [type STRING] [maxlength 64] */
 	public $name = NULL;
+	
+	/** [type STRING] [maxlength 255] */
+	public $email_address = NULL;
+	
 }
