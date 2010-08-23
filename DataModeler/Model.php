@@ -48,33 +48,27 @@ abstract class Model {
 			return $v;
 		} else {
 			$v = current($argv);
-			$this->set($k, $v);
+			if ( is_scalar($v) ) {
+				$this->set($k, $v);
+			}
 			
 			return $this;
 		}
 	}
-	
-	
-/*
-	public function equalTo(Model $model) {
+
+	public function equalTo(\DataModeler\Model $model) {
 		$modelEquals = true;
 		
-		$thisModel = $this->model();
-		$thatModel = $model->model();
+		$modelMeta = $this->modelMeta;
 		
-		foreach ( $thisModel as $k => $type ) {
-			if ( $thisModel[$k]->value !== $thatModel[$k]->value ) {
+		foreach ( $modelMeta as $k => $meta ) {
+			if ( !property_exists($model, $k) || $this->$k !== $model->$k ) {
 				$modelEquals = false;
 			}
 		}
 		
-		return (
-			$this->isA($model) &&
-			$this->id() === $model->id() &&
-			$modelEquals
-		);
+		return ( $this->isA($model) && $this->id() === $model->id() && $modelEquals );
 	}
-*/
 	
 	public function exists() {
 		$id = $this->id();
@@ -105,13 +99,15 @@ abstract class Model {
 		$fields = array_keys($this->modelMeta);
 		
 		foreach ( $fields as $field ) {
-			if ( property_exists($this, $field) ) {
-				$model[$field] = $this->$field;
-			}
+			$model[$field] = $this->$field;
 		}
 		ksort($model);
 		
 		return $model;
+	}
+	
+	public function modelMeta() {
+		return $this->modelMeta;
 	}
 
 	public function modelId() {
@@ -128,8 +124,8 @@ abstract class Model {
 	}
 	
 	public function similarTo(Model $model) {
-		$keys1 = array_keys($this->model());
-		$keys2 = array_keys($model->model());
+		$keys1 = array_keys($this->modelMeta);
+		$keys2 = array_keys($model->modelMeta());
 		
 		return ( $this->isA($model) && $keys1 === $keys2 );
 	}
@@ -206,6 +202,8 @@ abstract class Model {
 			$this->modelMeta[$schemaField][self::SCHEMA_TYPE] = $metaType;
 			$this->set($schemaField, $defaultValue);
 		}
+		
+		ksort($this->modelMeta);
 		
 		return true;
 	}
