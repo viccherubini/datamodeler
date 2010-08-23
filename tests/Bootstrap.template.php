@@ -19,7 +19,6 @@ set_include_path(implode(PATH_SEPARATOR, $includeList));
 
 require_once 'DataModeler/Exception.php';
 require_once 'DataModeler/Lib.php';
-require_once 'DataModeler/Type.php';
 
 $dbType = 'sqlite';
 $dbName = 'datamodeler_tests';
