@@ -12,9 +12,7 @@ namespace DataModeler;
  * @version 0.0.10
  */
 abstract class Model {
-	private $_id = NULL;
-	
-	private $model = array();
+
 	private $modelMeta = array();
 	private $modelId = NULL;
 	
@@ -25,6 +23,9 @@ abstract class Model {
 	const SCHEMA_PRECISION = 'precision';
 	const SCHEMA_TYPE = 'type';
 	const SCHEMA_TYPE_TYPELESS = 'TYPELESS';
+	
+	const SCHEMA_TYPE_DATE_VALUE = 'NOW';
+	const SCHEMA_TYPE_DATETIME_VALUE = 'NOW';
 	
 	public function __construct() {
 		$this->modelId = sha1(get_class($this));
@@ -43,47 +44,18 @@ abstract class Model {
 		
 		if ( 0 === $argc ) {
 			/* If the length is 0, assume this is a get() */
-			$v = $this->__get($k);
+			$v = $this->get($k);
 			return $v;
 		} else {
 			$v = current($argv);
-			$this->__set($k, $v);
+			$this->set($k, $v);
 			
 			return $this;
 		}
 	}
 	
-	public function __get($key) {
-		if ( $key === $this->pkey ) {
-			return $this->_id;
-		} else {
-			if ( isset($this->model[$key]) ) {
-				return $this->model[$key];
-			}
-		}
-		
-		return NULL;
-	}
 	
-	public function __set($field, $value) {
-		if ( isset($this->modelMeta[$field]) ) {
-			$type = $this->modelMeta[$field][self::SCHEMA_TYPE];
-			$method = "type{$type}";
-			
-			if ( method_exists($this, $method) ) {
-				$this->model[$field] = $this->$method($field, $value);
-			}
-			
-			if ( $field == $this->pkey ) {
-				$this->_id = $this->model[$field];
-			}
-		}
-		
-		ksort($this->model);
-
-		return true;
-	}
-	
+/*
 	public function equalTo(Model $model) {
 		$modelEquals = true;
 		
@@ -102,42 +74,44 @@ abstract class Model {
 			$modelEquals
 		);
 	}
+*/
 	
 	public function exists() {
 		$id = $this->id();
-		return (false === empty($id));
-	}
-	
-	public function field($field, \DataModeler\Type $type) {
-		$this->model[$field] = clone $type;
-		ksort($this->model);
-		
-		return $this;
+		return (!empty($id));
 	}
 	
 	public function id($id = 0) {
+		$pkey = $this->pkey;
 		if ( $id > 0 ) {
-			$this->_id = $id;
+			$this->set($pkey, $id);
 		}
-		return $this->_id;
+		return $this->$pkey;
 	}
 	
-	public function isA(Model $model) {
-		return (
-			$this->table() === $model->table() &&
-			$this->modelId() === $model->modelId()
-		);
+	public function isA(\DataModeler\Model $model) {
+		return ( $this->table() === $model->table() && $this->modelId() === $model->modelId() );
 	}
 	
-	public function load(array $nvp) {
-		foreach ( $nvp as $k => $v ) {
-			$this->__set($k, $v);
+	public function load(array $modelData) {
+		foreach ( $modelData as $field => $value ) {
+			$this->set($field, $value);
 		}
 		return $this;
 	}
 
 	public function model() {
-		return $this->model;
+		$model = array();
+		$fields = array_keys($this->modelMeta);
+		
+		foreach ( $fields as $field ) {
+			if ( property_exists($this, $field) ) {
+				$model[$field] = $this->$field;
+			}
+		}
+		ksort($model);
+		
+		return $model;
 	}
 
 	public function modelId() {
@@ -154,10 +128,10 @@ abstract class Model {
 	}
 	
 	public function similarTo(Model $model) {
-		return (
-			$this->isA($model) &&
-			array_keys($this->model()) === array_keys($model->model())
-		);
+		$keys1 = array_keys($this->model());
+		$keys2 = array_keys($model->model());
+		
+		return ( $this->isA($model) && $keys1 === $keys2 );
 	}
 
 	public function table($table = NULL) {
@@ -168,33 +142,41 @@ abstract class Model {
 		}
 		return $this->table;
 	}
-
-	private function convertCamelCaseToUnderscores($v) {
-		$v = substr($v, 3);
-		$v = strtolower(substr($v, 0, 1)) . substr($v, 1);
-		$v = preg_replace('/[A-Z]/', '_\\0', $v);
-		$v = strtolower($v);
-		return $v;
+	
+	
+	/**
+	 * ##################################################
+	 * PRIVATE METHODS
+	 * ##################################################
+	 */
+	
+	private function set($field, $value) {
+		if ( isset($this->modelMeta[$field]) ) {
+			$type = $this->modelMeta[$field][self::SCHEMA_TYPE];
+			$method = "type{$type}";
+			
+			if ( method_exists($this, $method) ) {
+				$this->$field = $this->$method($field, $value);
+			}
+		}
+		return true;
+	}
+	
+	private function get($field) {
+		if ( isset($this->modelMeta[$field]) ) {
+			return $this->$field;
+		}
+		return NULL;
 	}
 	
 	private function buildSchema() {
 		$reflection = new \ReflectionClass(get_class($this));
-		$propertyList = $reflection->getProperties(\ReflectionProperty::IS_PRIVATE);
-		
-		$namespace = __NAMESPACE__;
-
-		$model = array();
-		
-		$schema = array();
-		$schemaMeta = array();
+		$propertyList = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
 		
 		foreach ( $propertyList as $property ) {
 			$metaList = array();
 			$metaType = NULL;
-			
-			$maxlength = -1;
-			$precision = -1;
-			
+
 			$property->setAccessible(true);
 			$defaultValue = $property->getValue($this);
 			$schemaField = $property->getName();
@@ -222,17 +204,11 @@ abstract class Model {
 			}
 			
 			$this->modelMeta[$schemaField][self::SCHEMA_TYPE] = $metaType;
-			$this->__set($schemaField, $defaultValue);
+			$this->set($schemaField, $defaultValue);
 		}
 		
 		return true;
 	}
-	
-	private function removeBackticks($value) {
-		return str_replace('`', NULL, $value);
-	}
-	
-	
 	
 	private function typeBOOL($field, $boolean) {
 		$boolean = ( !is_bool($boolean) ? false : $boolean );
@@ -240,18 +216,32 @@ abstract class Model {
 	}
 	
 	private function typeDATE($field, $date) {
-		$parsedDate = date_parse($date);
-		if ( count($parsedDate['errors']) > 0 ) {
-			$date = NULL;
+		if ( !empty($date) ) {
+			$parsedDate = date_parse($date);
+			if ( count($parsedDate['errors']) > 0 ) {
+				$date = self::SCHEMA_TYPE_DATE_VALUE;
+			}
+			
+			if ( $date == self::SCHEMA_TYPE_DATE_VALUE ) {
+				$date = date('Y-m-d');
+			}
 		}
+		
 		return $date;
 	}
 	
 	private function typeDATETIME($field, $datetime) {
-		$parsedDate = date_parse($datetime);
-		if ( count($parsedDate['errors']) > 0 ) {
-			$datetime = NULL;
+		if ( !empty($datetime) ) {
+			$parsedDate = date_parse($datetime);
+			if ( count($parsedDate['errors']) > 0 ) {
+				$datetime = self::SCHEMA_TYPE_DATETIME_VALUE;
+			}
+			
+			if ( $datetime == self::SCHEMA_TYPE_DATETIME_VALUE ) {
+				$datetime = date('Y-m-d H:i:s');
+			}
 		}
+		
 		return $datetime;
 	}
 	
@@ -291,6 +281,18 @@ abstract class Model {
 
 	private function typeTYPELESS($field, $text) {
 		return $text;
+	}
+	
+	private function convertCamelCaseToUnderscores($v) {
+		$v = substr($v, 3);
+		$v = strtolower(substr($v, 0, 1)) . substr($v, 1);
+		$v = preg_replace('/[A-Z]/', '_\\0', $v);
+		$v = strtolower($v);
+		return $v;
+	}
+	
+	private function removeBackticks($value) {
+		return str_replace('`', NULL, $value);
 	}
 	
 }
