@@ -13,17 +13,17 @@ class User extends Model {
 	protected $pkey = 'id';
 	
 	/** [type INTEGER] */
-	private $id = 0;
+	public $id = 0;
 	
 	/** [type STRING] [maxlength 255] */
-	private $username = NULL;
+	public $username = NULL;
 	
 	/** [type STRING] [maxlength 255] */
-	private $password = NULL;
+	public $password = NULL;
 	
 	/** [type INTEGER] */
-	private $age = 0;
+	public $age = 0;
 	
 	/** [type STRING] [maxlength 255] */
-	private $favorite_book = NULL;
+	public $favorite_book = NULL;
 }

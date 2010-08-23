@@ -9,32 +9,31 @@ require_once 'DataModeler/Model.php';
 
 class Product extends Model {
 	protected $table = 'products';
-	
 	protected $pkey = 'product_id';
 	
 	/** [type INTEGER] */
-	private $product_id = 0;
+	public $product_id = 0;
 	
 	/** [type DATETIME] */
-	private $date_created = NULL;
+	public $date_created = self::SCHEMA_TYPE_DATETIME_VALUE;
 	
-	/** [type DATETIME] [default NULL] */
-	private $date_updated = NULL;
+	/** [type DATETIME] */
+	public $date_updated = NULL;
 	
 	/** [type DATE] */
-	private $date_available = NULL;
+	public $date_available = self::SCHEMA_TYPE_DATE_VALUE;
 	
 	/** [type INTEGER] */
-	private $customer_id = 0;
+	public $customer_id = 0;
 	
 	/** [type FLOAT] [precision 2] */
-	private $price = 0.00;
+	public $price = 87.65;
 	
 	/** [type STRING] [maxlength 64] */
-	private $name = NULL;
+	public $name = NULL;
 	
-	/** [type STRING] [maxlength 12] [default SKUP1] */
-	private $sku;
+	/** [type STRING] [maxlength 12] */
+	public $sku = 'SKUP1';
 	
-	private $field = NULL;
+	public $field = NULL;
 }
