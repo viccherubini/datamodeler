@@ -22,16 +22,12 @@ class IteratorTest extends TestCase {
 			array('name' => 'Product 4', 'price' => 88.90)
 		);
 		
-		$modelList = array();
+		$product = new Product;
 		foreach ( $this->iteratorArrayData as $arrayData ) {
-			$product = new Product;
-			foreach ( $arrayData as $k => $v ) {
-				$product->$k = $v;
-			}
-			$modelList[] = $product;
+			$product->load($arrayData);
+			$this->iteratorModelData[] = clone $product;
 		}
 		
-		$this->iteratorModelData = $modelList;
 	}
 	
 	public function test__Clone_NewIteratorContainsSameData() {
@@ -87,7 +83,6 @@ class IteratorTest extends TestCase {
 		$this->assertEquals(current($data), $iterator->current());
 	}
 
-	
 	/**
 	 * @dataProvider providerIteratorArray
 	 */
@@ -96,7 +91,6 @@ class IteratorTest extends TestCase {
 		
 		$this->assertEquals(end($data), $iterator->last());
 	}
-	
 	
 	public function testKey_ReturnsKeyNumber() {
 		$iterator = new Iterator(array());
@@ -107,7 +101,7 @@ class IteratorTest extends TestCase {
 	public function testKey_ReturnsKeyOffsetWithPageAndLimit() {
 		$page = 10;
 		$perPage = 10;
-		$expectedKey = ($page - 1) * $perPage;
+		$expectedKey = 90; //($page - 1) * $perPage;
 		
 		$iterator = new Iterator(array());
 		
@@ -165,12 +159,13 @@ class IteratorTest extends TestCase {
 	public function testValid_IsValidForKeyAtEndOfData($data) {
 		$iterator = new Iterator($data);
 		
-		$iterator->page(count($data))->limit(1)->rewind();
+		$iterator->page(count($data))
+			->limit(1)
+			->rewind();
 		
 		$this->assertTrue($iterator->valid());
 		$this->assertEquals(end($data), $iterator->last());
 	}
-	
 	
 	public function testPage_CanOnlyBePositiveInteger() {
 		$iterator = new Iterator(array());
@@ -186,7 +181,6 @@ class IteratorTest extends TestCase {
 		$this->assertGreaterThanOrEqual(0, $iteratorPageProperty->getValue($iterator));
 	}
 	
-	
 	/**
 	 * @dataProvider providerIteratorArray
 	 */
@@ -195,7 +189,6 @@ class IteratorTest extends TestCase {
 		
 		$this->assertEquals(count($data), $iterator->length());
 	}
-	
 	
 	public function testFilter_AddsNewFilter() {
 		$iterator = new Iterator(array());
@@ -207,13 +200,12 @@ class IteratorTest extends TestCase {
 		$this->assertTrue($iterator->hasFilter());
 	}
 	
-
 	/**
 	 * @dataProvider providerIteratorArray
 	 */
 	public function testFetch_ReturnsSameIteratorDataForNoFilters($data) {
 		$iterator = new Iterator($data);
-		
+
 		$matchedIterator = $iterator->fetch();
 		
 		$this->assertEquals($iterator->getData(), $matchedIterator->getData());
@@ -225,8 +217,8 @@ class IteratorTest extends TestCase {
 	 */
 	public function testFetch_ReturnsMatchedIteratorForArrays($field, $value, $expected) {
 		$iterator = new Iterator($this->iteratorArrayData);
-		
 		$iterator->filter($field, $value);
+		
 		$matchedIterator = $iterator->fetch();
 		
 		$this->assertEquals($expected, $matchedIterator->getData());
@@ -238,7 +230,6 @@ class IteratorTest extends TestCase {
 	 */
 	public function testFetch_ReturnsMatchedIteratorForArraysWithMaxLimit($field, $value, $expected, $limit) {
 		$iterator = new Iterator($this->iteratorArrayData);
-		
 		$iterator->filter($field, $value);
 		$iterator->limit($limit);
 		
@@ -252,11 +243,23 @@ class IteratorTest extends TestCase {
 	 */
 	public function testFetch_CanFilterOnAnArrayOfModels($field, $value, $expected) {
 		$iterator = new Iterator($this->iteratorModelData);
-		
 		$iterator->filter($field, $value);
+		
 		$matchedIterator = $iterator->fetch();
 		
 		$this->assertEquals(count($expected), $matchedIterator->length());
+	}
+	
+	/**
+	 * @dataProvider providerFilter
+	 */
+	public function testFetch_ResetsFilter($field, $value, $expected) {
+		$iterator = new Iterator($this->iteratorModelData);
+		$iterator->filter($field, $value);
+		$matchedIterator = $iterator->fetch();
+		
+		$this->assertFalse($iterator->hasFilter());
+		$this->assertFalse($matchedIterator->hasFilter());
 	}
 
 	public function providerIteratorArray() {
