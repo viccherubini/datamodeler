@@ -15,6 +15,7 @@ abstract class Model {
 
 	private $modelMeta = array();
 	private $modelId = NULL;
+	private $multibyte = false;
 	
 	protected $pkey = NULL;
 	protected $table = NULL;
@@ -27,7 +28,14 @@ abstract class Model {
 	const SCHEMA_TYPE_DATE_VALUE = 'NOW';
 	const SCHEMA_TYPE_DATETIME_VALUE = 'NOW';
 	
-	public function __construct() {
+	public function __construct() {		
+		$this->multibyte = extension_loaded('mbstring');
+		
+		if ( $this->multibyte ) {
+			mb_internal_encoding('UTF-8');
+			mb_regex_encoding('UTF-8');
+		}
+		
 		$this->modelId = sha1(get_class($this));
 		$this->buildSchema();
 	}
@@ -106,24 +114,52 @@ abstract class Model {
 		return $model;
 	}
 	
-	public function modelMeta() {
-		return $this->modelMeta;
-	}
-
 	public function modelId() {
 		return $this->modelId;
 	}
 	
-	public function pkey($pkey = NULL) {
+	public function modelMeta() {
+		return $this->modelMeta;
+	}
+	
+	public function multibyte($multibyte=-1) {
+		if ( -1 == $multibyte ) {
+			return $this->multibyte;
+		}
+		
+		if ( !is_bool($multibyte) ) {
+			$multibyte = true;
+		}
+		$this->multibyte = $multibyte;
+		
+		return $this->multibyte;
+	}
+
+	public function pkey($pkey=NULL) {
 		$pkey = trim($pkey);
 		if ( !empty($pkey) ) {
+			$oldPkey = $this->pkey;
+			
 			$pkey = $this->removeBackticks($pkey);
 			$this->pkey = $pkey;
+			
+			// Copy the old pkey information to the new information
+			// Generally you wouldn't change the pkey data mid-program, but
+			// who knows what crazy shit people do.
+			if ( array_key_exists($oldPkey, $this->modelMeta) ) {
+				$this->modelMeta[$pkey] = $this->modelMeta[$oldPkey];
+				
+				unset($this->modelMeta[$oldPkey]);
+				ksort($this->modelMeta);
+				
+				$this->$pkey = $this->$oldPkey;
+			}
 		}
+		
 		return $this->pkey;
 	}
 	
-	public function similarTo(Model $model) {
+	public function similarTo(\DataModeler\Model $model) {
 		$keys1 = array_keys($this->modelMeta);
 		$keys2 = array_keys($model->modelMeta());
 		
@@ -216,7 +252,15 @@ abstract class Model {
 	private function typeDATE($field, $date) {
 		if ( !empty($date) ) {
 			$parsedDate = date_parse($date);
+			$dateRegex = '/^
+			(19|20)\d\d-             # Years in range 1900-2099
+			(0[1-9]|1[012])-         # Months in range 01-12
+			(0[1-9]|[12][0-9]|3[01]) # Days in range 01-31
+			$/x';
+			
 			if ( count($parsedDate['errors']) > 0 ) {
+				$date = self::SCHEMA_TYPE_DATE_VALUE;
+			} elseif ( 0 === preg_match($dateRegex, $date) ) {
 				$date = self::SCHEMA_TYPE_DATE_VALUE;
 			}
 			
@@ -230,9 +274,20 @@ abstract class Model {
 	
 	private function typeDATETIME($field, $datetime) {
 		if ( !empty($datetime) ) {
-			$parsedDate = date_parse($datetime);
-			if ( count($parsedDate['errors']) > 0 ) {
+			$parsedDatetime = date_parse($datetime);
+			$datetimeRegex = '/^
+			(19|20)\d\d-               # Years in range 1900-2099
+			(0[1-9]|1[012])-           # Months in range 01-12
+			(0[1-9]|[12][0-9]|3[01])\  # Days in range 01-31
+			(0[0-9]|1[0-9]|2[0-3]):    # Hours in range 00-23
+			(0[0-9]|[1-5][0-9]):       # Minutes in range 00-59
+			(0[0-9]|[1-5][0-9])        # Seconds in range 00-59
+			$/x'; 
+			
+			if ( count($parsedDatetime['errors']) > 0 ) {
 				$datetime = self::SCHEMA_TYPE_DATETIME_VALUE;
+			} elseif ( 0 === preg_match($datetimeRegex, $datetime) ) {
+				$datetime = self::SCHEMA_TYPE_DATE_VALUE;
 			}
 			
 			if ( $datetime == self::SCHEMA_TYPE_DATETIME_VALUE ) {
@@ -268,8 +323,13 @@ abstract class Model {
 		}
 		
 		if ( $maxlength > 0 ) {
-			$string = substr($string, 0, $maxlength);
+			if ( $this->multibyte ) {
+				$string = mb_substr($string, 0, $maxlength);
+			} else {
+				$string = substr($string, 0, $maxlength);
+			}
 		}
+		
 		return $string;
 	}
 	
