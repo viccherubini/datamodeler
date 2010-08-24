@@ -34,6 +34,22 @@ class MiscTest extends TestCase {
 
 		$this->assertEquals($expected, $valid);
 	}
+	
+	public function testRegexDate() {
+		$value = '2019-12-12';
+		
+		$matchCount = preg_match('/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/', $value);
+		
+		//var_dump($matchCount);
+	}
+
+	public function testRegexDatetime() {
+		$value = '2019-12-12 10:00:00';
+		
+		$matchCount = preg_match('/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[0-9]|1[0-9]|2[0-3]):(0[0-9]|[1-5][0-9]|60):(0[0-9]|[1-5][0-9]|60)$/', $value);
+		
+		var_dump($matchCount);
+	}
 
 
 	public function providerDocComment() {
