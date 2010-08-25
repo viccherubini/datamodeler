@@ -253,10 +253,10 @@ abstract class Model {
 		if ( !empty($date) ) {
 			$parsedDate = date_parse($date);
 			$dateRegex = '/^
-			(19|20)\d\d-             # Years in range 1900-2099
-			(0[1-9]|1[012])-         # Months in range 01-12
-			(0[1-9]|[12][0-9]|3[01]) # Days in range 01-31
-			$/x';
+				(19|20)\d\d-             # Years in range 1900-2099
+				(0[1-9]|1[012])-         # Months in range 01-12
+				(0[1-9]|[12][0-9]|3[01]) # Days in range 01-31
+				$/x';
 			
 			if ( count($parsedDate['errors']) > 0 ) {
 				$date = self::SCHEMA_TYPE_DATE_VALUE;
@@ -276,13 +276,13 @@ abstract class Model {
 		if ( !empty($datetime) ) {
 			$parsedDatetime = date_parse($datetime);
 			$datetimeRegex = '/^
-			(19|20)\d\d-               # Years in range 1900-2099
-			(0[1-9]|1[012])-           # Months in range 01-12
-			(0[1-9]|[12][0-9]|3[01])\  # Days in range 01-31
-			(0[0-9]|1[0-9]|2[0-3]):    # Hours in range 00-23
-			(0[0-9]|[1-5][0-9]):       # Minutes in range 00-59
-			(0[0-9]|[1-5][0-9])        # Seconds in range 00-59
-			$/x'; 
+				(19|20)\d\d-               # Years in range 1900-2099
+				(0[1-9]|1[012])-           # Months in range 01-12
+				(0[1-9]|[12][0-9]|3[01])\  # Days in range 01-31
+				(0[0-9]|1[0-9]|2[0-3]):    # Hours in range 00-23
+				(0[0-9]|[1-5][0-9]):       # Minutes in range 00-59
+				(0[0-9]|[1-5][0-9])        # Seconds in range 00-59
+				$/x';
 			
 			if ( count($parsedDatetime['errors']) > 0 ) {
 				$datetime = self::SCHEMA_TYPE_DATETIME_VALUE;
