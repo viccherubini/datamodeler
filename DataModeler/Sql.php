@@ -10,7 +10,7 @@ class Sql {
 	
 	private $pdo = NULL;
 	private $sqlHash = NULL;
-	private $statement = NULL;
+	private $pdoStatement = NULL;
 	
 	private $prepareCount = 0;
 	
@@ -29,8 +29,8 @@ class Sql {
 		return $this;
 	}
 
-	public function attachPdoStatement($statement) {
-		$this->statement = $statement;
+	public function attachPdoStatement(\PDOStatement $pdoStatement) {
+		$this->pdoStatement = $pdoStatement;
 		return $this;
 	}
 
@@ -66,7 +66,7 @@ class Sql {
 		$modelData = $model->model();
 		$parameters = array_values($modelData);
 		
-		$fieldList = array_map(function($v) use ($table) { return "{$table}.{$v}"; }, array_keys($modelData));
+		$fieldList = array_map(function($v) { return "`{$v}`"; }, array_keys($modelData));
 		
 		if ( $model->exists() ) {
 			$setList = implode(' = ?, ', $fieldList);
@@ -82,7 +82,8 @@ class Sql {
 
 		$hash = sha1($sql);
 		if ( $hash !== $this->sqlHash ) {
-			$this->attachPdoStatement($pdo->prepare($sql));
+			$pdoStatement = $pdo->prepare($sql);
+			$this->attachPdoStatement($pdoStatement);
 			
 			$this->sqlHash = $hash;
 			$this->prepareCount++;
@@ -128,11 +129,11 @@ class Sql {
 		$this->checkPdo();
 		$pdo = $this->getPdo();
 		
-		$statement = $pdo->prepare($sql);
-		$this->checkPdoStatement($statement);
+		$pdoStatement = $pdo->prepare($sql);
+		$this->checkPdoStatement($pdoStatement);
 		
 		$sqlResult = new SqlResult;
-		$sqlResult->attachPdoStatement($statement);
+		$sqlResult->attachPdoStatement($pdoStatement);
 		
 		return $sqlResult;
 	}
@@ -146,13 +147,13 @@ class Sql {
 		}
 		
 		$sql = "SELECT COUNT(*) FROM {$model->table()} {$where}";
-		$statement = $pdo->prepare($sql);
+		$pdoStatement = $pdo->prepare($sql);
 	
 		$rowCount = 0;
-		if ( $statement instanceof \PDOStatement ) {
-			$statement->execute($parameters);
+		if ( $pdoStatement instanceof \PDOStatement ) {
+			$pdoStatement->execute($parameters);
 			
-			$rowCount = $statement->fetchColumn(0);
+			$rowCount = $pdoStatement->fetchColumn(0);
 			$rowCount = intval($rowCount);
 		}
 		
@@ -172,12 +173,16 @@ class Sql {
 	}
 
 	public function getPdoStatement() {
-		return $this->statement;
+		return $this->pdoStatement;
 	}
 
 	public function getPrepareCount() {
 		return $this->prepareCount;
 	}
+	
+	
+	
+	
 	
 	private function checkPdo() {
 		if ( !($this->pdo instanceof \PDO) ) {
