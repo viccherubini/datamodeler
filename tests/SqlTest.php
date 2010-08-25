@@ -81,187 +81,16 @@ class SqlTest extends TestCase {
 		$sql->save($this->buildMockProduct());
 	}
 	
-	/**
-	 * @expectedException \DataModeler\Exception
-	 */
-	public function testSave_RequiresPdoStatement() {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		$product = new Product;
-		$product->id(1); // Fake load
-		$product->setName('Product N')
-			->setPrice(mt_rand(1, 100))
-			->setCustomerId(mt_rand(1, 1000));
-			
-		$product = $sql->save($product);
-		$this->assertTrue($product->exists()); // Ensure it actually updates properly
-		
-		$sql->attachPdoStatement(false); // Inject a bad statement
-		
-		$product->setPrice(mt_rand(101, 1000));
-		$sql->save($product);
-	}
-	
-	public function testSave_SetsInsertId() {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		$product = new Product;
-		$product->setName('Product 1')
-			->setPrice(10.99)
-			->setCustomerId(10993);
-		
-		$product = $sql->save($product);
-		
-		$this->assertGreaterThan(0, $product->id());
-		$this->assertEquals(1, $sql->getPrepareCount());
-	}
-	
-	public function testSave_PreparesOnceForInsert() {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		for ( $i=0; $i<5; $i++ ) {
-			$product = new Product;
-			$product->setName("Product {$i}")
-				->setPrice(mt_rand(1, 100))
-				->setCustomerId(mt_rand(1, 1000));
-				
-			$sql->save($product);
-		}
-		
-		$this->assertEquals(1, $sql->getPrepareCount());
-	}
-	
-	public function testSave_PreparesMultipleForInsert() {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		$product = new Product;
-		$product->setName('Product N')
-			->setPrice(mt_rand(1, 100))
-			->setCustomerId(mt_rand(1, 1000));
-			
-		$user = new User;
-		$user->setUsername('leftnode')
-			->setPassword('password')
-			->setAge(date('Y') - 1984);
-			
-		$sql->save($product);
-		$sql->save($user);
-		
-		$this->assertEquals(2, $sql->getPrepareCount());
-	}
-	
-	public function testSave_PreparesOnceForUpdate() {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		for ( $i=0; $i<5; $i++ ) {
-			$product = new Product;
-			$product->id(1); // Fake load
-			$product->setName("Product {$i}")
-				->setPrice(mt_rand(1, 100))
-				->setCustomerId(mt_rand(1, 1000));
-				
-			$sql->save($product);
-		}
-		
-		$this->assertEquals(1, $sql->getPrepareCount());
-	}
-	
-	public function testSave_PreparesMultipleForUpdate() {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		$product = new Product;
-		$product->id(1);
-		$product->setName('Product N')
-			->setPrice(mt_rand(1, 100))
-			->setCustomerId(mt_rand(1, 1000));
-			
-		$user = new User;
-		$user->id(1);
-		$user->setUsername('leftnode')
-			->setPassword('password')
-			->setAge(date('Y') - 1984);
-			
-		$sql->save($product);
-		$sql->save($user);
-		
-		$this->assertEquals(2, $sql->getPrepareCount());
-	}
-	
-	public function testSave_PreparesOnceForInsertOnceForUpdate() {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		$product = new Product;
-		$product->setName('Product N')
-			->setPrice(mt_rand(1, 100))
-			->setCustomerId(mt_rand(1, 1000));
-		$product = $sql->save($product); // Prepare #1 - INSERT
-		
-		$product->setName('Product N *updated*');
-		$sql->save($product); // Prepare #2 - UPDATE
-		
-		$this->assertEquals(2, $sql->getPrepareCount());
-	}
 	
 	
-	/**
-	 * @expectedException \DataModeler\Exception
-	 */
-	public function testDelete_RequiresPdo() {
-		$sql = new Sql;
-		
-		$sql->delete($this->buildMockProduct());
-	}
 	
-	/**
-	 * @expectedException PHPUnit_Framework_Error
-	 */
-	public function testDelete_RequiresModel() {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		$sql->delete(NULL);
-	}
 	
-	/**
-	 * @expectedException \DataModeler\Exception
-	 */
-	public function testDelete_ModelMustExist() {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		$sql->delete($this->buildMockProduct());
-	}
-
-	public function testDelete_CanDeleteModel() {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		$product = new Product;
-		$product->id(1); // Fake load
-		
-		$deleted = $sql->delete($product);
-		
-		$this->assertTrue($deleted);
-	}
 	
-	public function testDelete_CannotDeleteModel() {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		$product = new Product;
-		$product->id(mt_rand(5000, 10000));
-		
-		$deleted = $sql->delete($product);
-		
-		$this->assertFalse($deleted);
-	}
+	
+	
+	
+	
+	
 	
 	/**
 	 * @expectedException \DataModeler\Exception
@@ -273,26 +102,31 @@ class SqlTest extends TestCase {
 	}
 	
 	/**
-	 * @dataProvider providerSql
+	 * @expectedException \DataModeler\Exception
+	 * @dataProvider providerInvalidQuery
+	 */
+	public function testQuery_RequiresValidQuery($query) {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$sql->query($query);
+	}
+	
+	/**
+	 * @dataProvider providerValidQuery
 	 */
 	public function testQuery_ReturnsSqlResult($query) {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
 		$sqlResult = $sql->query($query);
-		
-		$this->assertTrue($sqlResult instanceof \DataModeler\SqlResult);
+		$this->assertSqlResult($sqlResult);
 	}
 	
-	/**
-	 * @expectedException \DataModeler\Exception
-	 */
-	public function testQuery_RequiresValidQuery() {
-		$sql = new Sql;
-		$sql->attachPdo($this->pdo);
-		
-		$sql->query('SELECT COUNT FROM missing_table WHERE id = ?');
-	}
+	
+	
+	
+	
 	
 	/**
 	 * @expectedException \DataModeler\Exception
@@ -317,28 +151,53 @@ class SqlTest extends TestCase {
 	
 	public function testNow_ReturnsDatetime() {
 		$sql = new Sql;
-		
-		$parsedDate = date_parse($sql->now());
+		$datetimeRegex = '/^
+			(19|20)\d\d-               # Years in range 1900-2099
+			(0[1-9]|1[012])-           # Months in range 01-12
+			(0[1-9]|[12][0-9]|3[01])\  # Days in range 01-31
+			(0[0-9]|1[0-9]|2[0-3]):    # Hours in range 00-23
+			(0[0-9]|[1-5][0-9]):       # Minutes in range 00-59
+			(0[0-9]|[1-5][0-9])        # Seconds in range 00-59
+			$/x';
+			
+		$now = $sql->now();
+		$parsedDate = date_parse($now);
 		$this->assertEquals(0, count($parsedDate['errors']));
+		$this->assertEquals(1, preg_match($datetimeRegex, $now));
 		
-		$parsedDate = date_parse($sql->now(-1000));
+		$now = $sql->now(-1000);
+		$parsedDate = date_parse($now);
 		$this->assertEquals(0, count($parsedDate['errors']));
+		$this->assertEquals(1, preg_match($datetimeRegex, $now));
 		
-		$parsedDate = date_parse($sql->now(103990239));
+		$now = $sql->now(103990239);
+		$parsedDate = date_parse($now);
 		$this->assertEquals(0, count($parsedDate['errors']));
+		$this->assertEquals(1, preg_match($datetimeRegex, $now));
 	}
 	
 	public function testNow_ReturnsDate() {
 		$sql = new Sql;
+		$dateRegex = '/^
+			(19|20)\d\d-             # Years in range 1900-2099
+			(0[1-9]|1[012])-         # Months in range 01-12
+			(0[1-9]|[12][0-9]|3[01]) # Days in range 01-31
+			$/x';
 		
-		$parsedDate = date_parse($sql->now(0, true));
+		$now = $sql->now(0, true);
+		$parsedDate = date_parse($now);
 		$this->assertEquals(0, count($parsedDate['errors']));
+		$this->assertEquals(1, preg_match($dateRegex, $now));
 		
-		$parsedDate = date_parse($sql->now(-1000, true));
+		$now = $sql->now(-1000, true);
+		$parsedDate = date_parse($now);
 		$this->assertEquals(0, count($parsedDate['errors']));
+		$this->assertEquals(1, preg_match($dateRegex, $now));
 		
-		$parsedDate = date_parse($sql->now(103990239, true));
+		$now = $sql->now(103990239, true);
+		$parsedDate = date_parse($now);
 		$this->assertEquals(0, count($parsedDate['errors']));
+		$this->assertEquals(1, preg_match($dateRegex, $now));
 	}
 	
 	public function testGetPdo_ReturnsPdoObject() {
@@ -369,13 +228,24 @@ class SqlTest extends TestCase {
 		);
 	}
 	
-	public function providerSql() {
+	public function providerValidQuery() {
 		return array(
 			array('SELECT * FROM products WHERE product_id > ?'),
-			array('SELECT * FROM orders INNER JOIN products USING(customer_id) WHERE order_id > ?'),
-			array('SELECT * FROM orders LEFT JOIN products USING(customer_id) WHERE order_id > ?'),
+			array('SELECT * FROM orders INNER JOIN users ON customer_id = id WHERE order_id > ?'),
+			array('SELECT * FROM orders LEFT JOIN users ON customer_id = id WHERE order_id > ?'),
 			array('SELECT * FROM orders INNER JOIN users ON customer_id = id WHERE username <> ? AND favorite_book = ?'),
 			array('SELECT SUM(o.total) FROM orders o WHERE o.total > 0')
+		);
+	}
+	
+	public function providerInvalidQuery() {
+		return array(
+			array('SELECT * FROM products_missing WHERE product_id > ?'),
+			array('SELECT * FROM orders INNER JOIN users USING(customer_id) WHERE order_id > ?'),
+			array('SELECT * FROM orders LEFT JOIN users USING(customer_id) WHERE order_id > ?'),
+			array('SELECT * FROM orders INNER JOIN users USING(id) WHERE username <> ? AND favorite_book = ?'),
+			array('SELECT SUM(o.total) FROM orders o WHERE o.total_price > 0'),
+			array('SELECT missing_field FROM products WHERE products_price > ? AND product_name != ?')
 		);
 	}
 	
