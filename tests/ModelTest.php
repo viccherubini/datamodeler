@@ -471,19 +471,44 @@ class ModelTest extends TestCase {
 	}
 	
 	public function testTypeFloat_SetsPrecision() {
+		$productPrice = 10.983993;
 		
+		$product = new Product;
+		$product->setPrice($productPrice);
+		
+		$modelMeta = $product->modelMeta();		
+		
+		$this->assertEquals(round($productPrice, $modelMeta['price']['precision']), $product->getPrice());
 	}
 	
 	public function testTypeString_SupportsMaxLengthAscii() {
+		$productName = str_repeat('A', 1000);
 		
+		$product = new Product;
+		$product->multibyte(false);
+		$product->setName($productName);
+		
+		$modelMeta = $product->modelMeta();
+		
+		$this->assertEquals(substr($productName, 0, $modelMeta['name']['maxlength']), $product->getName());
 	}
 	
-	public function testTypeString_SupportsMaxLengthUtf8() {
+	/**
+	 * @dataProvider providerUtf8Value
+	 */
+	public function testTypeString_SupportsMaxLengthUtf8($productName, $productNameExpected) {
+		$product = new Product;
+		$product->multibyte(true);
+		$product->setName($productName);
 		
+		$this->assertEquals($productNameExpected, $product->getName());
 	}
 	
 	public function testTypeText_AlwaysConvertedToString() {
+		$product = new Product;
+		$product->setDescription(10);
 		
+		$this->assertTrue(is_string($product->getDescription()));
 	}
 	
 	
@@ -559,5 +584,27 @@ class ModelTest extends TestCase {
 		);
 	}
 	
+	public function providerUtf8Value() {
+		return array(
+			array(str_repeat('әӘөүҗңһһ', 10), str_repeat('әӘөүҗңһһ', 8)),
+			array(str_repeat('市民派利市的習慣', 10), str_repeat('市民派利市的習慣', 8)),
+			array(str_repeat('ൄുറഅᚎߜਗט', 10), str_repeat('ൄുറഅᚎߜਗט', 8)),
+			array(str_repeat('ねちさぢはぼほの', 10), str_repeat('ねちさぢはぼほの', 8)),
+			array(str_repeat('؆؇صشفقكل', 10), str_repeat('؆؇صشفقكل', 8)),
+			array(str_repeat('ձդՔՓՆՅՄՑ', 10), str_repeat('ձդՔՓՆՅՄՑ', 8)),
+			array(str_repeat('ঁঔডঢৈষথঘ', 10), str_repeat('ঁঔডঢৈষথঘ', 8)),
+			array(str_repeat('ㄅㄆㄇㄈㄉㄊㄋㄌ', 10), str_repeat('ㄅㄆㄇㄈㄉㄊㄋㄌ', 8)),
+			array(str_repeat('⠾⠲⠦⠧⠛⠏⠜⠝', 10), str_repeat('⠾⠲⠦⠧⠛⠏⠜⠝', 8)),
+			array(str_repeat('ᨀᨁᨂᨃᨄᨅᨆᨇ', 10), str_repeat('ᨀᨁᨂᨃᨄᨅᨆᨇ', 8)),
+			array(str_repeat('ᐁᐂᐃᐄᐅᐆᐇᐉ', 10), str_repeat('ᐁᐂᐃᐄᐅᐆᐇᐉ', 8)),
+			array(str_repeat('ᎠᎡᎢᎣᎤᎥᎦᎧ', 10), str_repeat('ᎠᎡᎢᎣᎤᎥᎦᎧ', 8)),
+			array(str_repeat('¡¢£¤¦¥§¨', 10), str_repeat('¡¢£¤¦¥§¨', 8)),
+			array(str_repeat('ϣϤϥϦϧϨϩϢ', 10), str_repeat('ϣϤϥϦϧϨϩϢ', 8)),
+			array(str_repeat('ЀЁЂЃЄЅІЇ', 10), str_repeat('ЀЁЂЃЄЅІЇ', 8)),
+			array(str_repeat('ँंःऄअआइई', 10), str_repeat('ँंःऄअआइई', 8)),
+			array(str_repeat('ሀሁሂሃሄህሆለ', 10), str_repeat('ሀሁሂሃሄህሆለ', 8)),
+			array(str_repeat('ႠႡႢႣႤႥႦႧ', 10), str_repeat('ႠႡႢႣႤႥႦႧ', 8))
+		);
+	}
 	
 }
