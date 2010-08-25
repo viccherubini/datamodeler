@@ -4,16 +4,18 @@ CREATE TABLE IF NOT EXISTS products (
 	date_created datetime NOT NULL,
 	date_updated datetime DEFAULT NULL,
 	date_available date NOT NULL,
-	customer_id int(11) NOT NULL,
+	`name` varchar(64) NOT NULL,
 	price float NOT NULL,
-	`name` varchar(255) NOT NULL,
 	sku varchar(12) NOT NULL,
-	field text DEFAULT NULL,
+	description TEXT NOT NULL,
+	image varchar(128) NOT NULL,
+	available tinyint(1) default 0,
+	store_name varchar(64) NOT NULL,
 	PRIMARY KEY (product_id)
 ) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-INSERT INTO products VALUES(1, '0000-00-00 00:00:00', NULL, '0000-00-00', 0, 19.33, 'Product 1', 'P1', NULL);
-INSERT INTO products VALUES(2, '0000-00-00 00:00:00', NULL, '0000-00-00', 0, 24.56, 'Product 2', 'P2', NULL);
-INSERT INTO products VALUES(3, '0000-00-00 00:00:00', NULL, '0000-00-00', 0, 8.56, 'Product 3', 'P3', NULL);
+INSERT INTO products VALUES(1, NOW(), NULL, NOW(), 'Product 1', 19.33, 'SKU_P1', 'Product 1 Description', 'product1.jpg', 1, 'Costco');
+INSERT INTO products VALUES(2, NOW(), NULL, NOW(), 'Product 2', 18.25, 'SKU_P2', 'Product 2 Description', 'product2.jpg', 1, 'Sams');
+INSERT INTO products VALUES(3, NOW(), NULL, NOW(), 'Product 3', 17.96, 'SKU_P3', 'Product 3 Description', 'product3.jpg', 0, 'Wal-Mart');
 
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (

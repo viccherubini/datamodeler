@@ -4,15 +4,17 @@ CREATE TABLE IF NOT EXISTS products (
 	date_created TEXT NOT NULL,
 	date_updated TEXT DEFAULT NULL,
 	date_available TEXT NOT NULL,
-	customer_id INTEGER NOT NULL,
-	price REAL NOT NULL,
 	`name` TEXT NOT NULL,
+	price REAL NOT NULL,
 	sku TEXT NOT NULL, 
-	field TEXT DEFAULT NULL
+	description TEXT NOT NULL,
+	image TEXT NOT NULL,
+	available INTEGER DEFAULT 0,
+	store_name TEXT DEFAULT NULL
 );
-INSERT INTO products VALUES(1, '0000-00-00 00:00:00', NULL, '0000-00-00', 0, 19.33, 'Product 1', 'P1', NULL);
-INSERT INTO products VALUES(2, '0000-00-00 00:00:00', NULL, '0000-00-00', 0, 24.56, 'Product 2', 'P2', NULL);
-INSERT INTO products VALUES(3, '0000-00-00 00:00:00', NULL, '0000-00-00', 0, 8.56, 'Product 3', 'P3', NULL);
+INSERT INTO products VALUES(1, datetime(), NULL, date(), 'Product 1', 19.33, 'SKU_P1', 'Product 1 Description', 'product1.jpg', 1, 'Costco');
+INSERT INTO products VALUES(2, datetime(), NULL, date(), 'Product 2', 18.25, 'SKU_P2', 'Product 2 Description', 'product2.jpg', 1, 'Sams');
+INSERT INTO products VALUES(3, datetime(), NULL, date(), 'Product 3', 17.96, 'SKU_P3', 'Product 3 Description', 'product3.jpg', 0, 'Wal-Mart');
 
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
@@ -39,7 +41,8 @@ CREATE TABLE orders (
 	date_created TEXT,
 	date_updated TEXT NULL DEFAULT NULL,
 	date_available TEXT,
-	customer_id INTEGER,
-	total REAL,
-	name TEXT
+	customer_id INTEGER default 0,
+	total REAL default 0.00,
+	name TEXT NOT NULL,
+	email_address TEXT NOT NULL
 );
