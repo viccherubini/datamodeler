@@ -3,12 +3,12 @@ CREATE TABLE IF NOT EXISTS products (
 	product_id integer PRIMARY KEY,
 	date_created TEXT NOT NULL,
 	date_updated TEXT DEFAULT NULL,
-	date_available TEXT NOT NULL,
-	`name` TEXT NOT NULL,
-	price REAL NOT NULL,
+	date_available TEXT DEFAULT NULL,
+	name TEXT NOT NULL,
+	price REAL NOT NULL DEFAULT 0.00,
 	sku TEXT NOT NULL, 
-	description TEXT NOT NULL,
-	image TEXT NOT NULL,
+	description TEXT DEFAULT NULL,
+	image TEXT DEFAULT NULL,
 	available INTEGER DEFAULT 0,
 	store_name TEXT DEFAULT NULL
 );

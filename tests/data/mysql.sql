@@ -3,14 +3,14 @@ CREATE TABLE IF NOT EXISTS products (
 	product_id int(11) NOT NULL AUTO_INCREMENT,
 	date_created datetime NOT NULL,
 	date_updated datetime DEFAULT NULL,
-	date_available date NOT NULL,
+	date_available date DEFAULT NULL,
 	`name` varchar(64) NOT NULL,
-	price float NOT NULL,
+	price float NOT NULL DEFAULT 0.00,
 	sku varchar(12) NOT NULL,
-	description TEXT NOT NULL,
-	image varchar(128) NOT NULL,
+	description TEXT DEFAULT NULL,
+	image varchar(128) DEFAULT NULL,
 	available tinyint(1) default 0,
-	store_name varchar(64) NOT NULL,
+	store_name varchar(64) DEFAULT NULL,
 	PRIMARY KEY (product_id)
 ) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 INSERT INTO products VALUES(1, NOW(), NULL, NOW(), 'Product 1', 19.33, 'SKU_P1', 'Product 1 Description', 'product1.jpg', 1, 'Costco');
