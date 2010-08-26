@@ -62,9 +62,9 @@ class Sql {
 		$this->checkPdo();
 		$pdo = $this->getPdo();
 
+		$pkey = $model->pkey();
 		$table = $model->table();
 		$modelData = $model->model();
-		$parameters = array_values($modelData);
 		
 		$fieldList = array_map(function($v) { return "`{$v}`"; }, array_keys($modelData));
 		
@@ -72,12 +72,15 @@ class Sql {
 			$setList = implode(' = ?, ', $fieldList);
 			
 			$sql = "UPDATE {$table} SET {$setList} = ? WHERE {$model->pkey()} = ?";
-			$parameters[] = $model->id();
+			$modelData[] = $model->id();
 		} else {
 			$fieldList = implode(', ', $fieldList);
 			$valueList = implode(', ', array_fill(0, count($modelData), '?'));
 			
 			$sql = "INSERT INTO {$table} ({$fieldList}) VALUES({$valueList})";
+			if ( isset($modelData[$pkey]) ) {
+				$modelData[$pkey] = NULL;
+			}
 		}
 
 		$hash = sha1($sql);
@@ -88,7 +91,9 @@ class Sql {
 			$this->sqlHash = $hash;
 			$this->prepareCount++;
 		}
-
+		
+		$parameters = array_values($modelData);
+		
 		$pdoStatement = $this->getPdoStatement();
 		$this->checkPdoStatement($pdoStatement);
 
