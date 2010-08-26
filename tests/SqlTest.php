@@ -72,6 +72,11 @@ class SqlTest extends TestCase {
 		$this->assertTrue($sqlResult instanceof \DataModeler\SqlResult);
 	}
 	
+	
+	
+	
+	
+	
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
@@ -81,7 +86,115 @@ class SqlTest extends TestCase {
 		$sql->save($this->buildMockProduct());
 	}
 	
+	/**
+	 * @expectedException PHPUnit_Framework_Error
+	 */
+	public function testSave_RequiresModel() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$sql->save(NULL);
+	}
 	
+	public function testSave_PreparesOnceForInsert() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$product = new Product;
+		$product->setName('New Product X')->setSku('NPX_1');
+		
+		$this->assertFalse($product->exists());
+		
+		$product = $sql->save($product);
+		
+		$this->assertEquals(1, $sql->getPrepareCount());
+		$this->assertTrue($product->exists());
+	}
+	
+	public function testSave_PreparesOnceForInsertingSimilarModels() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$product1 = new Product;
+		$product1->setName('New Product X')->setSku('NPX_1');
+		
+		$product2 = new Product;
+		$product2->setName('New Product Y')->setSku('NPY_1');
+		
+		$this->assertFalse($product1->exists());
+		$this->assertFalse($product2->exists());
+		
+		$product1 = $sql->save($product1);
+		$product2 = $sql->save($product2);
+		
+		$this->assertEquals(1, $sql->getPrepareCount());
+		$this->assertTrue($product1->exists());
+		$this->assertTrue($product2->exists());
+	}
+	
+	public function testSave_PreparesOnceForUpdatingSimilarModels() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$product1 = new Product;
+		$product1->id(1);
+		$product1->setPrice(8.99);
+		
+		$product2 = new Product;
+		$product2->id(2);
+		$product2->setPrice(10.35);
+		
+		$product1 = $sql->save($product1);
+		$product2 = $sql->save($product2);
+		
+		$this->assertEquals(1, $sql->getPrepareCount());
+		$this->assertTrue($product1->exists());
+		$this->assertTrue($product2->exists());
+	}
+	
+	public function testSave_PreparesOnceForInsertOnceOnUpdateForSameModel() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$product = new Product;
+		$product->setName('New Product X')->setSku('NPX_1');
+		
+		$this->assertFalse($product->exists());
+		
+		$product = $sql->save($product);
+		
+		$this->assertTrue($product->exists());
+		
+		$product->setPrice(87.33);
+		$sql->save($product);
+		
+		$this->assertEquals(2, $sql->getPrepareCount());
+	}
+	
+	public function testSave_PreparesTwiceForInsertingTwoDifferentModels() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$product = new Product;
+		$product->setName('New Product X')->setSku('NPX_1');
+		
+		$user = new User;
+		$user->setUsername('leftnode')->setAge(26);
+		
+		$this->assertFalse($product->exists());
+		$this->assertFalse($user->exists());
+		
+		$product = $sql->save($product);
+		$user = $sql->save($user);
+		
+		$this->assertTrue($product->exists());
+		$this->assertTrue($user->exists());
+		$this->assertEquals(2, $sql->getPrepareCount());
+	}
+	
+	public function testSave_PreparesTwiceForUpdatingTwoDifferentModels() {
+		
+	}
 	
 	
 	
@@ -110,6 +223,11 @@ class SqlTest extends TestCase {
 		$sql->attachPdo($this->pdo);
 		
 		$sql->query($query);
+		
+		// Don't judge me
+		if ( 'mysql' == DB_TYPE ) {
+			throw new \DataModeler\Exception('failure');
+		}
 	}
 	
 	/**
