@@ -28,7 +28,7 @@ class Product extends Model {
 	public $name = NULL;
 	
 	/** [type FLOAT] [precision 2] */
-	public $price = 0.00;
+	public $price = 0.99;
 	
 	/** [type STRING] [maxlength 12] */
 	public $sku = 'SKU1';
