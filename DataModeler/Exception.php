@@ -6,24 +6,29 @@ namespace DataModeler;
 class Exception extends \Exception {
 
 	public function __construct($message) {
-		$messageBits = array();
+		$msg = NULL;
 		
 		$trace = $this->getTrace();
 		$trace = current($trace);
 		
+		$filename = parent::getFile();
+		$lineNumber = parent::getLine();
+		
 		if ( isset($trace['class']) ) {
-			$messageBits[] = $trace['class'];
+			$msg = $trace['class'];
 		}
 		
-		$function = NULL;
+		if ( isset($trace['type']) ) {
+			$msg .= $trace['type'];
+		}
+		
 		if ( isset($trace['function']) ) {
-			$messageBits[] = $trace['function'];
+			$msg .= $trace['function'] . '()';
 		}
 
-		$messageBits[] = $message;
-		$message = implode('_', $messageBits);
-		
-		parent::__construct($message);
+		$msg .= " [{$message}] ({$filename} +{$lineNumber})";
+
+		parent::__construct($msg);
 	}
 
 }

@@ -13,8 +13,10 @@ class ExceptionTest extends TestCase {
 		
 		$class = __CLASS__;
 		$method = __FUNCTION__;
+		$filename = __FILE__;
+		$line = __LINE__ - 5;
 		
-		$message = "{$class}_{$method}_{$exceptionMessage}";
+		$message = "{$class}->{$method}() [{$exceptionMessage}] ({$filename} +{$line})";
 		
 		$this->assertEquals($message, $exception->getMessage());
 	}
