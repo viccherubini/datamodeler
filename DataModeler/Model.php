@@ -23,6 +23,7 @@ abstract class Model {
 	const SCHEMA_MAXLENGTH = 'maxlength';
 	const SCHEMA_PRECISION = 'precision';
 	const SCHEMA_TYPE = 'type';
+	const SCHEMA_TYPE_PDO = 'pdotype';
 	const SCHEMA_TYPE_TYPELESS = 'TYPELESS';
 	
 	const SCHEMA_TYPE_DATE_VALUE = 'NOW';
@@ -245,6 +246,7 @@ abstract class Model {
 	}
 	
 	private function typeBOOL($field, $boolean) {
+		$this->setTypePdo($field, $boolean, \PDO::PARAM_INT);
 		$boolean = ( !is_bool($boolean) ? false : $boolean );
 		return $boolean;
 	}
@@ -268,6 +270,8 @@ abstract class Model {
 				$date = date('Y-m-d');
 			}
 		}
+		
+		$this->setTypePdo($field, $date, \PDO::PARAM_STR);
 		
 		return $date;
 	}
@@ -295,10 +299,13 @@ abstract class Model {
 			}
 		}
 		
+		$this->setTypePdo($field, $datetime, \PDO::PARAM_STR);
+		
 		return $datetime;
 	}
 	
 	private function typeINTEGER($field, $integer) {
+		$this->setTypePdo($field, $integer, \PDO::PARAM_INT);
 		return (int)$integer;
 	}
 
@@ -307,6 +314,8 @@ abstract class Model {
 		if ( isset($this->modelMeta[$field][self::SCHEMA_PRECISION]) ) {
 			$precision = (int)$this->modelMeta[$field][self::SCHEMA_PRECISION];
 		}
+		
+		$this->setTypePdo($field, $number, \PDO::PARAM_STR);
 		
 		$number = (float)$number;
 		if ( $precision > -1 ) {
@@ -322,6 +331,8 @@ abstract class Model {
 			$maxlength = (int)$this->modelMeta[$field][self::SCHEMA_MAXLENGTH];
 		}
 		
+		$this->setTypePdo($field, $string, \PDO::PARAM_STR);
+		
 		if ( $maxlength > 0 ) {
 			if ( $this->multibyte ) {
 				$string = mb_substr($string, 0, $maxlength);
@@ -334,11 +345,21 @@ abstract class Model {
 	}
 	
 	private function typeTEXT($field, $text) {
+		$this->setTypePdo($field, $text, \PDO::PARAM_STR);
 		return (string)$text;
 	}
 
 	private function typeTYPELESS($field, $text) {
+		$this->setTypePdo($field, $text, \PDO::PARAM_STR);
 		return $text;
+	}
+	
+	private function setTypePdo($field, $value, $type) {
+		if ( is_null($value) ) {
+			$this->modelMeta[$field][self::SCHEMA_TYPE_PDO] = \PDO::PARAM_NULL;
+		} else {
+			$this->modelMeta[$field][self::SCHEMA_TYPE_PDO] = $type;
+		}
 	}
 	
 	private function convertCamelCaseToUnderscores($v) {
@@ -348,6 +369,8 @@ abstract class Model {
 		$v = strtolower($v);
 		return $v;
 	}
+	
+	
 	
 	private function removeBackticks($value) {
 		return str_replace('`', NULL, $value);
