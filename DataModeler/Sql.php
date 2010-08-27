@@ -24,6 +24,7 @@ class Sql {
 	
 	public function attachPdo(\PDO $pdo) {
 		$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
+		$pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, 0);
 		$this->pdo = $pdo;
 		
 		return $this;
@@ -58,55 +59,68 @@ class Sql {
 		return $this->prepare($model, "{$model->pkey()} = ?");
 	}
 	
-	public function save(\DataModeler\Model $model) {
+	public function save(\DataModeler\Model $m) {
 		$this->checkPdo();
 		$pdo = $this->getPdo();
 
-		$pkey = $model->pkey();
-		$table = $model->table();
-		$modelData = $model->model();
+		$pkey = $m->pkey();
+		$table = $m->table();
+		$model = $m->model();
+		$modelMeta = $m->modelMeta();
 		
-		$fieldList = array_map(function($v) { return "`{$v}`"; }, array_keys($modelData));
+		if ( array_key_exists($pkey, $model) ) {
+			unset($model[$pkey]);
+		}
 		
-		if ( $model->exists() ) {
-			$setList = implode(' = ?, ', $fieldList);
+		$modelFields = array_keys($model);
+		$modelFieldsString = implode(', ', $modelFields);
+		
+		// Array of field => :field values
+		$valueList = array_combine($modelFields, array_map(function($v) {
+			return ":{$v}";
+		}, $modelFields));
+		
+		if ( $m->exists() ) {
+			//$bindList = 
 			
-			$sql = "UPDATE {$table} SET {$setList} = ? WHERE {$model->pkey()} = ?";
-			$modelData[] = $model->id();
+			//$setList = implode(' = ?, ', $fieldList);
+			//$sql = "UPDATE {$table} SET {$setList} = ? WHERE {$model->pkey()} = ?";
+		
+			//$modelData[] = $model->id();
 		} else {
-			$fieldList = implode(', ', $fieldList);
-			$valueList = implode(', ', array_fill(0, count($modelData), '?'));
-			
-			$sql = "INSERT INTO {$table} ({$fieldList}) VALUES({$valueList})";
-			if ( isset($modelData[$pkey]) ) {
-				$modelData[$pkey] = NULL;
-			}
+			$bindList = implode(', ', $valueList);
+			$sql = "INSERT INTO {$table} ({$modelFieldsString}) VALUES({$bindList})";
 		}
 
-		$hash = sha1($sql);
-		if ( $hash !== $this->sqlHash ) {
+		$sqlHash = sha1($sql);
+		if ( $sqlHash !== $this->sqlHash ) {
 			$pdoStatement = $pdo->prepare($sql);
 			$this->attachPdoStatement($pdoStatement);
 			
-			$this->sqlHash = $hash;
+			$this->sqlHash = $sqlHash;
 			$this->prepareCount++;
 		}
-		
-		$parameters = array_values($modelData);
 		
 		$pdoStatement = $this->getPdoStatement();
 		$this->checkPdoStatement($pdoStatement);
 
-		$model = clone $model;
-		$execute = $pdoStatement->execute($parameters);
+		foreach ( $modelFields as $field ) {
+			$pdoStatement->bindValue($valueList[$field], $model[$field], $modelMeta[$field][\DataModeler\Model::SCHEMA_TYPE_PDO]);
+		}
 
-		if ( $execute ) {
-			if ( !$model->exists() ) {
-				$model->id($pdo->lastInsertId());
-			}
+		$m = clone $m;
+		$execute = $pdoStatement->execute();
+
+		if ( !$execute ) {
+			$errorInfo = $pdoStatement->errorInfo();
+			throw new \DataModeler\Exception("driver: {$errorInfo[2]}");
 		}
 		
-		return $model;
+		if ( !$m->exists() ) {
+			$m->id($pdo->lastInsertId());
+		}
+		
+		return $m;
 	}
 	
 	public function delete(\DataModeler\Model $model) {
