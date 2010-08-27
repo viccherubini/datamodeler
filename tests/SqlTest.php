@@ -223,11 +223,6 @@ class SqlTest extends TestCase {
 		$sql->attachPdo($this->pdo);
 		
 		$sql->query($query);
-		
-		// Don't judge me
-		if ( 'mysql' == DB_TYPE ) {
-			throw new \DataModeler\Exception('failure');
-		}
 	}
 	
 	/**
