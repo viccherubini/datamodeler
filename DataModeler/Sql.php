@@ -24,7 +24,7 @@ class Sql {
 	
 	public function attachPdo(\PDO $pdo) {
 		$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
-		$pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, 0);
+		$pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
 		$this->pdo = $pdo;
 		
 		return $this;
