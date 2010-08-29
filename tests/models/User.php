@@ -9,7 +9,6 @@ require_once 'DataModeler/Model.php';
 
 class User extends Model {
 	protected $table = 'users';
-	
 	protected $pkey = 'id';
 	
 	/** [type INTEGER] */
@@ -19,7 +18,7 @@ class User extends Model {
 	public $username = NULL;
 	
 	/** [type STRING] [maxlength 255] */
-	public $password = NULL;
+	public $password = 'password';
 	
 	/** [type INTEGER] */
 	public $age = 0;
