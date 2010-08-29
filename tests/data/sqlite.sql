@@ -22,7 +22,7 @@ CREATE TABLE users (
 	username TEXT,
 	password TEXT,
 	age INTEGER,
-	favorite_book TEXT
+	favorite_book TEXT DEFAULT NULL
 );
 INSERT INTO users VALUES(NULL, 'vcherubini', 'password1', 25, 'xUnit Test Patterns');
 INSERT INTO users VALUES(NULL, 'bsaget', 'password2', 50, 'The Olsen Twins: A Legacy');

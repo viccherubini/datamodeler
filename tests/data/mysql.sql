@@ -23,7 +23,7 @@ CREATE TABLE users (
 	username VARCHAR(255) NOT NULL,
 	password VARCHAR(255) NOT NULL,
 	age INT NOT NULL,
-	favorite_book VARCHAR(255) NOT NULL
+	favorite_book VARCHAR(255) DEFAULT NULL
 ) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 INSERT INTO users VALUES(NULL, 'vcherubini', 'password1', 25, 'xUnit Test Patterns');
 INSERT INTO users VALUES(NULL, 'bsaget', 'password2', 50, 'The Olsen Twins: A Legacy');
