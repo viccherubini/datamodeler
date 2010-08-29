@@ -29,7 +29,7 @@ class Sql {
 		
 		return $this;
 	}
-
+	
 	public function attachPdoStatement(\PDOStatement $pdoStatement) {
 		$this->pdoStatement = $pdoStatement;
 		return $this;
@@ -59,42 +59,51 @@ class Sql {
 		return $this->prepare($model, "{$model->pkey()} = ?");
 	}
 	
-	public function save(\DataModeler\Model $m) {
+	public function save(\DataModeler\Model $model) {
 		$this->checkPdo();
 		$pdo = $this->getPdo();
 
-		$pkey = $m->pkey();
-		$table = $m->table();
-		$model = $m->model();
-		$modelMeta = $m->modelMeta();
-		
-		if ( array_key_exists($pkey, $model) ) {
-			unset($model[$pkey]);
-		}
-		
-		$modelFields = array_keys($model);
-		$modelFieldsString = implode(', ', $modelFields);
-		
-		// Array of field => :field values
-		$valueList = array_combine($modelFields, array_map(function($v) {
-			return ":{$v}";
-		}, $modelFields));
-		
-		if ( $m->exists() ) {
-			//$bindList = 
-			
-			//$setList = implode(' = ?, ', $fieldList);
-			//$sql = "UPDATE {$table} SET {$setList} = ? WHERE {$model->pkey()} = ?";
-		
-			//$modelData[] = $model->id();
-		} else {
-			$bindList = implode(', ', $valueList);
-			$sql = "INSERT INTO {$table} ({$modelFieldsString}) VALUES({$bindList})";
-		}
+		$pkey = $model->pkey();
+		$table = $model->table();
+		$modelNvp = $model->model();
+		$modelMeta = $model->modelMeta();
 
+		$saveNames = array();
+		$saveUpdates = array();
+		$saveFields = array_keys($modelNvp);
+		
+		foreach ( $saveFields as $field ) {
+			if ( $field != $pkey ) {
+				$namedField = ":{$field}";
+				
+				$saveNames[$field] = $namedField;
+				$saveUpdates[] = "{$field} = {$namedField}";
+			}
+		}
+		
+		if ( $model->exists() ) {
+			$namedPkeyField = ":{$pkey}";
+			$updateFields = implode(', ', $saveUpdates);
+			$saveNames[$pkey] = $namedPkeyField;
+			
+			$sql = "UPDATE {$table} SET {$updateFields} WHERE {$pkey} = {$namedPkeyField}";
+		} else {
+			if ( array_key_exists($pkey, $modelNvp) ) {
+				unset($modelNvp[$pkey]);
+				$saveFields = array_keys($modelNvp);
+			}
+			
+			$insertFields = implode(', ', $saveFields);
+			$bindList = implode(', ', $saveNames);
+			
+			$sql = "INSERT INTO {$table} ({$insertFields}) VALUES({$bindList})";
+		}
+		
 		$sqlHash = sha1($sql);
 		if ( $sqlHash !== $this->sqlHash ) {
 			$pdoStatement = $pdo->prepare($sql);
+			
+			$this->checkPdoStatement($pdoStatement);
 			$this->attachPdoStatement($pdoStatement);
 			
 			$this->sqlHash = $sqlHash;
@@ -102,13 +111,12 @@ class Sql {
 		}
 		
 		$pdoStatement = $this->getPdoStatement();
-		$this->checkPdoStatement($pdoStatement);
 
-		foreach ( $modelFields as $field ) {
-			$pdoStatement->bindValue($valueList[$field], $model[$field], $modelMeta[$field][\DataModeler\Model::SCHEMA_TYPE_PDO]);
+		foreach ( $saveNames as $field => $namedField ) {
+			$pdoStatement->bindValue($namedField, $modelNvp[$field], $modelMeta[$field][\DataModeler\Model::SCHEMA_TYPE_PDO]);
 		}
 
-		$m = clone $m;
+		$model = clone $model;
 		$execute = $pdoStatement->execute();
 
 		if ( !$execute ) {
@@ -116,11 +124,11 @@ class Sql {
 			throw new \DataModeler\Exception("driver: {$errorInfo[2]}");
 		}
 		
-		if ( !$m->exists() ) {
-			$m->id($pdo->lastInsertId());
+		if ( !$model->exists() ) {
+			$model->id($pdo->lastInsertId());
 		}
 		
-		return $m;
+		return $model;
 	}
 	
 	public function delete(\DataModeler\Model $model) {
@@ -134,14 +142,28 @@ class Sql {
 		$id = $model->id();
 		
 		$sql = "DELETE FROM {$model->table()} WHERE {$model->pkey()} = ?";
-		$statement = $pdo->prepare($sql);
+		$pdoStatement = $pdo->prepare($sql);
 		
-		$this->checkPdoStatement($statement);
+		$this->checkPdoStatement($pdoStatement);
 		
-		$statement->execute(array($id));
-		$affectedRows = $statement->rowCount();
+		$pdoStatement->execute(array($id));
+		$affectedRows = $pdoStatement->rowCount();
 		
 		return ( $affectedRows > 0 ? true : false );
+	}
+	
+	public function drop(\DataModeler\Model $model) {
+		$pdo = $this->checkPdo();
+		
+		$table = $model->table();
+		$dropped = $pdo->exec("DROP TABLE {$table}");
+		
+		if ( false === $dropped ) {
+			$errorInfo = $pdo->errorInfo();
+			throw new \DataModeler\Exception("driver: {$errorInfo[2]}");
+		}
+		
+		return true;
 	}
 	
 	public function query($sql) {
@@ -207,7 +229,7 @@ class Sql {
 		if ( !($this->pdo instanceof \PDO) ) {
 			throw new \DataModeler\Exception('not_attached');
 		}
-		return true;
+		return $this->pdo;
 	}
 	
 	private function checkPdoStatement($statement) {
