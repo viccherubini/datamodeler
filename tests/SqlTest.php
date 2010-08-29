@@ -72,11 +72,6 @@ class SqlTest extends TestCase {
 		$this->assertTrue($sqlResult instanceof \DataModeler\SqlResult);
 	}
 	
-	
-	
-	
-	
-	
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
@@ -112,7 +107,7 @@ class SqlTest extends TestCase {
 		$this->assertTrue($product->exists());
 	}
 	
-	public function _testSave_PreparesOnceForInsertingSimilarModels() {
+	public function testSave_PreparesOnceForInsertingSimilarModels() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
@@ -133,17 +128,17 @@ class SqlTest extends TestCase {
 		$this->assertTrue($product2->exists());
 	}
 	
-	public function _testSave_PreparesOnceForUpdatingSimilarModels() {
+	public function testSave_PreparesOnceForUpdatingSimilarModels() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
 		$product1 = new Product;
 		$product1->id(1);
-		$product1->setPrice(8.99);
+		$product1->setName('Product X1')->setPrice(8.99);
 		
 		$product2 = new Product;
 		$product2->id(2);
-		$product2->setPrice(10.35);
+		$product2->setName('Product X2')->setPrice(10.35);
 		
 		$product1 = $sql->save($product1);
 		$product2 = $sql->save($product2);
@@ -153,7 +148,7 @@ class SqlTest extends TestCase {
 		$this->assertTrue($product2->exists());
 	}
 	
-	public function _testSave_PreparesOnceForInsertOnceOnUpdateForSameModel() {
+	public function testSave_PreparesOnceForInsertOnceOnUpdateForSameModel() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
@@ -172,7 +167,7 @@ class SqlTest extends TestCase {
 		$this->assertEquals(2, $sql->getPrepareCount());
 	}
 	
-	public function _testSave_PreparesTwiceForInsertingTwoDifferentModels() {
+	public function testSave_PreparesTwiceForInsertingTwoDifferentModels() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
 		
@@ -193,8 +188,118 @@ class SqlTest extends TestCase {
 		$this->assertEquals(2, $sql->getPrepareCount());
 	}
 	
-	public function _testSave_PreparesTwiceForUpdatingTwoDifferentModels() {
+	public function testSave_PreparesTwiceForUpdatingTwoDifferentModels() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
 		
+		$product = new Product;
+		$product->id(1);
+		$product->setName('New Product X')->setSku('NPX_1');
+		
+		$user = new User;
+		$user->id(1);
+		$user->setUsername('leftnode')->setAge(26);
+		
+		$product = $sql->save($product);
+		$user = $sql->save($user);
+		
+		$this->assertTrue($product->exists());
+		$this->assertTrue($user->exists());
+		$this->assertEquals(2, $sql->getPrepareCount());
+	}
+	
+	/**
+	 * @expectedException \DataModeler\Exception
+	 */
+	public function testSave_ModelMustBeValid() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$product = new Product;
+		$product->setName('New Product X')->setSku('NPX_1');
+		
+		$product = $sql->save($product);
+		
+		// Update the product once to prepare that query
+		$product->setPrice(18.78);
+		$sql->save($product);
+		
+		// Drop the products table so the next update fails
+		$sql->drop($product);
+		
+		$product->setPrice(10.99);
+		$sql->save($product);
+	}
+	
+	/**
+	 * @expectedException \DataModeler\Exception
+	 */
+	public function testDelete_RequiresPdo() {
+		$sql = new Sql;
+		
+		$sql->delete($this->buildMockProduct());
+	}
+	
+	/**
+	 * @expectedException \DataModeler\Exception
+	 */
+	public function testDelete_ModelExists() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$product = new Product;
+		
+		$sql->delete($product);
+	}
+	
+	/**
+	 * @expectedException \DataModeler\Exception
+	 */
+	public function testDelete_TableExists() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$model = $this->buildMockModel('non_existent', 'id');
+		$model->id = 10;
+		$model->id(10);
+		
+		$sql->delete($model);
+	}
+	
+	public function testDelete_DeletesModel() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$product = new Product;
+		$product->id(1);
+		
+		$sql->delete($product);
+	}
+	
+	/**
+	 * @expectedException \DataModeler\Exception
+	 */
+	public function testDrop_RequiresPdo() {
+		$sql = new Sql;
+		
+		$sql->drop($this->buildMockProduct());
+	}
+	
+	/**
+	 * @expectedException \DataModeler\Exception
+	 */
+	public function testDrop_TableExists() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$sql->drop($this->buildMockModel());
+	}
+	
+	public function testDrop_DropsTable() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+		
+		$sql->drop($this->buildMockProduct());
 	}
 	
 	/**
@@ -227,11 +332,6 @@ class SqlTest extends TestCase {
 		$sqlResult = $sql->query($query);
 		$this->assertSqlResult($sqlResult);
 	}
-	
-	
-	
-	
-	
 	
 	/**
 	 * @expectedException \DataModeler\Exception
