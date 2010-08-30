@@ -10,7 +10,7 @@ class SqlResult {
 	private $closureList = array();
 
 	private $model = NULL;
-	private $statement = NULL;
+	private $pdoStatement = NULL;
 
 	public function __construct() {
 	
@@ -25,88 +25,97 @@ class SqlResult {
 		return $this;
 	}
 	
-	public function attachPdoStatement(\PDOStatement $statement) {
-		$this->statement = $statement;
+	public function attachPdoStatement(\PDOStatement $pdoStatement) {
+		$this->pdoStatement = $pdoStatement;
 		return $this;
 	}
 
 	public function find($parameters=array()) {
-		$statement = $this->checkPdoStatement();
+		$pdoStatement = $this->checkPdoStatement();
 		$executed = $this->compile($parameters);
 		
-		$row = array();
+		$dbRow = array();
 		if ( $executed ) {
-			$row = $statement->fetch(\PDO::FETCH_ASSOC);
+			$dbRow = $pdoStatement->fetch(\PDO::FETCH_ASSOC);
 		}
 		
-		if ( !$row || !is_array($row) ) {
+		if ( !$executed || !$dbRow || !is_array($dbRow) ) {
 			return false;
 		}
 		
 		if ( $this->hasModel() ) {
-			$model = clone $this->getModel();
+			$model = $this->getClonedModel();
+			$model->load($dbRow);
 			
-			$model->load($row);
 			$pkey = $model->pkey();
-			if ( isset($row[$pkey]) ) {
-				$model->id($row[$pkey]);
+			if ( isset($dbRow[$pkey]) ) {
+				$model->id($dbRow[$pkey]);
 			}
 			
 			return $model;
 		}
 		
-		return $row;
+		return $dbRow;
 	}
 	
 	public function findAll($parameters=array()) {
-		$statement = $this->checkPdoStatement();
+		$pdoStatement = $this->checkPdoStatement();
 		$executed = $this->compile($parameters);
 		
-		$rows = array();
+		$dbRows = array();
 		if ( $executed ) {
-			$rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
+			$dbRows = $pdoStatement->fetchAll(\PDO::FETCH_ASSOC);
 		}
 		
 		$iterator = new Iterator(array());
 		
 		if ( $this->hasModel() ) {
-			$modelList = array();
+			$dbModels = array();
 
-			foreach ( $rows as $row ) {
-				$m = clone $this->getModel();
-				$m->load($row);
+			foreach ( $dbRows as $dbRow ) {
+				$model = $this->getClonedModel();
+				$model->load($dbRow);
 				
-				$pkey = $m->pkey();
-				if ( isset($row[$pkey]) ) {
-					$m->id($row[$pkey]);
+				$pkey = $model->pkey();
+				if ( isset($dbRow[$pkey]) ) {
+					$model->id($dbRow[$pkey]);
 				}
 				
-				array_push($modelList, $m);
+				array_push($dbModels, $model);
 			}
 			
-			$iterator->init($modelList);
+			$iterator->init($dbModels);
 		} else {
-			$iterator->init($rows);
+			$iterator->init($dbRows);
 		}
 		
 		return $iterator;
 	}
 	
-	
 	public function free() {
-		unset($this->statement);
-		$this->statement = NULL;
+		$this->pdoStatement = NULL;
 	}
 
 	public function getModel() {
 		return $this->model;
 	}
+	
+	public function getClonedModel() {
+		return (clone $this->getModel());
+	}
+
+
+	/**
+	 * ##################################################
+	 * PRIVATE METHODS
+	 * ##################################################
+	 */
 
 	private function checkPdoStatement() {
-		if ( !($this->statement instanceof \PDOStatement) ) {
+		if ( !($this->pdoStatement instanceof \PDOStatement) ) {
 			throw new \DataModeler\Exception('pdostatement_not_attached');
 		}
-		return $this->statement;
+		return $this->pdoStatement;
 	}
 	
 	private function hasModel() {
@@ -114,13 +123,33 @@ class SqlResult {
 	}
 	
 	private function compile($parameters) {
-		$statement = $this->checkPdoStatement();
+		$pdoStatement = $this->checkPdoStatement();
 		
-		if ( is_scalar($parameters) ) {
+		if ( is_scalar($parameters) || is_null($parameters) ) {
 			$parameters = array($parameters);
 		}
+
+		// Attempt to determine how to bind the parameters
+		foreach ( $parameters as $column => $pValue ) {
+			$type = \PDO::PARAM_STR;
+			
+			if ( is_int($pValue) ) {
+				$type = \PDO::PARAM_INT;
+			} elseif ( is_bool($pValue) ) {
+				$pValue = ( false === $pValue ? 0 : 1 );
+				$type = \PDO::PARAM_INT;
+			}
+			
+			// Parameters are 1-based, not 0-based
+			if ( is_numeric($column) ) {
+				$column++;
+			}
+			
+			$pdoStatement->bindValue($column, $pValue, $type);
+		}
 		
-		$executed = $statement->execute($parameters);
+		$executed = $pdoStatement->execute();
 		return $executed;
 	}
+	
 }
