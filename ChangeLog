@@ -1,0 +1,937 @@
+2010-08-30 07:14
+	* Vic Cherubini <vmc@leftnode.com> buildPdo() sets the ATTR_EMULATE_PREPARES constant to false to ensure that prepares are always sent to the database. Slower, but more correct. (07:14:26)
+
+2010-08-30 07:13
+	* Vic Cherubini <vmc@leftnode.com> Many more tests to test each possible version of SqlResult. These will be split up into a different file. (07:13:42)
+
+2010-08-30 07:11
+	* Vic Cherubini <vmc@leftnode.com> Updated compile() to attempt to determine the type of data. (07:11:51)
+
+2010-08-29 09:19
+	* Vic Cherubini <vmc@leftnode.com> Made the password field have a default value of password. (09:19:48)
+	* Vic Cherubini <vmc@leftnode.com> Made the favorite_book field of the users table NULL by default. (09:19:31)
+	* Vic Cherubini <vmc@leftnode.com> Added the new tests for drop() and delete(), and updated the save() tests to ensure everything is prepared a certain number of times. (09:19:09)
+
+2010-08-29 09:15
+	* Vic Cherubini <vmc@leftnode.com> Added method drop(), refactored method save(). (09:15:44)
+
+2010-08-27 11:43
+	* Vic Cherubini <vmc@leftnode.com> Merge conflict fixed with pull. (11:43:38)
+
+2010-08-27 11:41
+	* Vic Cherubini <vmc@leftnode.com> Made the default product price 99 cents. (11:41:48)
+	* Vic Cherubini <vmc@leftnode.com> Temporarily removed some tests while the UPDATE code is being written. (11:41:30)
+
+2010-08-27 11:40
+	* Vic Cherubini <vmc@leftnode.com> Massive updates to how queries are created, currently can't update any queries. (11:40:56)
+	* Vic Cherubini <vmc@leftnode.com> Updated the models to store the PDO schema type so they will be sent to the database properly. (11:40:06)
+
+2010-08-27 11:39
+	* Vic Cherubini <vmc@leftnode.com> Better exceptions, gives you a nice format. (11:39:24)
+
+2010-08-26 20:31
+	* Vic Cherubini <vmc@leftnode.com> Removed the bad code that threw an exception to make up for emulating_prepares being on. (20:31:50)
+	* Vic Cherubini <vmc@leftnode.com> attachPdo() now sets the ATTR_EMULATE_PREAPRES PDO attribute to false to ensure that all prepares are always sent to the server. (20:31:31)
+
+2010-08-26 07:14
+	* Vic Cherubini <vmc@leftnode.com> Writing more tests for save(). (07:14:53)
+	* Vic Cherubini <vmc@leftnode.com> Moved setting up parameters below everything else, still work on how this will work. (07:14:33)
+
+2010-08-26 07:13
+	* Vic Cherubini <vmc@leftnode.com> Made most of the fields null by default. (07:13:49)
+
+2010-08-25 07:00
+	* Vic Cherubini <vmc@leftnode.com> Removed most of the custom assertions since they aren't used, and updated buildPdo() to only read the data in once per testsuite execution. (07:00:00)
+
+2010-08-25 06:59
+	* Vic Cherubini <vmc@leftnode.com> Removed most of the tests, going to rewrite to conform with different database types. (06:59:30)
+	* Vic Cherubini <vmc@leftnode.com> Updated save() to not wrap the field in tablename.fieldname because sqlite does not support that, and made instances of  to . (06:59:08)
+
+2010-08-25 06:58
+	* Vic Cherubini <vmc@leftnode.com> Formatted the regexes a bit nicer. (06:58:23)
+	* Vic Cherubini <vmc@leftnode.com> Conformed the test data to the models. (06:58:07)
+
+2010-08-25 04:37
+	* Vic Cherubini <vmc@leftnode.com> Added tests for the maxlength property. (04:37:00)
+
+2010-08-24 07:17
+	* Vic Cherubini <vmc@leftnode.com> Many more tests for the different types, and added a new method multibyte() to get/set the multibyte value. (07:17:51)
+	* Vic Cherubini <vmc@leftnode.com> Working on getting the date regular expressions. (07:17:05)
+
+2010-08-23 21:00
+	* Vic Cherubini <vmc@leftnode.com> Removed the capitalized Bootstrap file, renamed to bootstrap.template.php because it is not a part of Jolt. (21:00:39)
+
+2010-08-23 20:59
+	* Vic Cherubini <vmc@leftnode.com> Removed the capitalized Bootstrap template file. (20:59:26)
+
+2010-08-23 07:18
+	* Vic Cherubini <vmc@leftnode.com> Cleaned up some code a lot, tried to make it much faster, made set() only allow scalar values to be set. (07:18:11)
+
+2010-08-23 07:17
+	* Vic Cherubini <vmc@leftnode.com> Added empty tests for future methods, and added tests for some basic methods. (07:17:40)
+	* Vic Cherubini <vmc@leftnode.com> Added new test to ensure the filter is reset after executing a fetch(), and removed some whitespace to add a single newline between each method. (07:17:17)
+
+2010-08-23 07:16
+	* Vic Cherubini <vmc@leftnode.com> Added some new fields, made everything public, added some default TYPELESS fields. (07:16:38)
+
+2010-08-23 07:15
+	* Vic Cherubini <vmc@leftnode.com> Removed the Lib.php file from the bootstrap file. (07:15:41)
+	* Vic Cherubini <vmc@leftnode.com> Removed the LibTest and MiscTest tests from AllTests, and added Exception test. (07:15:18)
+
+2010-08-23 07:14
+	* Vic Cherubini <vmc@leftnode.com> Removed the lib functions because they're not used. (07:14:57)
+	* Vic Cherubini <vmc@leftnode.com> New test for the exception class. (07:14:35)
+
+2010-08-22 20:41
+	* Vic Cherubini <vmc@leftnode.com> Removed all of the tests, starting fresh. (20:41:21)
+
+2010-08-22 20:40
+	* Vic Cherubini <vmc@leftnode.com> Removed the type tests. (20:40:18)
+
+2010-08-22 20:38
+	* Vic Cherubini <vmc@leftnode.com> Made all private variables public. (20:38:51)
+	* Vic Cherubini <vmc@leftnode.com> Removed the Type.php file from the library. (20:38:09)
+
+2010-08-22 20:37
+	* Vic Cherubini <vmc@leftnode.com> Removed all of the type classes. (20:37:49)
+	* Vic Cherubini <vmc@leftnode.com> Cleaned up the most code a bit, removed the __get and __set methods, fixed some bugs in typeDATE and typeDATETIME to only manipulate the date if it's not empty. Otherwise, parse_date() returns false and the date is set to today by default, which is incorrect. (20:37:38)
+
+2010-08-20 13:16
+	* Vic Cherubini <vmc@leftnode.com> Updated these to work without the need of the Type classes, and fixed a small bug in the iterator. (13:16:47)
+
+2010-08-20 07:17
+	* Vic Cherubini <vmc@leftnode.com> Changed a setname to setName and tried to break a sql statement but mysql just isn't having it. (07:17:57)
+	* Vic Cherubini <vmc@leftnode.com> Updated find() and findAll() to get all of the parameters and execute the statement in one way. (07:17:13)
+
+2010-08-20 07:16
+	* Vic Cherubini <vmc@leftnode.com> Updated save() to build the field list composed of tablename.fieldname to avoid having to wrap everything in backticks, but it appears that Sqlite doesn't like the fully qualified names.... (07:16:48)
+	* Vic Cherubini <vmc@leftnode.com> Added __clone() for a deep clone of all of the model type methods. Going to change this to just use arrays to avoid the deep cloning issue. (07:16:15)
+
+2010-08-20 07:15
+	* Vic Cherubini <vmc@leftnode.com> Added new method init() to give the ability to rebuild the iterator, the constructor now calls this method. (07:15:54)
+
+2010-08-19 06:37
+	* Vic Cherubini <vmc@leftnode.com> Temporarily got findAll() working, need to test it and combine find() and findAll() to a central method. (06:37:05)
+
+2010-08-18 20:59
+	* Vic Cherubini <vmc@leftnode.com> Tests for the SqlResult object. (20:59:57)
+	* Vic Cherubini <vmc@leftnode.com> Removed the \DataModelerTest\Product use statement. (20:59:38)
+	* Vic Cherubini <vmc@leftnode.com> Added the LibTest test suite. (20:59:10)
+	* Vic Cherubini <vmc@leftnode.com> Removed the methods that aren't being used now and updated findFirst() to find(), and made it either take one scalar parameter or an array of parameters. (20:59:05)
+
+2010-08-18 20:58
+	* Vic Cherubini <vmc@leftnode.com> Updated the calls to attachStatement() to attachPdoStatement(). (20:58:26)
+	* Vic Cherubini <vmc@leftnode.com> Added the test file for the two library methods. (20:58:10)
+
+2010-08-18 07:01
+	* Vic Cherubini <vmc@leftnode.com> Tests (07:01:32)
+	* Vic Cherubini <vmc@leftnode.com> Added code for the parameters. (07:01:29)
+	* Vic Cherubini <vmc@leftnode.com> Moved location of the requires to below the include path. (07:01:14)
+
+2010-08-18 07:00
+	* Vic Cherubini <vmc@leftnode.com> Added prices. (07:00:56)
+	* Vic Cherubini <vmc@leftnode.com> New library file for common methods. (07:00:44)
+
+2010-08-18 04:57
+	* Vic Cherubini <vmc@leftnode.com> Updated query() to return the SqlResult object that's created and added a test to ensure a query must be syntactically correct. (04:57:26)
+
+2010-08-18 04:56
+	* Vic Cherubini <vmc@leftnode.com>  Removed some old tests that will be replaced soon. (04:56:47)
+	* Vic Cherubini <vmc@leftnode.com>  Formatted the use and removed the DIRECTORY_MODELS from the require_once. (04:56:21)
+
+2010-08-18 04:39
+	* Vic Cherubini <vmc@leftnode.com> Finally organized the SQL tests and added a few methods to help get 100% test coverage. (04:39:47)
+
+2010-08-17 21:11
+	* Vic Cherubini <vmc@leftnode.com> Moved the building of an actual PDO object with the sample data into a central method in TestCase. (21:11:17)
+
+2010-08-17 07:15
+	* Vic Cherubini <vmc@leftnode.com> Need to leave to bring kid to school, he's screaming. (07:15:47)
+
+2010-08-17 05:00
+	* Vic Cherubini <vmc@leftnode.com> Made the include path include the model directory too. (05:00:31)
+
+2010-08-17 04:59
+	* Vic Cherubini <vmc@leftnode.com> Made most of the assert<ClassName> methods use the full Namespace\Class structure. (04:59:59)
+	* Vic Cherubini <vmc@leftnode.com> Removed most of the tests during the refactoring, fixed the setUp() method to be a bit nicer. (04:59:26)
+
+2010-08-17 04:58
+	* Vic Cherubini <vmc@leftnode.com> Removed most of the methods in exchange for heavy refactoring. (04:58:37)
+
+2010-08-17 04:57
+	* Vic Cherubini <vmc@leftnode.com> New class SqlResult and the associated test suite for it. (04:57:55)
+	* Vic Cherubini <vmc@leftnode.com> Updated the test suite to include the SqlResult test. (04:57:29)
+	* Vic Cherubini <vmc@leftnode.com> After renaming these, updated them to be a bit more readable. (04:57:09)
+
+2010-08-17 04:56
+	* Vic Cherubini <vmc@leftnode.com> Updated the phpunit configuration file to not stop on errors. (04:56:44)
+	* Vic Cherubini <vmc@leftnode.com> Updated the constructor to attempt to pull in the name of the class and function that the error occurred in. (04:56:17)
+
+2010-08-17 04:55
+	* Vic Cherubini <vmc@leftnode.com> Updated nvp to not return the pkey in the array because it has it's own methods to get it. (04:55:47)
+
+2010-08-14 21:11
+	* Vic Cherubini <vmc@leftnode.com> Removed the configuration file and updated the .gitignore file to reflect that. (21:11:53)
+
+2010-08-14 07:04
+	* Vic Cherubini <vmc@leftnode.com> Updated countOf() to actually work with the WHERE clause. (07:04:48)
+	* Vic Cherubini <vmc@leftnode.com> Updated the Sql test suite to work with where clauses in the countOf() method. (07:04:27)
+
+2010-08-14 06:08
+	* Vic Cherubini <vmc@leftnode.com> EOL removal (06:08:26)
+	* Vic Cherubini <vmc@leftnode.com> Renamed lib to DataModeler so it can be used in other projects. (06:08:07)
+
+2010-08-12 05:41
+	* Vic Cherubini <vmc@leftnode.com> Added method load() that loads an array of data into the model. (05:41:16)
+
+2010-08-12 05:40
+	* Vic Cherubini <vmc@leftnode.com> Updated sql scripts for a more robust products table. (05:40:58)
+
+2010-08-12 05:37
+	* Vic Cherubini <vmc@leftnode.com> New tests and code for the Sql class. (05:37:55)
+	* Vic Cherubini <vmc@leftnode.com> New models for testing purposes. (05:37:31)
+
+2010-08-12 04:41
+	* Vic Cherubini <vmc@leftnode.com> Removed a file that won't have stuff in it for a long time. (04:41:06)
+
+2010-08-11 07:30
+	* Vic Cherubini <vmc@leftnode.com> Merge branch 'master' of ssh://leftnode.com/var/git/datamodeler (07:30:03)
+
+2010-08-11 07:22
+	* Vic Cherubini <vmc@leftnode.com> Updated the way all of the types work so you only have to extend one method. (07:22:08)
+
+2010-08-11 07:01
+	* Vic Cherubini <vmc@leftnode.com> Updated the test system to have a central point to load in concrete models. (07:01:03)
+
+2010-08-11 05:56
+	* Vic Cherubini <vmc@leftnode.com> Removed the former way of handling Sql and adapters. (05:56:41)
+	* Vic Cherubini <vmc@leftnode.com> Started working on the Sql interface. (05:56:19)
+
+2010-08-11 05:19
+	* Vic Cherubini <vmc@leftnode.com> Removed the Types.php file and included all of the types in the Model.php file directly. (05:19:32)
+
+2010-08-10 16:03
+	* Vic Cherubini <vmc@leftnode.com> Merge branch 'models-support-table-schema' (16:03:51)
+	* Vic Cherubini <vmc@leftnode.com> Merge branch 'models-support-table-schema' (16:03:51)
+
+2010-08-10 15:50
+	* Vic Cherubini <vmc@leftnode.com> Added new method buildMockType(). (15:50:17)
+	* Vic Cherubini <vmc@leftnode.com> Removed the ConcreteModelTest file. (15:50:00)
+
+2010-08-10 14:13
+	* Vic Cherubini <vmc@leftnode.com> Totally refactored most of the schema management and removed a lot of methods from the rest of the class. (14:13:11)
+
+2010-08-10 13:44
+	* Vic Cherubini <vmc@leftnode.com> Updated all of the types to set the data correctly through the array. (13:44:16)
+
+2010-08-10 11:47
+	* Vic Cherubini <vmc@leftnode.com> Moving this to the ModelTest.php file. (11:47:18)
+
+2010-08-10 08:50
+	* Vic Cherubini <vmc@leftnode.com> New data type and test for it. (08:50:13)
+
+2010-08-10 08:49
+	* Vic Cherubini <vmc@leftnode.com> Renamed all of the type tests and moved directories to just normal names. (08:49:53)
+
+2010-08-10 07:00
+	* Vic Cherubini <vmc@leftnode.com> Removed the use \DataModeler\Type classes since they're outdated. (07:00:27)
+
+2010-08-10 06:59
+	* Vic Cherubini <vmc@leftnode.com> Added a new value,  and a new meta type, default. (06:59:08)
+
+2010-08-10 06:58
+	* Vic Cherubini <vmc@leftnode.com> Renamed the testMagic* methods to test__{methodName} methods. (06:58:43)
+	* Vic Cherubini <vmc@leftnode.com> Working on reading the schema when the model is built. (06:58:05)
+
+2010-08-10 06:57
+	* Vic Cherubini <vmc@leftnode.com> Removed most of the getter/setters and made them public, made default and value non-existent so setting them goes through __set(). (06:57:46)
+	* Vic Cherubini <vmc@leftnode.com> Removed the other adapters as it's going to be really hard to make a central writer. (06:57:03)
+
+2010-07-19 08:33
+	* Vic Cherubini <vmc@leftnode.com> Small changes to test remote. (08:33:05)
+
+2010-07-19 05:49
+	* Vic Cherubini <vmc@leftnode.com> New class that will take a prepared statement, execute it, and return the object. (05:49:26)
+
+2010-07-19 05:39
+	* Vic Cherubini <vmc@leftnode.com> Removed newline at end of file. (05:39:52)
+
+2010-06-26 07:14
+	* Vic Cherubini <vmc@leftnode.com> Incomplete implementation of how the type system is going to work. (07:14:49)
+	* Vic Cherubini <vmc@leftnode.com> Added two abstract methods in \DataModeler\Type, setDefaultValue() and setValue() so they can be manipulated through the front end API, and added them to each child class. (07:14:28)
+
+2010-06-26 07:13
+	* Vic Cherubini <vmc@leftnode.com> Removed ending newline. (07:13:08)
+
+2010-06-26 07:12
+	* Vic Cherubini <vmc@leftnode.com> Made the order class name itself 'orders' after the table. (07:12:24)
+
+2010-06-26 07:11
+	* Vic Cherubini <vmc@leftnode.com> Updated the class to be modeled after the orders table. (07:11:48)
+	* Vic Cherubini <vmc@leftnode.com> Added a test for validating dates. (07:11:29)
+	* Vic Cherubini <vmc@leftnode.com> Added new fields to the order table. (07:11:18)
+
+2010-06-25 20:53
+	* Vic Cherubini <vmc@leftnode.com> Fixed the template to align with the actual file. (20:53:25)
+	* Vic Cherubini <vmc@leftnode.com> Removed the loader, again, forgot to do that during merge conflicts. (20:53:05)
+
+2010-06-25 20:52
+	* Vic Cherubini <vmc@leftnode.com> Made the setUp method throw an error if the sql file can't be found to avoid a lot of headaches in the future. (20:52:49)
+
+2010-06-24 21:30
+	* Vic Cherubini <vmc@leftnode.com> Added a test to ensure removing the first and last character of a string works. (21:30:40)
+	* Vic Cherubini <vmc@leftnode.com> spelled INTEGER properly. (21:30:24)
+	* Vic Cherubini <vmc@leftnode.com> Got the building of the schema table to work. (21:30:14)
+
+2010-06-24 06:29
+	* Vic Cherubini <vmc@leftnode.com> Work to read the table schema based on docBlock comments and variable names. (06:29:14)
+
+2010-06-24 06:28
+	* Vic Cherubini <vmc@leftnode.com> New test suite for an object that extends Model. (06:28:44)
+	* Vic Cherubini <vmc@leftnode.com> Added MiscTest to provide testing for random scripts, and added it to AllTests. (06:28:19)
+
+2010-06-24 05:25
+	* Vic Cherubini <vmc@leftnode.com> Added the drop if exists syntax so the query runs properly. (05:25:06)
+
+2010-06-23 06:48
+	* Vic Cherubini <vmc@leftnode.com> Starting to work on the data types. (06:48:40)
+
+2010-06-25 16:46
+	* Vic Cherubini <vmc@leftnode.com> Made some empty methods for future developments. (16:46:02)
+
+2010-06-25 16:24
+	* Vic Cherubini <vmc@leftnode.com> Better readme. (16:24:37)
+
+2010-06-25 15:24
+	* Vic Cherubini <vmc@leftnode.com> Removed whitespace. (15:24:56)
+
+2010-06-25 15:20
+	* Vic Cherubini <vmc@leftnode.com> Moved the location of test coverage. (15:20:32)
+
+2010-06-25 15:19
+	* Vic Cherubini <vmc@leftnode.com> Made the test coverage built within this directory since it's not really documentation. (15:19:36)
+
+2010-06-25 15:18
+	* Vic Cherubini <vmc@leftnode.com> Renamed test-coverage to Test-Coverage, not sure which ones I like. (15:18:45)
+
+2010-06-25 15:17
+	* Vic Cherubini <vmc@leftnode.com> Renamed so it shows up in hidden directory listings. (15:17:50)
+
+2010-06-25 15:02
+	* Vic Cherubini <vmc@leftnode.com> Removed the loader and writer because they aren't needed anymore. (15:02:08)
+
+2010-06-25 10:41
+	* Vic Cherubini <vmc@leftnode.com> New tests for the different types. (10:41:03)
+
+2010-06-25 10:40
+	* Vic Cherubini <vmc@leftnode.com> Removed the commented out line that had the testdox target because it really doesn't do much. (10:40:49)
+	* Vic Cherubini <vmc@leftnode.com> Added the Type test suite. (10:40:32)
+	* Vic Cherubini <vmc@leftnode.com> Removed newline for formatting. (10:40:19)
+	* Vic Cherubini <vmc@leftnode.com> Added newline for formatting. (10:40:08)
+
+2010-06-25 10:39
+	* Vic Cherubini <vmc@leftnode.com> New type formats and updated them to be syntactically correct. (10:39:52)
+
+2010-06-25 08:53
+	* Vic Cherubini <vmc@leftnode.com> Adding the basic type system. (08:53:43)
+
+2010-06-24 08:23
+	* Vic Cherubini <vmc@leftnode.com> Added new build mock method called buildMockOrder() to do that. (08:23:03)
+
+2010-06-24 08:22
+	* Vic Cherubini <vmc@leftnode.com> Added tests for transactional support and tests for countOf(). (08:22:47)
+	* Vic Cherubini <vmc@leftnode.com> Added transactional support and new method countOf() which returns the length of rows from a query. (08:22:16)
+
+2010-06-24 08:21
+	* Vic Cherubini <vmc@leftnode.com> Added the orders table for testing. (08:21:51)
+
+2010-06-23 08:52
+	* Vic Cherubini <vmc@leftnode.com> Removed the Factory and Virtual files because they aren't going to be used. (08:52:33)
+
+2010-06-21 07:13
+	* Vic Cherubini <vmc@leftnode.com> Added testdox log type. (07:13:07)
+
+2010-06-21 07:12
+	* Vic Cherubini <vmc@leftnode.com> Cleaned up some code, and added some code to test an iterator of Model objects. (07:12:53)
+	* Vic Cherubini <vmc@leftnode.com> Added tests for each method in \Adapter\Sql for each method that didn't have one. (07:12:26)
+
+2010-06-21 07:11
+	* Vic Cherubini <vmc@leftnode.com> Removed the final else when filtering. (07:11:46)
+	* Vic Cherubini <vmc@leftnode.com> Updated setStatement() to ensure  is a PDOStatement object (without using type hinting), and updated setSqlHash() to ensure the hash is 40 characters (sha1). (07:11:27)
+
+2010-06-20 08:47
+	* Vic Cherubini <vmc@leftnode.com> New tests for to ensure a query is prepared only a certain number of times. (08:47:09)
+
+2010-06-20 08:46
+	* Vic Cherubini <vmc@leftnode.com> New method called assertPdoStatement() to assert a value is a PDOstatement. (08:46:40)
+	* Vic Cherubini <vmc@leftnode.com> Added the large_object table to the testsuite. (08:46:19)
+
+2010-06-20 08:45
+	* Vic Cherubini <vmc@leftnode.com> New video to show the test time of mysql vs. sqlite. (08:45:55)
+	* Vic Cherubini <vmc@leftnode.com> Added the LoaderTest to the test suite. (08:45:35)
+	* Vic Cherubini <vmc@leftnode.com> Basic outline of the class. (08:45:16)
+	* Vic Cherubini <vmc@leftnode.com> Added a bunch of getters/setters and converted the internals of the class to use these methods. (08:45:04)
+
+2010-06-17 06:30
+	* Vic Cherubini <vmc@leftnode.com> New templated bootstrap file. (06:30:32)
+	* Vic Cherubini <vmc@leftnode.com> Removed the bootstrap file to template it so it can contain database information. (06:30:15)
+
+2010-06-17 06:29
+	* Vic Cherubini <vmc@leftnode.com> Using the new DSN information in setUp(). (06:29:02)
+
+2010-06-17 06:28
+	* Vic Cherubini <vmc@leftnode.com> Updated the way the DSN and database information is set so multiple drivers can be used. (06:28:46)
+
+2010-06-17 06:27
+	* Vic Cherubini <vmc@leftnode.com> Updated save() to add the value of the ID to the parameter list for doing an update. (06:27:13)
+
+2010-06-17 06:26
+	* Vic Cherubini <vmc@leftnode.com> New driver specific sql files. (06:26:44)
+	* Vic Cherubini <vmc@leftnode.com> Removed old sql file since there are now sql files for each driver. (06:26:29)
+
+2010-06-17 06:00
+	* Vic Cherubini <vmc@leftnode.com> Added new assertion method assertModelList() to determine if an array is an array of \DataModeler\Model objects, and updated the other custom assertion methods to pass the message around to each. Also added new method buildMockUser() to do that since users are in the SqlData.sql file now. (06:00:13)
+
+2010-06-17 05:59
+	* Vic Cherubini <vmc@leftnode.com> Removed double spaces because I decided I don't like them. (05:59:17)
+	* Vic Cherubini <vmc@leftnode.com> Added all of the tests for the new Sql class methods. (05:59:01)
+
+2010-06-17 05:55
+	* Vic Cherubini <vmc@leftnode.com> Refactored save() to work with some new private methods and maintaining a record of the last executed query. (05:55:46)
+
+2010-06-17 05:54
+	* Vic Cherubini <vmc@leftnode.com> Removed double spaces between functions because I decided I don't like them anymore, and added similarTo() to determine if two models are similar to each other. (05:54:38)
+
+2010-06-16 07:03
+	* Vic Cherubini <vmc@leftnode.com> Added new assertion assertSql() to test if a value is a \DataModeler\Sql object. (07:03:14)
+
+2010-06-16 07:02
+	* Vic Cherubini <vmc@leftnode.com> New tests for the isA() and equalTo() methods on the Model class. (07:02:54)
+
+2010-06-16 06:58
+	* Vic Cherubini <vmc@leftnode.com> Totally rewritten SQL adapter test suite. (06:58:55)
+
+2010-06-16 06:57
+	* Vic Cherubini <vmc@leftnode.com> Added new table users for further testing. (06:57:16)
+	* Vic Cherubini <vmc@leftnode.com> Added two new methods equalTo() to determine if two models are equal to each other (table, modelId and id's are the same) or if two models are each other (id and table names are the same). (06:57:03)
+
+2010-06-16 06:56
+	* Vic Cherubini <vmc@leftnode.com> Totally rewritten SQL API for much more efficient and faster queries. (06:56:28)
+
+2010-06-15 07:00
+	* Vic Cherubini <vmc@leftnode.com> Removed the write() method since it's not abstracted. (07:00:43)
+	* Vic Cherubini <vmc@leftnode.com> Really fleshed out the public API and wrote the two find() methods. (07:00:33)
+
+2010-06-15 06:59
+	* Vic Cherubini <vmc@leftnode.com> Updated model() to extract the ID value of the model based on the pkey so if you set an array to the object and it contains the primary key, it will be extracted and exists() returns true. (06:59:57)
+	* Vic Cherubini <vmc@leftnode.com> Totally updated test class for the \DataModeler\Adapter\Sql class now that the public API is a bit more fleshed out. Changed all underscored variable names to camelCase. (06:59:08)
+
+2010-06-15 06:57
+	* Vic Cherubini <vmc@leftnode.com> Added new assertion method assertModel() to assert if an object is a \DataModeler\Model object, updated buildMockModel() to take two optional arguments for building a named modeel (based on the table and primary key), added buildMockProduct() to have a specialized call to buildMockModel(). (06:57:54)
+
+2010-06-14 21:55
+	* Vic Cherubini <vmc@leftnode.com> Renamed data to .Data. (21:55:02)
+
+2010-06-14 07:13
+	* Vic Cherubini <vmc@leftnode.com> Formatting whitespace changes. (07:13:07)
+
+2010-06-14 07:11
+	* Vic Cherubini <vmc@leftnode.com> Fixed bug with misnamed variable. (07:11:04)
+
+2010-06-14 07:10
+	* Vic Cherubini <vmc@leftnode.com> Bunch of new test methods for the fetch() and filtering(). (07:10:48)
+
+2010-06-13 21:25
+	* Vic Cherubini <vmc@leftnode.com> New custom assertiion assertIterator() to test if an object is a \DataModeler\Iterator object. (21:25:13)
+
+2010-06-13 21:24
+	* Vic Cherubini <vmc@leftnode.com> Added the IteratorTest. (21:24:51)
+	* Vic Cherubini <vmc@leftnode.com> Removed a bunch of old tests, and temporarily commented out some tests while the interface is being worked on. (21:24:41)
+	* Vic Cherubini <vmc@leftnode.com> Whitespace changes for consistency. (21:24:07)
+
+2010-06-13 21:23
+	* Vic Cherubini <vmc@leftnode.com> Wrote entire class. (21:23:28)
+	* Vic Cherubini <vmc@leftnode.com> Started to hash out the public interface. (21:23:18)
+	* Vic Cherubini <vmc@leftnode.com> Removed the abstract write() method. (21:23:00)
+
+2010-06-13 21:22
+	* Vic Cherubini <vmc@leftnode.com> Wow, totally wrote this entire file without even checking it in. Big time source control failure. (21:22:45)
+
+2010-06-11 05:33
+	* Vic Cherubini <vmc@leftnode.com> Began the initial development of the getFieldList() method which returns a list of fields for a table so that you can't write fields to a model that don't exist. (05:33:38)
+
+2010-06-11 05:31
+	* Vic Cherubini <vmc@leftnode.com> Updated the adapter to set the priority, and added the test accordingly. The priority determines the write/load order of the adapters in each the writer/loader. (05:31:48)
+
+2010-06-10 07:09
+	* Vic Cherubini <vmc@leftnode.com> Made the write() method just use Model rather than \DataModeler\Model (07:09:03)
+
+2010-06-09 07:03
+	* Vic Cherubini <vmc@leftnode.com> Made all of the adapters have a concrete but empty implementation of write(). (07:03:45)
+
+2010-06-09 06:04
+	* Vic Cherubini <vmc@leftnode.com> Alphabetized the SQL list. (06:04:02)
+
+2010-06-09 06:03
+	* Vic Cherubini <vmc@leftnode.com> Included the Adapter and Exception classes from the main library. They are not included in each file. (06:03:05)
+
+2010-06-09 06:02
+	* Vic Cherubini <vmc@leftnode.com> Whole new tests for valid and invalid queries. (06:02:44)
+	* Vic Cherubini <vmc@leftnode.com> Updated handlePreparedStatementExecute() to get the error info, and fixed syntax errors to use ->sql rather than  in the exception. (06:02:17)
+
+2010-06-09 06:01
+	* Vic Cherubini <vmc@leftnode.com> Made all of the document objects extend the Adapter class. (06:01:33)
+
+2010-06-09 06:00
+	* Vic Cherubini <vmc@leftnode.com> Removed some whitespac. (06:00:30)
+
+2010-06-08 08:11
+	* Vic Cherubini <vmc@leftnode.com> Small change to test pushing remotes. (08:11:52)
+
+2010-06-08 05:17
+	* Vic Cherubini <vmc@leftnode.com> Renamed all tests to be testMethodName_WhatImTesting(). (05:17:26)
+
+2010-06-07 07:05
+	* Vic Cherubini <vmc@leftnode.com> Added a new provider for valid prepared queries. (07:05:37)
+	* Vic Cherubini <vmc@leftnode.com> Refactored some of the public methods to use private methods to be more expressive, and started to work on the main query() method. (07:05:22)
+
+2010-06-07 05:35
+	* Vic Cherubini <vmc@leftnode.com> Moved the sql to an external file so it can be edited easier and to keep the code a bit cleaner. (05:35:37)
+
+2010-06-06 09:30
+	* Vic Cherubini <vmc@leftnode.com> Removed the write() method because I don't have any tests for it yet and I'm not sure I like it like that. (09:30:51)
+
+2010-06-06 09:29
+	* Vic Cherubini <vmc@leftnode.com> Added new method exists() to the model to quickly check if the model exists if the id is non-empty, and added the tests to support this. (09:29:15)
+
+2010-06-06 09:10
+	* Vic Cherubini <vmc@leftnode.com> Basic formatting. (09:10:42)
+
+2010-06-06 09:06
+	* Vic Cherubini <vmc@leftnode.com> Worked on getting 100% test coverage by testing rawQuery to make sure that returned a PDOStatement object. (09:06:44)
+
+2010-06-06 08:42
+	* Vic Cherubini <vmc@leftnode.com> Updated test suite for executing raw sql queries thanks to in memory sqlite databases. Not entirely sure I love how this works yet, but I'll work on it. (08:42:10)
+
+2010-06-06 08:40
+	* Vic Cherubini <vmc@leftnode.com> Added some defines for when data needs to be loaded from the datasystem. (08:40:49)
+	* Vic Cherubini <vmc@leftnode.com> Added new methods to execute raw sql queries. (08:40:11)
+
+2010-06-05 16:43
+	* Vic Cherubini <vmc@leftnode.com> Removed the extension of Adapter since each adapter doesn't extend that. (16:43:41)
+	* Vic Cherubini <vmc@leftnode.com> New exception class for DM. (16:43:08)
+
+2010-06-05 15:13
+	* Vic Cherubini <vmc@leftnode.com> Added the magic __call() method for magic getters and setters. Also added new private method for converting a camelCaseString to an under_score_string (camelCaseString = camel_case_string). (15:13:55)
+	* Vic Cherubini <vmc@leftnode.com> Added more tests to ensure 100% coverage and added tests for the new magic caller methods. (15:13:44)
+
+2010-06-05 14:50
+	* Vic Cherubini <vmc@leftnode.com> Updated headers. (14:50:01)
+
+2010-06-05 14:49
+	* Vic Cherubini <vmc@leftnode.com> New class for the TokyoTyrant document database. (14:49:21)
+
+2010-06-05 08:23
+	* Vic Cherubini <vmc@leftnode.com> Better readme. (08:23:25)
+
+2010-06-05 06:24
+	* Vic Cherubini <vmc@leftnode.com> New method to build a mock PDO object with a DSN. (06:24:07)
+
+2010-06-05 06:23
+	* Vic Cherubini <vmc@leftnode.com> Added the Adapter test suite. (06:23:46)
+	* Vic Cherubini <vmc@leftnode.com> Changed calls to PdoTest to SqlTest to match the class name, and wrote the first test to ensure a PDO object can be attached. (06:23:28)
+
+2010-06-05 06:22
+	* Vic Cherubini <vmc@leftnode.com> Changed the addTestSuite() call to use the full namespace path because PHPUnit can't pick it up automatically for some reason. (06:22:54)
+	* Vic Cherubini <vmc@leftnode.com> Updated the Sql class to attach a PDO object to the class itself. (06:22:19)
+
+2010-06-05 06:21
+	* Vic Cherubini <vmc@leftnode.com> Temporary place to store data in the tests. (06:21:50)
+
+2010-06-05 05:47
+	* Vic Cherubini <vmc@leftnode.com> Basic test suite for the adapter tests. (05:47:30)
+	* Vic Cherubini <vmc@leftnode.com> New test for Sql. (05:47:12)
+
+2010-06-05 05:46
+	* Vic Cherubini <vmc@leftnode.com> Renamed back to Sql, keeping it named Pdo is too confusing. (05:46:30)
+	* Vic Cherubini <vmc@leftnode.com> Added basic class structure. (05:46:09)
+
+2010-06-04 06:21
+	* Vic Cherubini <vmc@leftnode.com> Renamed SQL to PDO since it's just going to use PHP data objects. (06:21:16)
+
+2010-06-04 06:19
+	* Vic Cherubini <vmc@leftnode.com> Because of the move of AdapterTest.php out of this directory, going to properly set this directory up for the adapter test suite. (06:19:48)
+	* Vic Cherubini <vmc@leftnode.com> Moved the adapter test to the root test directory and will build a sub testsuite for the actual Adapter/ directory. (06:19:05)
+
+2010-06-04 06:17
+	* Vic Cherubini <vmc@leftnode.com> Reworked the location of the \DataModeler\Adapter class. (06:17:55)
+
+2010-06-04 06:16
+	* Vic Cherubini <vmc@leftnode.com> Moved the root abstract adapter to the root lib directory where it belongs. (06:16:22)
+
+2010-06-04 06:13
+	* Vic Cherubini <vmc@leftnode.com> Updated buildMockAdapter to build it from the right namespace. (06:13:54)
+	* Vic Cherubini <vmc@leftnode.com> On second though, keep things easy and just switched to a use statement. (06:13:40)
+
+2010-06-04 06:12
+	* Vic Cherubini <vmc@leftnode.com> Updated addAdapter to ensure it comes from the correct namespace. (06:12:31)
+	* Vic Cherubini <vmc@leftnode.com> Made this class part of the DataModeler\Adapter namespace. (06:12:17)
+
+2010-06-04 06:11
+	* Vic Cherubini <vmc@leftnode.com> Renamed file to Mongodb.php to match the class name and to match the official project name. (06:11:41)
+	* Vic Cherubini <vmc@leftnode.com> Added empty skeleton classes. (06:11:11)
+
+2010-06-04 06:01
+	* Vic Cherubini <vmc@leftnode.com> Updated readme showing a sample writer application. (06:01:09)
+
+2010-06-04 05:46
+	* Vic Cherubini <vmc@leftnode.com> Updated the writer test to show that an \DataModeler\Adapter object can be attached to the \DataModeler\Writer object. (05:46:31)
+
+2010-06-04 05:45
+	* Vic Cherubini <vmc@leftnode.com> New method buildMockAdapter() to build a mock adapter so it can be properly tested since it's abstract. (05:45:56)
+	* Vic Cherubini <vmc@leftnode.com> New test suite for the abstract adapter. (05:45:31)
+	* Vic Cherubini <vmc@leftnode.com> New methods to add an adapter to the stack and two write the model to each adapter set. (05:45:01)
+
+2010-06-04 05:44
+	* Vic Cherubini <vmc@leftnode.com> Added a newline. (05:44:29)
+
+2010-06-03 21:10
+	* Vic Cherubini <vmc@leftnode.com> Beginning parts of the Writer class. (21:10:13)
+
+2010-06-03 21:09
+	* Vic Cherubini <vmc@leftnode.com> New field  to determine if a model has a date or not. (21:09:55)
+	* Vic Cherubini <vmc@leftnode.com> Added new tests for the hasdate field. (21:09:29)
+	* Vic Cherubini <vmc@leftnode.com> Added the writer test to the test suite. (21:09:10)
+
+2010-06-03 21:08
+	* Vic Cherubini <vmc@leftnode.com> New test for the \DataModeler\Writer class. (21:08:50)
+
+2010-06-03 05:52
+	* Vic Cherubini <vmc@leftnode.com> Removed old main file. (05:52:11)
+
+2010-06-03 05:43
+	* Vic Cherubini <vmc@leftnode.com> More extensive readme. (05:43:52)
+
+2010-06-03 05:38
+	* Vic Cherubini <vmc@leftnode.com> Better readme. (05:38:32)
+
+2010-06-03 05:37
+	* Vic Cherubini <vmc@leftnode.com> Better readme. (05:37:37)
+
+2010-06-03 05:34
+	* Vic Cherubini <vmc@leftnode.com> New readme. (05:34:06)
+
+2010-06-03 05:28
+	* Vic Cherubini <vmc@leftnode.com> Added the magic getter/setters. (05:28:36)
+	* Vic Cherubini <vmc@leftnode.com> Added tests for the magic getter/setters. (05:28:31)
+
+2010-06-03 04:57
+	* Vic Cherubini <vmc@leftnode.com> Much updated test suite for the model. (04:57:37)
+	* Vic Cherubini <vmc@leftnode.com> Added method id() to get/set the primary key value (id) of the model (not all models will have them) and added an empty pkey method. (04:57:09)
+
+2010-06-02 21:26
+	* Vic Cherubini <vmc@leftnode.com> Included the right ModelTest.php file, made this part of the DataModelerTest namespace and added the ModelTest testsuite. (21:26:49)
+	* Vic Cherubini <vmc@leftnode.com> Included the TestCase.php file to get the custom class and made this part of the DataModelerTest namespace. (21:26:12)
+
+2010-06-02 21:25
+	* Vic Cherubini <vmc@leftnode.com> Working on getting the basic abstract models to work. (21:25:36)
+	* Vic Cherubini <vmc@leftnode.com> Some custom tests. (21:25:20)
+	* Vic Cherubini <vmc@leftnode.com> Working on the Model tests. (21:25:10)
+
+2010-06-02 20:53
+	* Vic Cherubini <vmc@leftnode.com> Made the class abstract, it has to be extended. (20:53:57)
+
+2010-06-02 20:52
+	* Vic Cherubini <vmc@leftnode.com> Added the declare and namespace statements. (20:52:26)
+	* Vic Cherubini <vmc@leftnode.com> Bunch of new files, and updated the configuration template. (20:52:12)
+
+2010-06-02 20:51
+	* Vic Cherubini <vmc@leftnode.com> Updated the files to ignore. (20:51:52)
+
+2010-06-02 20:45
+	* Vic Cherubini <vmc@leftnode.com> Removed old tests. (20:45:37)
+
+2010-06-02 20:44
+	* Vic Cherubini <vmc@leftnode.com> Removed data files. (20:44:51)
+
+2010-06-02 10:39
+	* Vic Cherubini <vmc@leftnode.com> Created the right subdirectories for the document and cache type object stores. (10:39:06)
+
+2010-06-01 17:04
+	* Vic Cherubini <vmc@leftnode.com> Starting to set up new layout. (17:04:19)
+
+2010-06-01 10:59
+	* Vic Cherubini <vmc@leftnode.com> Moved files around. (10:59:57)
+
+2010-06-01 10:56
+	* Vic Cherubini <vmc@leftnode.com> Removed old Phing build xml file. (10:56:57)
+
+2010-06-01 10:55
+	* Vic Cherubini <vmc@leftnode.com> Renamed TestSuite to tests. (10:55:30)
+
+2010-02-08 06:29
+	* Vic Cherubini <vmc@leftnode.com> Added a reset() after running fetch() on an iterator. (06:29:45)
+
+2010-02-07 14:51
+	* Vic Cherubini <vmc@leftnode.com> New methods in DataObject to make doing queries less painful. (14:51:30)
+	* Vic Cherubini <vmc@leftnode.com> Totally changed the way innerJoin works so you specify both objects and fields to join on. (14:51:10)
+
+2010-02-07 14:50
+	* Vic Cherubini <vmc@leftnode.com> Added method reset() so one can manually reset an iterator without having to clone it. (14:50:36)
+
+2010-02-04 12:23
+	* Vic Cherubini <vmc@leftnode.com> Updated innerJoin() to take an optional field to join on. (12:23:31)
+
+2010-02-04 06:20
+	* Vic Cherubini <vmc@leftnode.com> Implemented filtering in the iterators. (06:20:33)
+
+2010-02-04 05:38
+	* Vic Cherubini <vmc@leftnode.com> Massively updated building code to use cleaner PHP and to work better with backticks. (05:38:48)
+
+2010-02-03 22:26
+	* Vic Cherubini <vmc@leftnode.com> Updated the modeler to work with inner joins and fixed a few bugs so that way more advanced queries can be written. (22:26:29)
+
+2010-02-03 17:04
+	* Vic Cherubini <vmc@leftnode.com> Fixed small bug in hasDate(), it always set the date to true rather than to the argument. (17:04:16)
+
+2010-02-01 11:50
+	* Vic Cherubini <vmc@leftnode.com> Merge branch 'master' of git@github.com:leftnode/DataModeler (11:50:12)
+
+2010-02-01 09:05
+	* Vic Cherubini <vmc@leftnode.com> Updated save to return by reference and to add the id back to the object so it'll exist after being saved. (09:05:47)
+
+2010-02-01 06:19
+	* Vic Cherubini <vmc@leftnode.com> Added doxygen comments. (06:19:43)
+
+2010-02-01 06:18
+	* Vic Cherubini <vmc@leftnode.com> New adapters to interface with an artisan database connection. (06:18:38)
+	* Vic Cherubini <vmc@leftnode.com> Added method exists to determine if an object exists or not. (06:18:11)
+
+2010-01-27 07:49
+	* Vic Cherubini <vmc@leftnode.com> More doxygen comments. (07:49:03)
+
+2010-01-27 07:48
+	* Vic Cherubini <vmc@leftnode.com> Another test for the pagination of the iterator. (07:48:55)
+
+2010-01-27 06:44
+	* Vic Cherubini <vmc@leftnode.com> Should have 100% doxygen coverage. (06:44:40)
+
+2010-01-26 15:29
+	* Vic Cherubini <vmc@leftnode.com> New data adapter for working directly with mysqli. (15:29:34)
+
+2010-01-26 15:20
+	* Vic Cherubini <vmc@leftnode.com> More documentation. (15:20:33)
+
+2010-01-26 14:59
+	* Vic Cherubini <vmc@leftnode.com> Removed the empty functions for now. (14:59:10)
+
+2010-01-26 14:49
+	* Vic Cherubini <vmc@leftnode.com> More Doxygen goodness. (14:49:39)
+
+2010-01-26 14:44
+	* Vic Cherubini <vmc@leftnode.com> Removed this, no longer needed. (14:44:18)
+
+2010-01-26 14:25
+	* Vic Cherubini <vmc@leftnode.com> Doxygen comments kick ass. (14:25:40)
+
+2010-01-26 13:54
+	* Vic Cherubini <vmc@leftnode.com> Refactored the PDO stuff to work outside of the DataAdapterPdo/DataAdapterPdoMysql so it can be tested easier. (13:54:10)
+
+2010-01-26 06:00
+	* Vic Cherubini <vmc@leftnode.com> New data adapter interface to allow different types of databases. (06:00:56)
+
+2010-01-26 05:47
+	* Vic Cherubini <vmc@leftnode.com> Better Doxygen comments. (05:47:55)
+
+2010-01-26 05:21
+	* Vic Cherubini <vmc@leftnode.com> More Doxygen comments. (05:21:09)
+
+2010-01-26 05:20
+	* Vic Cherubini <vmc@leftnode.com> Finished up Doxygen comments for this file. (05:20:48)
+
+2010-01-25 13:45
+	* Vic Cherubini <vmc@leftnode.com> Added doxygen comments to everything in DataModel (13:45:11)
+
+2010-01-25 07:51
+	* Vic Cherubini <vmc@leftnode.com> Beginning the long task of doubling my code size by adding Doxygen comments on everything. (07:51:27)
+
+2010-01-25 05:10
+	* Vic Cherubini <vmc@leftnode.com> Removed the method_cache for the time being, there's no good way to do it easily yet. (05:10:25)
+
+2010-01-24 06:34
+	* Vic Cherubini <vmc@leftnode.com> Removed the constants in DataModel, fixed up main a bit with some formatting, and updated DataObject to cache the values anytime they are getted or setted. (06:34:26)
+
+2010-01-24 05:29
+	* Vic Cherubini <vmc@leftnode.com> Removed bad code. (05:29:39)
+
+2010-01-24 05:27
+	* Vic Cherubini <vmc@leftnode.com> Fixed the order by problems, everything's cool now. (05:27:38)
+
+2010-01-23 11:50
+	* Vic Cherubini <vmc@leftnode.com> TOtally removed the dataqueryier and added all of the select type methods to DataModel. (11:50:31)
+
+2010-01-23 08:02
+	* Vic Cherubini <vmc@leftnode.com> Better intro page. (08:02:49)
+	* Vic Cherubini <vmc@leftnode.com> Got everything back working again, I think. (08:02:05)
+
+2010-01-23 06:36
+	* Vic Cherubini <vmc@leftnode.com> Added configure.php to the list of ignores. (06:36:11)
+
+2010-01-23 06:35
+	* Vic Cherubini <vmc@leftnode.com> New configuration template file. (06:35:44)
+	* Vic Cherubini <vmc@leftnode.com> Massive updates to this file, added all of the methods to access special properties of the class: id() to get/set the id, pkey(), table(), model(), methodCache(), hasDate(), and children(). These all provide access to get the value if no argument is passed, and to set the value to the first argument passed. Works really nicely, I think. (06:35:03)
+
+2010-01-23 06:33
+	* Vic Cherubini <vmc@leftnode.com> Removed anything related to the data_object, it's not needed, and updated fetch() to test what the filter is operating on, either a DataObject object or an array. (06:33:39)
+
+2010-01-23 06:32
+	* Vic Cherubini <vmc@leftnode.com> Removed most of the code that dealt with loading up the table or pkey, that's now in DataObject where it belongs, and temporarily commented out some code while I'm still in the process of builiding things. (06:32:54)
+
+2010-01-23 06:31
+	* Vic Cherubini <vmc@leftnode.com> Updated the test suite to use the new DataIterator interface. (06:31:43)
+
+2010-01-23 06:26
+	* Vic Cherubini <vmc@leftnode.com> Updated the fetch() method to work with the new DataObject interface, and updated the constructor to create a fresh DataObject instance when built. Wait, why do I need a DataObject instance at all in the iterator? Hmmm, need to ponder this one.: (06:26:39)
+
+2010-01-23 06:25
+	* Vic Cherubini <vmc@leftnode.com> Removed most of the test code, going to make this a bit more official.: (06:25:17)
+
+2010-01-23 06:11
+	* Vic Cherubini <vmc@leftnode.com> Removed the TABLE_ROOT from here because its now in DataObject.php (06:11:34)
+
+2010-01-22 10:06
+	* Vic Cherubini <vmc@leftnode.com> Made the datamodel load up properly in findObjectPkey(). (10:06:57)
+
+2010-01-22 07:58
+	* Vic Cherubini <vmc@leftnode.com> More work on the datamodel so that loading up a dataobject is very fast and intuitive. (07:58:05)
+
+2010-01-22 06:36
+	* Vic Cherubini <vmc@leftnode.com> Added some comments. (06:36:34)
+
+2010-01-21 07:16
+	* Vic Cherubini <vmc@leftnode.com> Started testing/demoing the data_queryier. (07:16:41)
+	* Vic Cherubini <vmc@leftnode.com> Added some doxygen comments and removed the require_once for DataIterator.php (07:16:27)
+	* Vic Cherubini <vmc@leftnode.com> Changed setObjectData() to set() so one could still have a field named object_data if they needed to. (07:16:04)
+
+2010-01-21 07:08
+	* Vic Cherubini <vmc@leftnode.com> Renamed because queryier sounds better than searcher. (07:08:40)
+
+2010-01-21 06:54
+	* Vic Cherubini <vmc@leftnode.com> Moved all of the code from DataRelationship to DataSearcher to allow data to be queried. Perhaps this should be DataQueryier, yeah, I like that better. (06:54:22)
+
+2010-01-21 06:36
+	* Vic Cherubini <vmc@leftnode.com> Made the unit tests for the iterators test the length of the iterator as well because each one sould return at least one element. (06:36:27)
+
+2010-01-20 07:55
+	* Vic Cherubini <vmc@leftnode.com> Changed the relationship searcher. (07:55:53)
+
+2010-01-20 06:31
+	* Vic Cherubini <vmc@leftnode.com> Wrote the entirity of this class, got a bitchin' new regular expression to get the field, operator, and ? from the where() method. (06:31:32)
+
+2010-01-20 06:30
+	* Vic Cherubini <vmc@leftnode.com> Beginnings of the tests for the datamodel, looks like the phpunit database testing capabilities are a bit limited now. (06:30:50)
+
+2010-01-20 06:28
+	* Vic Cherubini <vmc@leftnode.com> Cleaned up the code a bit, added abstract method init() that must define the table and primary key on object creation. (06:28:51)
+	* Vic Cherubini <vmc@leftnode.com> Removed the call to ->hasDriver() because its no longer needed by the parent class. (06:28:08)
+
+2010-01-20 06:27
+	* Vic Cherubini <vmc@leftnode.com> Removed the need for having a driver, just build the concrete class directly. (06:27:39)
+	* Vic Cherubini <vmc@leftnode.com> Wrote some more examples of using the datarelationship class. (06:27:13)
+
+2010-01-19 16:32
+	* Vic Cherubini <vmc@leftnode.com> New test suite for the data model. (16:32:36)
+
+2010-01-19 13:29
+	* Vic Cherubini <vmc@leftnode.com> Removed old code, now use PDO for everything. (13:29:22)
+
+2010-01-19 05:17
+	* Vic Cherubini <vmc@leftnode.com> Got inserting, loading, and updating models to work properly. (05:17:09)
+
+2010-01-18 05:16
+	* Vic Cherubini <vmc@leftnode.com> More testbed. (05:16:11)
+
+2010-01-18 05:15
+	* Vic Cherubini <vmc@leftnode.com> Got the insert to work, or at least started working on it. (05:15:52)
+
+2010-01-18 05:12
+	* Vic Cherubini <vmc@leftnode.com> Updated query() to return a pdo_result or throw an exception if the query fails. (05:12:33)
+
+2010-01-18 05:11
+	* Vic Cherubini <vmc@leftnode.com> Reset the connection in the destructor to kill the connection to the database. (05:11:30)
+
+2010-01-18 05:09
+	* Vic Cherubini <vmc@leftnode.com> New class for handling results from database queries. (05:09:25)
+
+2010-01-17 06:29
+	* Vic Cherubini <vmc@leftnode.com> Updates to the pdo adapter and the pdo mysql adapter, testing the basic insert queries. (06:29:53)
+
+2010-01-17 05:51
+	* Vic Cherubini <vmc@leftnode.com> Working on the data adapters, but gonna move everything to pdo. (05:51:50)
+
+2010-01-16 17:29
+	* Vic Cherubini <vmc@leftnode.com> New exception type DataModelerException for fancier exception handling. (17:29:18)
+
+2010-01-16 17:28
+	* Vic Cherubini <vmc@leftnode.com> Removed the pkey and table fields, they are part of DataModel now. (17:28:12)
+
+2010-01-16 17:26
+	* Vic Cherubini <vmc@leftnode.com> Made everything come from ->getDataAdapter() rather than calling ->data_adapter directly. (17:26:49)
+
+2010-01-16 17:25
+	* Vic Cherubini <vmc@leftnode.com> New main file for test execution. (17:25:46)
+
+2010-01-16 16:50
+	* Vic Cherubini <vmc@leftnode.com> More complete test coverage for the iterator. (16:50:01)
+
+2010-01-16 16:27
+	* Vic Cherubini <vmc@leftnode.com> Made the test a bit more expressive in what it tests. (16:27:00)
+
+2010-01-16 11:21
+	* Vic Cherubini <vmc@leftnode.com> More efficient test for ensuring an object can't be built if an array isn't passed to it. (11:21:17)
+
+2010-01-16 10:59
+	* Vic Cherubini <vmc@leftnode.com> Got the iterator to work and wrote a lot of tests for it. (10:59:43)
+
+2010-01-16 06:42
+	* Vic Cherubini <vmc@leftnode.com> The test suite can only be run from the root level either through using phpunit TestSuite/FileTest.php or just by typing phing to do it automatically. (06:42:34)
+
+2010-01-16 06:29
+	* Vic Cherubini <vmc@leftnode.com> New build.xml file for phing builds. (06:29:29)
+	* Vic Cherubini <vmc@leftnode.com> Ignored build/* for building stuff. (06:29:14)
+	* Vic Cherubini <vmc@leftnode.com> Updated test script for more advanced things with the class. (06:29:03)
+
+2010-01-16 06:11
+	* Vic Cherubini <vmc@leftnode.com> Started writing extensive tests. (06:11:23)
+
+2010-01-16 05:24
+	* Vic Cherubini <vmc@leftnode.com> Updated all of the ->adapter to ->data_adapter and updated the type hinting in the setDataAdapter() and __construct() methods to use DataAdapterAbstract rather than DataAdapter. (05:24:09)
+
+2010-01-16 05:14
+	* Vic Cherubini <vmc@leftnode.com> Started to add the initial data adapters. (05:14:24)
+
+2010-01-16 05:12
+	* Vic Cherubini <vmc@leftnode.com> Renamed the adapter to adapterabstract since it is abstract. (05:12:12)
+
+2010-01-15 20:29
+	* Vic Cherubini <vmc@leftnode.com> Made the calls to this->getTable() and this->getPkey() rather than object->get*(). (20:29:16)
+
+2010-01-15 20:24
+	* Vic Cherubini <vmc@leftnode.com> Moved most of the database specific stuff too the DataModel class, and removed it from the DataObject class. (20:24:30)
+
+2010-01-15 17:36
+	* Vic Cherubini <vmc@leftnode.com> Added the getters and setters, and __call() for magic methods. I love that thing. (17:36:43)
+
+2010-01-15 17:35
+	* Vic Cherubini <vmc@leftnode.com> Added the basic methods for load and save. (17:35:49)
+	* Vic Cherubini <vmc@leftnode.com> New class for the data adapter (mainly ties it to a database. (17:35:30)
+
+2010-01-15 16:51
+	* Vic Cherubini <vmc@leftnode.com> Started with the basic test suite. (16:51:29)
+
+2010-01-15 16:44
+	* Vic Cherubini <vmc@leftnode.com> Added class skeletons. (16:44:56)
+
+2010-01-15 16:41
+	* Vic Cherubini <vmc@leftnode.com> Initial checkin. (16:41:33)
+
