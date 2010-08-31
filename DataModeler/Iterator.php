@@ -47,7 +47,7 @@ class Iterator implements \Iterator {
 	}
 
 	public function current() {
-		if ( true === isset($this->data[$this->key]) ) {
+		if ( isset($this->data[$this->key]) ) {
 			return $this->data[$this->key];
 		}
 		
@@ -84,7 +84,7 @@ class Iterator implements \Iterator {
 	}
 
 	public function valid() {
-		return ( $this->key != $this->length && true === isset($this->data[$this->key]) );
+		return ( $this->key != $this->length && isset($this->data[$this->key]) );
 	}
 
 	public function page($page) {
@@ -161,7 +161,7 @@ class Iterator implements \Iterator {
 			$field = trim($opBits[1]);
 			$op = trim($opBits[2]);
 			
-			if ( true == isset($dataMap[$field]) ) {
+			if ( isset($dataMap[$field]) ) {
 				switch ( $op ) {
 					case '==':
 					case '=': {
