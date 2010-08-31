@@ -153,22 +153,6 @@ class SqlResultTest extends TestCase {
 		$this->assertEquals($dbRow1, $dbRow2);
 	}
 	
-	public function _testFind_ArrayLoop() {
-		$available = true;
-		
-		$pdoStatement = $this->pdo->prepare('SELECT * FROM products WHERE available = ?');
-		
-		$sqlResult = new SqlResult;
-		$sqlResult->attachPdoStatement($pdoStatement);
-		
-		while ( $pdoStatement->execute(array($available)) && $dbRow = $pdoStatement->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT) ) {
-			print_r($dbRow);
-		}
-		
-		
-		
-	}
-	
 	
 	/**
 	 * ##################################################
@@ -457,6 +441,7 @@ class SqlResultTest extends TestCase {
 		$this->assertGreaterThanOrEqual(1, $dbIterator1->length());
 		$this->assertGreaterThanOrEqual(1, $dbIterator2->length());
 	}
+
 	
 	/**
 	 * @expectedException \DataModeler\Exception
