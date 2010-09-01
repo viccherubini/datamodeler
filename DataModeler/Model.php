@@ -9,7 +9,6 @@ namespace DataModeler;
  * class that is a 1:1 relationship with a table or document.
  * 
  * @author vmc <vmc@leftnode.com>
- * @version 0.0.10
  */
 abstract class Model {
 
@@ -177,11 +176,9 @@ abstract class Model {
 	}
 	
 	
-	/**
-	 * ##################################################
-	 * PRIVATE METHODS
-	 * ##################################################
-	 */
+	// ##################################################
+	// PRIVATE METHODS
+	// ##################################################
 	
 	private function set($field, $value) {
 		if ( isset($this->modelMeta[$field]) ) {
@@ -369,8 +366,6 @@ abstract class Model {
 		$v = strtolower($v);
 		return $v;
 	}
-	
-	
 	
 	private function removeBackticks($value) {
 		return str_replace('`', NULL, $value);

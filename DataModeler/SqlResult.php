@@ -105,11 +105,9 @@ class SqlResult {
 	}
 
 
-	/**
-	 * ##################################################
-	 * PRIVATE METHODS
-	 * ##################################################
-	 */
+	// ##################################################
+	// PRIVATE METHODS
+	// ##################################################
 
 	private function checkPdoStatement() {
 		if ( !($this->pdoStatement instanceof \PDOStatement) ) {

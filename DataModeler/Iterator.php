@@ -146,6 +146,10 @@ class Iterator implements \Iterator {
 	}
 	
 	
+	// ##################################################
+	// PRIVATE METHODS
+	// ##################################################
+	
 	private function applyFilter($dataMap) {
 		$passed = false;
 		$matchCount = 0;

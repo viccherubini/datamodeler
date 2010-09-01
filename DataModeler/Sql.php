@@ -36,8 +36,7 @@ class Sql {
 	}
 
 	public function prepare(\DataModeler\Model $model, $where=NULL) {
-		$this->checkPdo();
-		$pdo = $this->getPdo();
+		$pdo = $this->checkPdo();
 		
 		if ( !empty($where) ) {
 			$where = "WHERE {$where}";
@@ -60,8 +59,7 @@ class Sql {
 	}
 	
 	public function save(\DataModeler\Model $model) {
-		$this->checkPdo();
-		$pdo = $this->getPdo();
+		$pdo = $this->checkPdo();
 
 		$pkey = $model->pkey();
 		$table = $model->table();
@@ -132,8 +130,7 @@ class Sql {
 	}
 	
 	public function delete(\DataModeler\Model $model) {
-		$this->checkPdo();
-		$pdo = $this->getPdo();
+		$pdo = $this->checkPdo();
 		
 		if ( !$model->exists() ) {
 			throw new \DataModeler\Exception('model_does_not_exist');
@@ -167,8 +164,7 @@ class Sql {
 	}
 	
 	public function query($sql) {
-		$this->checkPdo();
-		$pdo = $this->getPdo();
+		$pdo = $this->checkPdo();
 		
 		$pdoStatement = $pdo->prepare($sql);
 		$this->checkPdoStatement($pdoStatement);
@@ -220,10 +216,11 @@ class Sql {
 	public function getPrepareCount() {
 		return $this->prepareCount;
 	}
-	
-	
-	
-	
+
+
+	// ##################################################
+	// PRIVATE METHODS
+	// ##################################################
 	
 	private function checkPdo() {
 		if ( !($this->pdo instanceof \PDO) ) {
