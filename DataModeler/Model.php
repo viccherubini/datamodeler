@@ -176,11 +176,11 @@ abstract class Model {
 	}
 	
 	
-	// ##################################################
-	// PRIVATE METHODS
-	// ##################################################
+	/**
+	 * PROTECTED METHODS
+	 */
 	
-	private function set($field, $value) {
+	protected function set($field, $value) {
 		if ( isset($this->modelMeta[$field]) ) {
 			$type = $this->modelMeta[$field][self::SCHEMA_TYPE];
 			$method = "type{$type}";
@@ -192,13 +192,18 @@ abstract class Model {
 		return true;
 	}
 	
-	private function get($field) {
+	protected function get($field) {
 		if ( isset($this->modelMeta[$field]) ) {
 			return $this->$field;
 		}
 		return NULL;
 	}
 	
+	
+	/**
+	 * PRIVATE METHODS
+	 */
+
 	private function buildSchema() {
 		$reflection = new \ReflectionClass(get_class($this));
 		$propertyList = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
