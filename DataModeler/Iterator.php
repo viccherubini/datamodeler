@@ -119,10 +119,10 @@ class Iterator implements \Iterator {
 					$fetchList[] = $iteratorItem;
 				}
 			}
-			
-			if ( $this->limit > 0 ) {
-				$fetchList = array_slice($fetchList, 0, $this->limit);
-			}
+		}
+		
+		if ( $this->limit > 0 ) {
+			$fetchList = array_slice($fetchList, 0, $this->limit);
 		}
 		
 		$this->filter = array();
