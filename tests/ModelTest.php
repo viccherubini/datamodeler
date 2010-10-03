@@ -181,6 +181,16 @@ class ModelTest extends TestCase {
 		$this->assertEquals($productId, $product->id());
 	}
 	
+	public function testIncr_IncrementsIntegerFieldValueByOne() {
+		$product = new Product;
+		
+		$uses1 = $product->getUses();
+		$product->incr('uses');
+		$uses2 = $product->getUses();
+		
+		$this->assertEquals($uses1, $uses2-1);
+	}
+	
 	public function testIsA_ModelNamesMustBeEqual() {
 		$product1 = new Product;
 		$product2 = new Product;

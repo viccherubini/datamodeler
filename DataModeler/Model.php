@@ -91,6 +91,14 @@ abstract class Model {
 		return $this->$pkey;
 	}
 	
+	public function incr($field) {
+		$value = $this->get($field);
+		if ( is_int($value) ) {
+			$this->set($field, ++$value);
+		}
+		return $this;
+	}
+	
 	public function isA(\DataModeler\Model $model) {
 		return ( $this->table() === $model->table() && $this->modelId() === $model->modelId() );
 	}
