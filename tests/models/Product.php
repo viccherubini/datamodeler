@@ -44,4 +44,6 @@ class Product extends Model {
 	
 	public $store_name = NULL;
 	
+	/** [type INTEGER] */
+	public $uses = 0;
 }
