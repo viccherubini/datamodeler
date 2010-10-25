@@ -92,6 +92,13 @@ class SqlResult {
 		return $iterator;
 	}
 	
+	public function execute($parameters=array()) {
+		$pdoStatement = $this->checkPdoStatement();
+		$executed = $pdoStatement->execute($parameters);
+		
+		return $executed;
+	}
+	
 	public function free() {
 		$this->pdoStatement = NULL;
 	}
