@@ -15,7 +15,7 @@ require_once 'Product.php';
 require_once 'User.php';
 
 class SqlTest extends TestCase {
-	
+
 	public function setUp() {
 		$this->buildPdo();
 	}
@@ -29,288 +29,304 @@ class SqlTest extends TestCase {
 	 */
 	public function testAttachPdo_MustBePdo() {
 		$sql = new Sql;
-		
+
 		$sql->attachPdo(NULL);
 	}
-	
+
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
 	public function testPrepare_RequiresPdo() {
 		$sql = new Sql;
-		
+
 		$sql->prepare($this->buildMockModel());
 	}
-	
+
 	/**
 	 * @dataProvider providerProductWhereClause
 	 */
 	public function testPrepare_ReturnsSqlResult($where) {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
-		$sqlResult = $sql->prepare($this->buildMockProduct(), $where);
-		
+
+		$sqlResult = $sql->prepare($this->buildMockProduct(), NULL, $where);
+
 		$this->assertTrue($sqlResult instanceof \DataModeler\SqlResult);
 	}
-	
+
+	public function testPrepare_SpecifiesFields() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+
+		$sqlResult = $sql->prepare($this->buildMockProduct(), 'product_id, name, price, sku', 'product_id = ?');
+		$this->assertType('\DataModeler\SqlResult', $sqlResult);
+	}
+
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
 	public function testPreparePkey_RequiresPdo() {
 		$sql = new Sql;
-		
+
 		$sql->preparePkey($this->buildMockModel());
 	}
-	
+
 	public function testPreparePkey_ReturnsSqlResult() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$sqlResult = $sql->preparePkey($this->buildMockProduct());
-		
+
 		$this->assertTrue($sqlResult instanceof \DataModeler\SqlResult);
 	}
-	
+
+	public function testPreparePkey_SpecifiesFields() {
+		$sql = new Sql;
+		$sql->attachPdo($this->pdo);
+
+		$sqlResult = $sql->preparePkey($this->buildMockProduct(), 'product_id, name, price, sku');
+		$this->assertType('\DataModeler\SqlResult', $sqlResult);
+	}
+
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
 	public function testSave_RequiresPdo() {
 		$sql = new Sql;
-		
+
 		$sql->save($this->buildMockProduct());
 	}
-	
+
 	/**
 	 * @expectedException PHPUnit_Framework_Error
 	 */
 	public function testSave_RequiresModel() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$sql->save(NULL);
 	}
-	
+
 	public function testSave_PreparesOnceForInsert() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$product = new Product;
 		$product->setName('New Product X1')->setSku('NPX_1');
-		
+
 		$this->assertFalse($product->exists());
-		
+
 		$product = $sql->save($product);
-		
-		
+
+
 		$this->assertEquals(1, $sql->getPrepareCount());
 		$this->assertTrue($product->exists());
 	}
-	
+
 	public function testSave_PreparesOnceForInsertingSimilarModels() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$product1 = new Product;
 		$product1->setName('New Product X')->setSku('NPX_1');
-		
+
 		$product2 = new Product;
 		$product2->setName('New Product Y')->setSku('NPY_1');
-		
+
 		$this->assertFalse($product1->exists());
 		$this->assertFalse($product2->exists());
-		
+
 		$product1 = $sql->save($product1);
 		$product2 = $sql->save($product2);
-		
+
 		$this->assertEquals(1, $sql->getPrepareCount());
 		$this->assertTrue($product1->exists());
 		$this->assertTrue($product2->exists());
 	}
-	
+
 	public function testSave_PreparesOnceForUpdatingSimilarModels() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$product1 = new Product;
 		$product1->id(1);
 		$product1->setName('Product X1')->setPrice(8.99);
-		
+
 		$product2 = new Product;
 		$product2->id(2);
 		$product2->setName('Product X2')->setPrice(10.35);
-		
+
 		$product1 = $sql->save($product1);
 		$product2 = $sql->save($product2);
-		
+
 		$this->assertEquals(1, $sql->getPrepareCount());
 		$this->assertTrue($product1->exists());
 		$this->assertTrue($product2->exists());
 	}
-	
+
 	public function testSave_PreparesOnceForInsertOnceOnUpdateForSameModel() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$product = new Product;
 		$product->setName('New Product X')->setSku('NPX_1');
-		
+
 		$this->assertFalse($product->exists());
-		
+
 		$product = $sql->save($product);
-		
+
 		$this->assertTrue($product->exists());
-		
+
 		$product->setPrice(87.33);
 		$sql->save($product);
-		
+
 		$this->assertEquals(2, $sql->getPrepareCount());
 	}
-	
+
 	public function testSave_PreparesTwiceForInsertingTwoDifferentModels() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$product = new Product;
 		$product->setName('New Product X')->setSku('NPX_1');
-		
+
 		$user = new User;
 		$user->setUsername('leftnode')->setAge(26);
-		
+
 		$this->assertFalse($product->exists());
 		$this->assertFalse($user->exists());
-		
+
 		$product = $sql->save($product);
 		$user = $sql->save($user);
-		
+
 		$this->assertTrue($product->exists());
 		$this->assertTrue($user->exists());
 		$this->assertEquals(2, $sql->getPrepareCount());
 	}
-	
+
 	public function testSave_PreparesTwiceForUpdatingTwoDifferentModels() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$product = new Product;
 		$product->id(1);
 		$product->setName('New Product X')->setSku('NPX_1');
-		
+
 		$user = new User;
 		$user->id(1);
 		$user->setUsername('leftnode')->setAge(26);
-		
+
 		$product = $sql->save($product);
 		$user = $sql->save($user);
-		
+
 		$this->assertTrue($product->exists());
 		$this->assertTrue($user->exists());
 		$this->assertEquals(2, $sql->getPrepareCount());
 	}
-	
+
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
 	public function testSave_ModelMustBeValid() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$product = new Product;
 		$product->setName('New Product X')->setSku('NPX_1');
-		
+
 		$product = $sql->save($product);
-		
+
 		// Update the product once to prepare that query
 		$product->setPrice(18.78);
 		$sql->save($product);
-		
+
 		// Drop the products table so the next update fails
 		$sql->drop($product);
-		
+
 		$product->setPrice(10.99);
 		$sql->save($product);
 	}
-	
+
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
 	public function testDelete_RequiresPdo() {
 		$sql = new Sql;
-		
+
 		$sql->delete($this->buildMockProduct());
 	}
-	
+
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
 	public function testDelete_ModelExists() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$product = new Product;
-		
+
 		$sql->delete($product);
 	}
-	
+
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
 	public function testDelete_TableExists() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$model = $this->buildMockModel('non_existent', 'id');
 		$model->id = 10;
 		$model->id(10);
-		
+
 		$sql->delete($model);
 	}
-	
+
 	public function testDelete_DeletesModel() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$product = new Product;
 		$product->id(1);
-		
+
 		$sql->delete($product);
 	}
-	
+
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
 	public function testDrop_RequiresPdo() {
 		$sql = new Sql;
-		
+
 		$sql->drop($this->buildMockProduct());
 	}
-	
+
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
 	public function testDrop_TableExists() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$sql->drop($this->buildMockModel());
 	}
-	
+
 	public function testDrop_DropsTable() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$sql->drop($this->buildMockProduct());
 	}
-	
+
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
 	public function testQuery_RequiresPdo() {
 		$sql = new Sql;
-		
+
 		$sql->query('SELECT * FROM products');
 	}
-	
+
 	/**
 	 * @expectedException \DataModeler\Exception
 	 * @dataProvider providerInvalidQuery
@@ -318,42 +334,42 @@ class SqlTest extends TestCase {
 	public function testQuery_RequiresValidQuery($query) {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$sql->query($query);
 	}
-	
+
 	/**
 	 * @dataProvider providerValidQuery
 	 */
 	public function testQuery_ReturnsSqlResult($query) {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$sqlResult = $sql->query($query);
 		$this->assertSqlResult($sqlResult);
 	}
-	
+
 	/**
 	 * @expectedException \DataModeler\Exception
 	 */
 	public function testCountOf_RequiresPdo() {
 		$sql = new Sql;
-		
+
 		$sql->countOf($this->buildMockProduct());
 	}
-	
+
 	/**
 	 * @dataProvider providerProductWhereClauseAndParameters
 	 */
 	public function testCountOf_UsesWhere($where, $parameters) {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$countOf = $sql->countOf($this->buildMockProduct(), $where, $parameters);
-		
+
 		$this->assertGreaterThan(0, $countOf);
 	}
-	
+
 	public function _testNow_ReturnsDatetime() {
 		$sql = new Sql;
 		$datetimeRegex = '/^
@@ -364,23 +380,23 @@ class SqlTest extends TestCase {
 			(0[0-9]|[1-5][0-9]):       # Minutes in range 00-59
 			(0[0-9]|[1-5][0-9])        # Seconds in range 00-59
 			$/x';
-			
+
 		$now = $sql->now();
 		$parsedDate = date_parse($now);
 		$this->assertEquals(0, count($parsedDate['errors']));
 		$this->assertEquals(1, preg_match($datetimeRegex, $now));
-		
+
 		$now = $sql->now(-1000);
 		$parsedDate = date_parse($now);
 		$this->assertEquals(0, count($parsedDate['errors']));
 		$this->assertEquals(1, preg_match($datetimeRegex, $now));
-		
+
 		$now = $sql->now(103990239);
 		$parsedDate = date_parse($now);
 		$this->assertEquals(0, count($parsedDate['errors']));
 		$this->assertEquals(1, preg_match($datetimeRegex, $now));
 	}
-	
+
 	public function testNow_ReturnsDate() {
 		$sql = new Sql;
 		$dateRegex = '/^
@@ -388,30 +404,30 @@ class SqlTest extends TestCase {
 			(0[1-9]|1[012])-         # Months in range 01-12
 			(0[1-9]|[12][0-9]|3[01]) # Days in range 01-31
 			$/x';
-		
+
 		$now = $sql->now(0, true);
 		$parsedDate = date_parse($now);
 		$this->assertEquals(0, count($parsedDate['errors']));
 		$this->assertEquals(1, preg_match($dateRegex, $now));
-		
+
 		$now = $sql->now(-1000, true);
 		$parsedDate = date_parse($now);
 		$this->assertEquals(0, count($parsedDate['errors']));
 		$this->assertEquals(1, preg_match($dateRegex, $now));
-		
+
 		$now = $sql->now(103990239, true);
 		$parsedDate = date_parse($now);
 		$this->assertEquals(0, count($parsedDate['errors']));
 		$this->assertEquals(1, preg_match($dateRegex, $now));
 	}
-	
+
 	public function testGetPdo_ReturnsPdoObject() {
 		$sql = new Sql;
 		$sql->attachPdo($this->pdo);
-		
+
 		$this->assertTrue($sql->getPdo() instanceof \PDO);
 	}
-	
+
 	public function providerProductWhereClause() {
 		return array(
 			array('product_id = ?'),
@@ -432,7 +448,7 @@ class SqlTest extends TestCase {
 			array('product_id != ? AND name != ?', array(2, 'Product 1'))
 		);
 	}
-	
+
 	public function providerValidQuery() {
 		return array(
 			array('SELECT * FROM products WHERE product_id > ?'),
@@ -442,7 +458,7 @@ class SqlTest extends TestCase {
 			array('SELECT SUM(o.total) FROM orders o WHERE o.total > 0')
 		);
 	}
-	
+
 	public function providerInvalidQuery() {
 		return array(
 			array('SELECT * FROM products_missing WHERE product_id > ?'),
@@ -453,5 +469,5 @@ class SqlTest extends TestCase {
 			array('SELECT missing_field FROM products WHERE products_price > ? AND product_name != ?')
 		);
 	}
-	
+
 }

@@ -35,14 +35,18 @@ class Sql {
 		return $this;
 	}
 
-	public function prepare(\DataModeler\Model $model, $where=NULL) {
+	public function prepare(\DataModeler\Model $model, $fields='*', $where=NULL) {
 		$pdo = $this->checkPdo();
 
 		if ( !empty($where) ) {
 			$where = "WHERE {$where}";
 		}
 
-		$sql = "SELECT * FROM {$model->table()} {$where}";
+		if ( empty($fields) ) {
+			$fields = '*';
+		}
+
+		$sql = "SELECT {$fields} FROM {$model->table()} {$where}";
 		$statement = $pdo->prepare($sql);
 
 		$this->checkPdoStatement($statement);
