@@ -58,8 +58,8 @@ class Sql {
 		return $sqlResult;
 	}
 
-	public function preparePkey(\DataModeler\Model $model) {
-		return $this->prepare($model, "{$model->pkey()} = ?");
+	public function preparePkey(\DataModeler\Model $model, $fields='*') {
+		return $this->prepare($model, $fields, "{$model->pkey()} = ?");
 	}
 
 	public function save(\DataModeler\Model $model) {
