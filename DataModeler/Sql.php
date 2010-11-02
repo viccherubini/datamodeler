@@ -35,6 +35,27 @@ class Sql {
 		return $this;
 	}
 
+	public function begin() {
+		$pdo = $this->checkPdo();
+		$pdo->beginTransaction();
+
+		return $this;
+	}
+
+	public function commit() {
+		$pdo = $this->checkPdo();
+		$pdo->commit();
+
+		return $this;
+	}
+
+	public function rollback() {
+		$pdo = $this->checkPdo();
+		$pdo->rollBack();
+
+		return $this;
+	}
+
 	public function prepare(\DataModeler\Model $model, $fields='*', $where=NULL) {
 		$pdo = $this->checkPdo();
 
@@ -58,8 +79,8 @@ class Sql {
 		return $sqlResult;
 	}
 
-	public function preparePkey(\DataModeler\Model $model) {
-		return $this->prepare($model, "{$model->pkey()} = ?");
+	public function preparePkey(\DataModeler\Model $model, $fields='*') {
+		return $this->prepare($model, $fields, "{$model->pkey()} = ?");
 	}
 
 	public function save(\DataModeler\Model $model) {
